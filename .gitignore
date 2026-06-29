@@ -1,15 +1,47 @@
+# Virtual environments
 .venv/
-__pycache__/
-*.pyc
+venv/
+env/
 
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Hugging Face
 .cache/
+huggingface/
+
+# Models
 models/
 checkpoints/
-outputs/
-logs/
+weights/
 
-*.pt
+# Datasets
+data/raw/
+data/cache/
+
+# Logs & outputs
+logs/
+outputs/
+results/
+
+# Notebook
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Large model files
 *.bin
+*.pt
+*.pth
+*.ckpt
 *.safetensors
 
+# Environment
 .env

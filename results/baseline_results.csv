@@ -1,0 +1,6 @@
+prompt,accuracy
+expert,0.65
+concise,0.7
+careful,0.65
+board_exam,0.65
+strict,0.7

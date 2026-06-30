@@ -13,7 +13,6 @@ __pycache__/
 huggingface/
 
 # Models
-models/
 checkpoints/
 weights/
 

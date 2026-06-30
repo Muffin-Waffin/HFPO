@@ -16,7 +16,7 @@ from __future__ import annotations
 
 from random import Random
 
-from src.evolution.population import Population
+from src.core.population import Population
 from src.core.prompt_candidate import PromptCandidate
 
 _VALID_RANKING_STRATEGIES: frozenset[str] = frozenset(

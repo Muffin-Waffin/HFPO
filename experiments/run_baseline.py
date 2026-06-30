@@ -1,4 +1,4 @@
-from src.models.loader import load_model
+from src.llms.loader import load_model
 from src.data.loader import load_dataset
 from src.evaluation.scorer import score_prompt
 from src.prompts.baseline import BASELINE_PROMPTS

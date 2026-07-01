@@ -33,6 +33,7 @@ from typing import Any
 
 from configs import config
 from src.core.lineage_tracker import LineageTracker
+from src.core.evaluation_cache import EvaluationCache
 from src.core.population import Population
 from src.core.prompt_candidate import PromptCandidate
 from src.core.seed_prompts import SEED_PROMPTS

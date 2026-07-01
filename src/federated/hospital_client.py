@@ -29,7 +29,7 @@ introduced, since only the `Evaluator` implementation changes, never
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import Any
+from typing import Any,Protocol
 
 from src.evaluation.evaluator import Evaluator
 

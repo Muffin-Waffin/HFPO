@@ -1,19 +1,11 @@
-"""
-src/federated/
- 
-Federated simulation layer for FedGAPrompt.
- 
-Milestone 6A: single-machine simulation (no Flower).
-Milestone 6B: Flower replaces the communication loop in server.py.
-"""
- 
-from .client import FederatedClient
-from .server import FederatedServer
-from .strategy import aggregate_best_prompt
- 
+"""Federated learning components for HFPO."""
+
+from .aggregator import Aggregator
+from .federated_server import FederatedServer
+from .hospital_client import HospitalClient
+
 __all__ = [
-    "FederatedClient",
+    "Aggregator",
     "FederatedServer",
-    "aggregate_best_prompt",
+    "HospitalClient",
 ]
- 

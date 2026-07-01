@@ -161,7 +161,7 @@ class PromptGenerator:
             origin=origin,
             metadata=metadata,
         )
-
+        self._lineage_tracker.register(candidate)
         return PromptGenerationResult(
             candidate=candidate,
             metadata=metadata,

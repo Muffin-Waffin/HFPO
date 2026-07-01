@@ -118,6 +118,19 @@ class _QwenReasoningLLM:
         self._tokenizer = tokenizer
         self._max_new_tokens = max_new_tokens
 
+        print("=" * 80)
+        print("HFPO Evolution")
+        print("=" * 80)
+        print(f"Model: {config.MODEL_NAME}")
+        print(f"Population Size: {config.GA_POPULATION_SIZE}")
+        print(f"Generations: {config.GA_GENERATIONS}")
+        print(f"Tournament Size: {config.GA_TOURNAMENT_SIZE}")
+        print(f"Mutation Rate: {config.GA_MUTATION_RATE}")
+        print(f"Crossover Rate: {config.GA_CROSSOVER_RATE}")
+        print("=" * 80)
+
+        # print(f"Loaded {dataset_name}: {len(dataset)} samples")
+
     def generate(self, prompt: str, temperature: float) -> str:
         """Generates text from a single-turn chat-formatted prompt.
 
@@ -175,17 +188,30 @@ def _build_seed_population(max_population_size: int) -> Population:
         A new Population containing one PromptCandidate per entry in
         SEED_PROMPTS.
     """
+    # seed_candidates = [
+    #     PromptCandidate(
+    #         id=str(uuid.uuid4()),
+    #         text=prompt_text,
+    #         generation=0,
+    #         parent_ids=[],
+    #         ancestry_ids=[],
+    #         origin="seed",
+    #         fitness=None,
+    #     )
+    #     for prompt_text in SEED_PROMPTS
+    # ]
+
     seed_candidates = [
-        PromptCandidate(
-            id=str(uuid.uuid4()),
-            text=prompt_text,
-            generation=0,
-            parent_ids=[],
-            ancestry_ids=[],
-            origin="seed",
-            fitness=None,
-        )
-        for prompt_text in SEED_PROMPTS
+    PromptCandidate(
+        id=str(uuid.uuid4()),
+        text=prompt_text,
+        generation=0,
+        parent_ids=[],
+        ancestry_ids=[],
+        origin="seed",
+        fitness=None,
+    )
+    for prompt_text in SEED_PROMPTS
     ]
 
     return Population(
@@ -214,6 +240,29 @@ def main() -> None:
         for dataset_name in HOSPITAL_DATASET_NAMES
     ]
 
+    # hospitals = []
+
+    # for dataset_name in HOSPITAL_DATASET_NAMES:
+    #     dataset = load_dataset(dataset_name, split=DATASET_SPLIT)
+
+    #     # ---------------- Debug mode ----------------
+    #     if hasattr(dataset, "select"):
+    #         dataset = dataset.select(range(min(10, len(dataset))))
+    #     else:
+    #         dataset = dataset[:10]
+    #     # --------------------------------------------
+
+    #     hospitals.append(
+    #         HospitalClient(
+    #             hospital_id=dataset_name,
+    #             dataset=dataset,
+    #             evaluator=QwenEvaluator(
+    #                 model=model,
+    #                 tokenizer=tokenizer,
+    #             ),
+    #         )
+    #     )
+
     aggregator = Aggregator()
     evaluation_cache = EvaluationCache()
     lineage_tracker = LineageTracker()
@@ -229,6 +278,8 @@ def main() -> None:
     )
 
     population = _build_seed_population(config.GA_POPULATION_SIZE)
+    for candidate in population:
+        lineage_tracker.register(candidate)
 
     prompt_generator = PromptGenerator(
         llm=llm,

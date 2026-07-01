@@ -141,15 +141,46 @@ class HospitalClient:
             An `EvaluationRecord` describing this hospital's evaluation of
             the prompt.
         """
+        import time
+
+        start = time.perf_counter()
+        print(
+        f"[{self.hospital_id}] "
+        f"Evaluating prompt {prompt.id[:8]}"
+        )
         num_correct = 0
         num_total = 0
 
-        for sample in self.dataset:
+        for index, sample in enumerate(self.dataset, start=1):
+
+            if index == 1:
+                print(
+                    f"[{self.hospital_id}] "
+                    f"Started evaluating prompt {prompt.id[:8]}"
+                )
+
+            if index % 100 == 0:
+                print(
+                    f"[{self.hospital_id}] "
+                    f"Prompt {prompt.id[:8]}: "
+                    f"{index}/{len(self.dataset)} samples"
+                )
+
             num_correct += self.evaluator.score_sample(prompt.text, sample)
             num_total += 1
-
+        print(
+            f"[{self.hospital_id}] "
+            f"Finished prompt {prompt.id[:8]}"
+        )
         evaluation_score = num_correct / num_total if num_total > 0 else 0.0
+        elapsed = time.perf_counter() - start
 
+        print(
+            f"[{self.hospital_id}] "
+            f"Finished prompt {prompt.id[:8]} "
+            f"in {elapsed:.1f}s "
+            f"({num_correct}/{num_total})"
+        )
         return EvaluationRecord(
             prompt_id=prompt.id,
             hospital_id=self.hospital_id,

@@ -134,7 +134,42 @@ class LineageTracker:
                 f"in the LineageTracker."
             )
         return list(self._parents[prompt_id])
+    def build_ancestry(self, parent_ids: list[str]) -> list[str]:
+        """Construct the ancestry chain for a newly created prompt.
 
+        Combines the ancestry chains of the supplied parents with the
+        parents themselves to produce the ancestry chain that should be
+        stored in a newly created PromptCandidate.
+
+        Args:
+            parent_ids: The direct parent IDs of the new prompt.
+
+        Returns:
+            A list of ancestor IDs ordered from oldest ancestor to newest,
+            followed by the direct parent IDs. Duplicate IDs are removed
+            while preserving order.
+
+        Raises:
+            ValueError: If any parent ID is empty or whitespace.
+            KeyError: If any parent has not been registered.
+        """
+        ancestry_ids: list[str] = []
+
+        for parent_id in parent_ids:
+            self._validate_prompt_id(parent_id)
+
+            if parent_id not in self._nodes:
+                raise KeyError(
+                    f"PromptCandidate with id '{parent_id}' is not registered "
+                    f"in the LineageTracker."
+                )
+
+            ancestry_ids.extend(self._nodes[parent_id].ancestry_ids)
+            ancestry_ids.append(parent_id)
+
+        # Remove duplicates while preserving insertion order.
+        return list(dict.fromkeys(ancestry_ids))
+    
     def ancestry(self, prompt_id: str) -> list[str]:
         """Return the complete ancestry chain of a prompt.
 

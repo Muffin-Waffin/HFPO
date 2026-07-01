@@ -148,6 +148,7 @@ class FederatedServer:
     def evaluate_population(
         self, population: list[PromptCandidate]
     ) -> list[PromptCandidate]:
+        print(f"Evaluating {len(population)} prompts...")
         """Evaluate a population of prompts via federated evaluation.
 
         For every prompt, first consults the `EvaluationCache` using the
@@ -184,7 +185,11 @@ class FederatedServer:
             )
 
         uncached_prompts: list[PromptCandidate] = []
-
+        print(
+            f"Federated evaluation: "
+            f"{len(population)} prompts "
+            f"across {len(self.hospitals)} hospitals."
+        )
         for prompt in population:
             cached_fitness = self._evaluation_cache.get(
                 prompt.text,
@@ -197,9 +202,13 @@ class FederatedServer:
                 prompt.fitness = cached_fitness
             else:
                 uncached_prompts.append(prompt)
-
+        print(
+            f"Cache hits: {len(population) - len(uncached_prompts)} | "
+            f"Need evaluation: {len(uncached_prompts)}"
+        )
         if uncached_prompts:
             per_hospital_records = self.broadcast(uncached_prompts)
+            print("Broadcast complete.")
 
             if len(per_hospital_records) != len(self._hospitals):
                 raise RuntimeError(
@@ -239,8 +248,9 @@ class FederatedServer:
                 )
 
         self.register_population(population)
-
+        print("Federated evaluation complete.")
         return population
+
 
     def broadcast(
         self, population: list[PromptCandidate]

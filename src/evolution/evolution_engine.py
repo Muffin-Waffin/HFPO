@@ -175,6 +175,7 @@ class EvolutionEngine:
     # ------------------------------------------------------------------
 
     def run(self) -> Population:
+        print("\nStarting Evolution...\n")
         """Executes the complete HFPO evolutionary optimization run.
 
         This is the only public execution method on EvolutionEngine.
@@ -203,18 +204,35 @@ class EvolutionEngine:
                 candidate is left without a FitnessVector.
         """
         self._initialize()
-
         for generation in range(self._num_generations):
+            print(f"\n{'=' * 80}")
+            print(f"Generation {generation + 1}/{self._num_generations}")
+            print(f"{'=' * 80}")
+
             generation_start = time.perf_counter()
 
+            print("Evaluating population...")
             evaluated_population = self._evaluate_population(generation)
 
-            elites = self._select_elites(evaluated_population)
+            best = max(
+                evaluated_population,
+                key=lambda p: p.fitness.average(),
+            )
 
+            print(
+                f"Evaluation complete | "
+                f"Best fitness: {best.fitness.average():.4f}"
+            )
+
+            elites = self._select_elites(evaluated_population)
+            print(f"Selected {len(elites)} elites.")
+
+            print("Generating offspring...")
             offspring = self._generate_offspring(
                 elites,
                 generation,
             )
+            print(f"Generated {len(offspring)} offspring.")
 
             elapsed_time_seconds = (
                 time.perf_counter() - generation_start
@@ -226,17 +244,19 @@ class EvolutionEngine:
                 elapsed_time_seconds,
             )
 
+            print("Saving generation snapshot...")
             self._save_outputs(snapshot)
 
+            print("Building next population...")
             self._population = self._build_next_population(
                 elites,
                 offspring,
             )
 
-            self._save_outputs(snapshot)
-
-        return self._population
-
+            print(
+                f"Generation {generation + 1} completed "
+                f"in {elapsed_time_seconds:.2f} seconds."
+            )
     # ------------------------------------------------------------------
     # Private orchestration helpers
     # ------------------------------------------------------------------
@@ -432,6 +452,7 @@ class EvolutionEngine:
     def _generate_offspring(
         self, elites: list[PromptCandidate], generation: int
     ) -> list[PromptCandidate]:
+        
         """Generates offspring candidates via the PromptGenerator.
 
         Produces enough offspring that ``len(elites) + len(offspring)``
@@ -488,6 +509,7 @@ class EvolutionEngine:
             raise ValueError("generation must be non-negative.")
 
         offspring: list[PromptCandidate] = []
+        print(f"Generating {offspring_needed} offspring...")
         offspring_needed = self._population.max_population_size - len(elites)
         existing_prompt_texts=set(self._population.texts())
         for _ in range(offspring_needed):
@@ -520,7 +542,11 @@ class EvolutionEngine:
 
             result = self._prompt_generator.generate(request)
             offspring.append(result.candidate)
-
+            print(
+                f"Generated offspring "
+                f"{len(offspring)}/{offspring_needed}"
+            )
+        print("Offspring generation complete.")
         return offspring
 
     def _select_distinct_second_parent(

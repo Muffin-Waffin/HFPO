@@ -51,6 +51,8 @@ from src.federated.aggregator import Aggregator
 from src.federated.federated_server import FederatedServer
 from src.federated.hospital_client import HospitalClient
 from src.llms.loader import load_model
+import random
+
 
 # ---------------------------------------------------------------------------
 # Experiment-level configuration.
@@ -231,14 +233,37 @@ def main() -> None:
         max_new_tokens=config.MAX_NEW_TOKENS,
     )
 
-    hospitals = [
-        HospitalClient(
-            hospital_id=dataset_name,
-            dataset=load_dataset(dataset_name, split=DATASET_SPLIT),
-            evaluator=QwenEvaluator(model=model, tokenizer=tokenizer),
+    import random
+    hospitals = []
+
+    for dataset_name in HOSPITAL_DATASET_NAMES:
+        dataset = load_dataset(dataset_name, split=DATASET_SPLIT)
+
+        if len(dataset) > config.EVALUATION_SUBSET_SIZE:
+            random.seed(config.RANDOM_SEED)
+
+            indices = random.sample(
+                range(len(dataset)),
+                config.EVALUATION_SUBSET_SIZE,
+            )
+
+            if hasattr(dataset, "select"):
+                dataset = dataset.select(indices)
+            else:
+                dataset = [dataset[i] for i in indices]
+
+        print(f"{dataset_name}: using {len(dataset)} evaluation samples")
+
+        hospitals.append(
+            HospitalClient(
+                hospital_id=dataset_name,
+                dataset=dataset,
+                evaluator=QwenEvaluator(
+                    model=model,
+                    tokenizer=tokenizer,
+                ),
+            )
         )
-        for dataset_name in HOSPITAL_DATASET_NAMES
-    ]
 
     # hospitals = []
 

@@ -11,10 +11,17 @@ All specialized work is delegated to injected collaborator
 components; EvolutionEngine's sole responsibility is to call those
 collaborators in the correct order.
 
-This is Stage 1 of the EvolutionEngine implementation: it establishes
-the orchestration architecture only. Every private helper method
-raises ``NotImplementedError`` and will be filled in during later
-implementation stages.
+Stage 1 established the orchestration architecture: ``run()`` calls
+every private helper in the correct order, but each helper raised
+``NotImplementedError``. Stage 2 implemented ``_initialize()``,
+``_evaluate_population()``, ``_generation_statistics()``,
+``_create_snapshot()``, and ``_save_outputs()``, making the engine
+capable of executing generation 0 end-to-end. Stage 3 implements
+``_select_elites()``, ``_generate_offspring()``, and
+``_build_next_population()``, and updates ``run()`` to perform the
+complete evolutionary loop across ``_num_generations`` generations:
+evaluate, snapshot, persist, select elites, generate offspring, and
+replace the population, each generation.
 """
 
 from __future__ import annotations
@@ -28,6 +35,7 @@ from src.evolution.elitism import Elitism
 from src.evolution.generation_snapshot import GenerationSnapshot
 from src.evolution.output_manager import OutputManager
 from src.evolution.prompt_generator.generator import PromptGenerator
+from src.evolution.prompt_generator.models import PromptGenerationRequest
 from src.evolution.tournament_selector import TournamentSelector
 from src.federated.federated_server import FederatedServer
 
@@ -44,16 +52,12 @@ class EvolutionEngine:
     computation, or persistence; it only sequences calls to the
     components that do.
 
-    Stage 1 established this orchestration structure. Stage 2 fills in
-    ``_initialize()``, ``_evaluate_population()``,
-    ``_generation_statistics()``, ``_create_snapshot()``, and
-    ``_save_outputs()``, making the engine capable of executing
-    generation 0 end-to-end: initializing, evaluating the population
-    via the federated server, computing reporting statistics,
-    building a snapshot, and persisting it. ``_select_elites()``,
-    ``_generate_offspring()``, and ``_build_next_population()`` still
-    raise ``NotImplementedError``; no evolutionary loop runs yet, and
-    ``run()`` executes exactly one generation before returning.
+    Stage 3 completes the evolutionary loop: ``_select_elites()``
+    delegates to ``_elitism``, ``_generate_offspring()`` delegates to
+    ``_tournament_selector`` and ``_prompt_generator``, and
+    ``_build_next_population()`` assembles the next generation's
+    ``Population``. ``run()`` executes this full cycle once per
+    generation, for ``_num_generations`` generations.
 
     Attributes:
         _population: The current Population under optimization.
@@ -68,7 +72,9 @@ class EvolutionEngine:
         _output_manager: Persistence utility used to write snapshots,
             best-prompt reports, summaries, and checkpoints.
         _num_generations: Total number of generations to run.
-            used to construct per-generation snapshots.
+        _task_description: Description of the task every generated
+            prompt must address.
+        _temperature: Sampling temperature used for prompt generation.
     """
 
     __slots__ = (
@@ -79,6 +85,8 @@ class EvolutionEngine:
         "_prompt_generator",
         "_output_manager",
         "_num_generations",
+        "_task_description",
+        "_temperature",
     )
 
     def __init__(
@@ -90,6 +98,8 @@ class EvolutionEngine:
         prompt_generator: PromptGenerator,
         output_manager: OutputManager,
         num_generations: int,
+        task_description: str,
+        temperature: float = 0.7,
     ) -> None:
         """Initializes the EvolutionEngine with all required collaborators.
 
@@ -110,11 +120,20 @@ class EvolutionEngine:
                 outputs.
             num_generations: Total number of generations to run. Must
                 be a positive integer.
+            task_description: Description of the task every generated
+                prompt must address, passed through to every
+                ``PromptGenerationRequest``. Must not be empty.
+            temperature: Sampling temperature passed through to every
+                ``PromptGenerationRequest``. Must be non-negative.
+                Defaults to 0.7.
 
         Raises:
             TypeError: If any collaborator is not an instance of its
-                if ``num_generations`` is not an integer.
-            ValueError: If ``num_generations`` is not positive.
+                expected type, if ``num_generations`` is not an
+                integer, or if ``task_description`` is not a string.
+            ValueError: If ``num_generations`` is not positive, if
+                ``task_description`` is empty or whitespace, or if
+                ``temperature`` is negative.
         """
         if not isinstance(population, Population):
             raise TypeError("population must be a Population instance.")
@@ -132,6 +151,14 @@ class EvolutionEngine:
             raise TypeError("num_generations must be an integer.")
         if num_generations <= 0:
             raise ValueError("num_generations must be positive.")
+        if not isinstance(task_description, str):
+            raise TypeError("task_description must be a string.")
+        if not task_description.strip():
+            raise ValueError("task_description must not be empty.")
+        if temperature < 0:
+            raise ValueError(
+                f"temperature must be >= 0, got {temperature}."
+            )
 
         self._population = population
         self._federated_server = federated_server
@@ -140,69 +167,82 @@ class EvolutionEngine:
         self._prompt_generator = prompt_generator
         self._output_manager = output_manager
         self._num_generations = num_generations
+        self._task_description = task_description
+        self._temperature = temperature
 
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
 
     def run(self) -> Population:
-        """Executes generation 0 of the HFPO evolutionary optimization run.
+        """Executes the complete HFPO evolutionary optimization run.
 
         This is the only public execution method on EvolutionEngine.
-        Stage 2 wires together the portion of the orchestration flow
-        needed to fully process one generation:
+        For each of ``_num_generations`` generations, it:
 
-            initialize
-            -> evaluate population (via FederatedServer)
-            -> compute generation statistics
-            -> create a GenerationSnapshot
-            -> persist outputs (via OutputManager)
-            -> return population
+            1. evaluates the population via the federated server
+            2. computes generation statistics
+            3. creates a GenerationSnapshot
+            4. persists outputs via the OutputManager
+            5. selects elites
+            6. generates offspring
+            7. builds the next population and replaces ``_population``
 
-        No evolutionary operations run yet: elitism, tournament
-        selection, offspring generation, and population replacement
-        are not invoked in Stage 2, so ``run()`` always completes
-        after generation 0 rather than looping for
-        ``_num_generations`` generations.
+        After the final generation, returns the resulting population.
 
         Returns:
-            The Population that was evaluated, unchanged. (Population
-            replacement is not implemented until a later stage.)
+            The final Population after all ``_num_generations``
+            generations have run.
 
         Raises:
             ValueError: If the engine's initial state is invalid (see
-                ``_initialize()``).
-            RuntimeError: Propagated from ``_federated_server`` if
-                evaluation fails (e.g. a candidate is left without a
-                FitnessVector).
+                ``_initialize()``), or propagated from any
+                collaborator for invalid intermediate state.
+            RuntimeError: Propagated from ``_federated_server`` or
+                ``_generation_statistics()`` if evaluation fails or a
+                candidate is left without a FitnessVector.
         """
         self._initialize()
 
-        start_time = time.perf_counter()
-        evaluated_population = self._evaluate_population()
-        elapsed_time_seconds = time.perf_counter() - start_time
+        for generation in range(self._num_generations):
+            generation_start = time.perf_counter()
 
-        generation_statistics = self._generation_statistics(evaluated_population)
-        snapshot = self._create_snapshot(
-            generation=0,
-            population=evaluated_population,
-            statistics=generation_statistics,
-            elapsed_time_seconds=elapsed_time_seconds,
-        )
-        self._save_outputs(snapshot)
+            evaluated_population = self._evaluate_population(generation)
+
+            elites = self._select_elites(evaluated_population)
+
+            offspring = self._generate_offspring(
+                elites,
+                generation,
+            )
+
+            elapsed_time_seconds = (
+                time.perf_counter() - generation_start
+            )
+
+            snapshot = self._create_snapshot(
+                generation,
+                evaluated_population,
+                elapsed_time_seconds,
+            )
+
+            self._save_outputs(snapshot)
+
+            self._population = self._build_next_population(
+                elites,
+                offspring,
+            )
+
+            self._save_outputs(snapshot)
 
         return self._population
 
     # ------------------------------------------------------------------
     # Private orchestration helpers
-    # (Stage 2: _initialize, _evaluate_population, _generation_statistics,
-    # _create_snapshot, and _save_outputs are implemented below.
-    # _select_elites, _generate_offspring, and _build_next_population
-    # remain Stage 1 stubs that raise NotImplementedError.)
     # ------------------------------------------------------------------
 
     def _initialize(self) -> None:
-        """Validates the engine's state before generation 0 runs.
+        """Validates the engine's state before the generational loop runs.
 
         Confirms that the current population is non-empty and that
         the engine is configured to run at least one generation.
@@ -227,7 +267,7 @@ class EvolutionEngine:
                 f"{self._num_generations}."
             )
 
-    def _evaluate_population(self) -> list[PromptCandidate]:
+    def _evaluate_population(self, generation: int) -> list[PromptCandidate]:
         """Evaluates the current population via the federated server.
 
         Delegates entirely to
@@ -237,70 +277,93 @@ class EvolutionEngine:
         and lineage registration; this method simply invokes it and
         returns its result unchanged.
 
+        Args:
+            generation: The zero-indexed generation currently being
+                evaluated. Must be a non-negative integer. Not used to
+                select which population is evaluated -- the engine
+                always evaluates ``self._population`` -- but validated
+                here since it identifies which generation this
+                evaluation round belongs to for the caller.
+
         Returns:
             The list of ``PromptCandidate`` objects from the current
             population, each with its ``fitness`` attribute populated
             by ``_federated_server``.
 
         Raises:
-            ValueError: Propagated from ``_federated_server`` if the
-                population is empty.
+            TypeError: If ``generation`` is not an integer.
+            ValueError: If ``generation`` is negative, or propagated
+                from ``_federated_server`` if the population is empty.
             RuntimeError: Propagated from ``_federated_server`` if
                 federated evaluation fails (e.g. a mismatched response
                 count or a candidate left without a FitnessVector).
         """
+        if not isinstance(generation, int) or isinstance(generation, bool):
+            raise TypeError("generation must be an integer.")
+        if generation < 0:
+            raise ValueError("generation must be non-negative.")
+
         return self._federated_server.evaluate_population(list(self._population))
 
     def _create_snapshot(
         self,
         generation: int,
-        population: list[PromptCandidate],
-        statistics: tuple[PromptCandidate, float, float, float],
+        fitness_results: list[PromptCandidate],
         elapsed_time_seconds: float,
     ) -> GenerationSnapshot:
         """Builds a GenerationSnapshot summarizing one generation.
 
-        Combines the evaluated population, the generation index, the
-        aggregate statistics produced by ``_generation_statistics()``,
-        and the measured wall-clock time into a single
+        Computes this generation's reporting statistics via
+        ``_generation_statistics()`` and combines them with the
+        evaluated population, the generation index, and the measured
+        wall-clock time into a single ``GenerationSnapshot``. This
+        method performs no domain validation of its own (e.g. score
+        ranges or population membership); ``GenerationSnapshot``'s own
+        ``__post_init__`` already enforces those invariants, and any
+        violation propagates from there rather than being duplicated
+        here.
 
         Args:
             generation: The zero-indexed generation this snapshot
                 describes.
-            population: The evaluated population for this generation,
-                as returned by ``_evaluate_population()``.
-            statistics: The ``(best_candidate, best_score,
-                average_score, worst_score)`` tuple produced by
-                ``_generation_statistics()``.
+            fitness_results: The evaluated population for this
+                generation, as returned by ``_evaluate_population()``.
             elapsed_time_seconds: The wall-clock time taken to
                 evaluate this generation, in seconds.
 
+        Returns:
+            A new ``GenerationSnapshot`` describing this generation.
 
         Raises:
-            TypeError: If ``generation`` is not an integer, if
-                ``population`` is not a list, or if ``statistics`` is
-                not a 4-tuple.
+            TypeError: If ``generation`` is not an integer, or if
+                ``fitness_results`` is not a list.
+            ValueError: If ``generation`` is negative, or propagated
+                from ``_generation_statistics()`` /
+                ``GenerationSnapshot`` if any field violates its
+                invariants (e.g. an out-of-range score, an empty
+                population, or a generation/population mismatch).
+            RuntimeError: Propagated from ``_generation_statistics()``
+                if any candidate has no ``FitnessVector``.
         """
         if not isinstance(generation, int) or isinstance(generation, bool):
             raise TypeError("generation must be an integer.")
-        if not isinstance(population, list):
-            raise TypeError("population must be a list of PromptCandidate.")
-        if not isinstance(statistics, tuple) or len(statistics) != 4:
-            raise TypeError(
-                "statistics must be a 4-tuple of (best_candidate, "
-                "best_score, average_score, worst_score)."
-            )
+        if generation < 0:
+            raise ValueError("generation must be non-negative.")
+        if not isinstance(fitness_results, list):
+            raise TypeError("fitness_results must be a list of PromptCandidate.")
 
-        best_candidate, best_score, average_score, worst_score = statistics
+        best_candidate, best_score, average_score, worst_score = (
+            self._generation_statistics(fitness_results)
+        )
 
         return GenerationSnapshot(
             generation=generation,
-            population=population,
+            population=fitness_results,
             best_candidate=best_candidate,
             best_score=best_score,
             average_score=average_score,
             worst_score=worst_score,
-            population_size=len(population),
+            population_size=len(fitness_results),
             elapsed_time_seconds=elapsed_time_seconds,
         )
 
@@ -313,20 +376,19 @@ class EvolutionEngine:
         method performs no file I/O itself.
 
         Args:
-            snapshot: The GenerationSnapshot to persist. Must be an
-                instance of ``_snapshot_class``.
+            snapshot: The GenerationSnapshot to persist.
 
         Raises:
-            TypeError: If ``snapshot`` is not an instance of
-                ``_snapshot_class``, or propagated from
-                ``_output_manager`` if ``snapshot.best_candidate`` is
-                not a valid PromptCandidate.
+            TypeError: If ``snapshot`` is not a ``GenerationSnapshot``,
+                or propagated from ``_output_manager`` if
+                ``snapshot.best_candidate`` is not a valid
+                PromptCandidate.
             ValueError: Propagated from ``_output_manager`` if
                 ``snapshot.best_candidate.generation`` is negative.
         """
         if not isinstance(snapshot, GenerationSnapshot):
             raise TypeError(
-                f"snapshot must be a GenerationSnapshot."
+                "snapshot must be a GenerationSnapshot."
             )
 
         self._output_manager.save_snapshot(snapshot)
@@ -335,42 +397,64 @@ class EvolutionEngine:
     def _select_elites(self, fitness_results: Any) -> list[PromptCandidate]:
         """Selects elite candidates to carry forward unmodified.
 
-        Intended to delegate to ``_elitism`` (and/or
-        ``_tournament_selector``) to choose the top-performing
-        candidates from the current generation, using
-        ``fitness_results`` to rank them. No selection logic is
-        implemented in Stage 1.
+        Delegates entirely to
+        ``self._elitism.select_elites(self._population)``. Since
+        federated evaluation mutates each ``PromptCandidate`` in place
+        (setting its ``fitness`` attribute), the candidates referenced
+        by ``self._population`` are already evaluated by the time this
+        method runs; ``fitness_results`` is accepted only to keep
+        ``run()``'s call signature symmetric with the other
+        per-generation steps and is not otherwise used. This method
+        computes no scores and performs no ranking itself; that logic
+        belongs entirely to ``Elitism``.
 
         Args:
-            fitness_results: The fitness data produced by
+            fitness_results: The evaluated population produced by
                 ``_evaluate_population()`` for the current generation.
                 Must not be ``None``.
 
         Returns:
-            This method does not return in Stage 1; it always raises.
+            The elite ``PromptCandidate`` objects selected by
+            ``_elitism``, ordered from highest to lowest fitness.
 
         Raises:
-            ValueError: If ``fitness_results`` is ``None``.
-            NotImplementedError: Always, in Stage 1, once validation
-                passes.
+            ValueError: If ``fitness_results`` is ``None``, or
+                propagated from ``_elitism`` if the population is
+                empty or smaller than its configured elite count.
+            RuntimeError: Propagated from ``_elitism`` if any
+                candidate has no ``FitnessVector``.
         """
         if fitness_results is None:
             raise ValueError("fitness_results must not be None.")
 
-        raise NotImplementedError(
-            "_select_elites() will be implemented in a later HFPO stage."
-        )
+        return self._elitism.select_elites(self._population)
 
     def _generate_offspring(
         self, elites: list[PromptCandidate], generation: int
     ) -> list[PromptCandidate]:
         """Generates offspring candidates via the PromptGenerator.
 
-        Intended to delegate to ``_prompt_generator`` to produce new
-        candidate prompts (via LLM-guided mutation/crossover) from the
-        selected elites, tagging offspring with the appropriate
-        generation and lineage metadata. No generation logic is
-        implemented in Stage 1.
+        Produces enough offspring that ``len(elites) + len(offspring)``
+        equals ``self._population.max_population_size``. For each
+        offspring, obtains parents from ``_tournament_selector`` (two
+        distinct parents when the population has at least two
+        members, one parent otherwise), builds a
+        ``PromptGenerationRequest``, and delegates the actual
+        mutation/crossover work to ``_prompt_generator.generate()``.
+        This method performs no mutation or crossover itself; it only
+        constructs requests and delegates.
+
+        ``TournamentSelector.select_parents()`` runs independent
+        tournaments with replacement, so two calls can legitimately
+        return the same winning candidate. ``PromptGenerationRequest``
+        forbids ``parent_b`` sharing an ID with ``parent_a``, so for
+        crossover offspring this method re-selects ``parent_b`` until
+        it differs from ``parent_a``, bounded by
+        ``len(self._population)`` attempts. Neither
+        ``TournamentSelector`` nor ``PromptGenerationRequest`` is
+        modified to accommodate this; the responsibility for
+        guaranteeing distinct crossover parents belongs to
+        ``EvolutionEngine``.
 
         Args:
             elites: The elite candidates selected by
@@ -379,14 +463,22 @@ class EvolutionEngine:
                 being produced for. Must be a non-negative integer.
 
         Returns:
-            This method does not return in Stage 1; it always raises.
+            A list of newly generated ``PromptCandidate`` objects,
+            with length equal to
+            ``self._population.max_population_size - len(elites)``.
 
         Raises:
             TypeError: If ``generation`` is not an integer.
             ValueError: If ``elites`` is ``None`` or ``generation`` is
-                negative.
-            NotImplementedError: Always, in Stage 1, once validation
-                passes.
+                negative, or propagated from
+                ``PromptGenerationRequest`` / ``_tournament_selector``
+                / ``_prompt_generator`` for invalid intermediate
+                state.
+            RuntimeError: If no ``parent_b`` distinct from
+                ``parent_a`` can be found within
+                ``len(self._population)`` attempts, or propagated from
+                ``_tournament_selector`` if any sampled candidate has
+                no ``FitnessVector``.
         """
         if elites is None:
             raise ValueError("elites must not be None.")
@@ -395,8 +487,80 @@ class EvolutionEngine:
         if generation < 0:
             raise ValueError("generation must be non-negative.")
 
-        raise NotImplementedError(
-            "_generate_offspring() will be implemented in a later HFPO stage."
+        offspring: list[PromptCandidate] = []
+        offspring_needed = self._population.max_population_size - len(elites)
+        existing_prompt_texts=set(self._population.texts())
+        for _ in range(offspring_needed):
+            if len(self._population) >= 2:
+                parent_a = self._tournament_selector.select_parents(
+                    self._population,
+                    1,
+                )[0]
+                parent_b = self._select_distinct_second_parent(parent_a)
+                request = PromptGenerationRequest(
+                    parent_a=parent_a,
+                    parent_b=parent_b,
+                    generation=self._population.generation + 1,
+                    task_description=self._task_description,
+                    temperature=self._temperature,
+                    existing_prompt_texts=existing_prompt_texts)
+            else:
+                parent = self._tournament_selector.select_parents(
+                    self._population,
+                    1,
+                )[0]
+                request = PromptGenerationRequest(
+                    parent_a=parent,
+                    parent_b=None,
+                    generation=self._population.generation + 1,
+                    task_description=self._task_description,
+                    temperature=self._temperature,
+                    existing_prompt_texts=existing_prompt_texts,
+                )
+
+            result = self._prompt_generator.generate(request)
+            offspring.append(result.candidate)
+
+        return offspring
+
+    def _select_distinct_second_parent(
+        self, parent_a: PromptCandidate
+    ) -> PromptCandidate:
+        """Selects a second crossover parent distinct from ``parent_a``.
+
+        Repeatedly runs ``_tournament_selector.select_parents()`` for
+        a single winner until one is found whose ID differs from
+        ``parent_a.id``, bounded by ``len(self._population)`` attempts.
+        This exists because ``TournamentSelector`` samples with
+        replacement across independent tournaments and may legitimately
+        return the same candidate twice, while
+        ``PromptGenerationRequest`` forbids a crossover request whose
+        two parents share an ID.
+
+        Args:
+            parent_a: The first crossover parent, already selected.
+
+        Returns:
+            A ``PromptCandidate`` whose ID differs from
+            ``parent_a.id``.
+
+        Raises:
+            RuntimeError: If no distinct candidate is found within
+                ``len(self._population)`` attempts.
+        """
+        max_attempts = len(self._population)
+
+        for _ in range(max_attempts):
+            candidate = self._tournament_selector.select_parents(
+                self._population,
+                1,
+            )[0]
+            if candidate.id != parent_a.id:
+                return candidate
+
+        raise RuntimeError(
+            "Could not find a second crossover parent distinct from "
+            f"'{parent_a.id}' after {max_attempts} attempts."
         )
 
     def _build_next_population(
@@ -406,10 +570,10 @@ class EvolutionEngine:
     ) -> Population:
         """Assembles the next generation's Population.
 
-        Intended to combine ``elites`` and ``offspring`` into a new
-        ``Population`` instance that replaces ``_population`` for the
-        next generation. No population-management logic is
-        implemented in Stage 1.
+        Combines ``elites`` and ``offspring`` into a brand-new
+        ``Population`` instance with an incremented generation index.
+        The existing ``self._population`` is not modified; a new
+        instance is constructed and returned for the caller to assign.
 
         Args:
             elites: The elite candidates preserved from the current
@@ -418,24 +582,29 @@ class EvolutionEngine:
                 ``_generate_offspring()``. Must not be ``None``.
 
         Returns:
-            This method does not return in Stage 1; it always raises.
+            A new ``Population`` containing ``elites + offspring``, at
+            generation ``self._population.generation + 1``, with the
+            same ``max_population_size`` as the current population.
 
         Raises:
-            ValueError: If ``elites`` or ``offspring`` is ``None``.
-            NotImplementedError: Always, in Stage 1, once validation
-                passes.
+            ValueError: If ``elites`` or ``offspring`` is ``None``, or
+                propagated from ``Population`` if the combined list is
+                empty, exceeds ``max_population_size``, or contains
+                duplicate candidate IDs.
         """
         if elites is None:
             raise ValueError("elites must not be None.")
         if offspring is None:
             raise ValueError("offspring must not be None.")
 
-        raise NotImplementedError(
-            "_build_next_population() will be implemented in a later HFPO stage."
+        return Population(
+            prompts=elites + offspring,
+            generation=self._population.generation + 1,
+            max_population_size=self._population.max_population_size,
         )
 
     def _generation_statistics(
-        self, evaluated_population: list[PromptCandidate]
+        self, fitness_results: list[PromptCandidate]
     ) -> tuple[PromptCandidate, float, float, float]:
         """Computes reporting statistics for an evaluated generation.
 
@@ -446,13 +615,12 @@ class EvolutionEngine:
         strategies govern *selection*, while this method governs what
         gets *reported* in the generation snapshot and is not
         configurable at this stage. Performs no file writing and does
-        not mutate ``evaluated_population``.
+        not mutate ``fitness_results``.
 
         Args:
-            evaluated_population: The list of evaluated
-                ``PromptCandidate`` objects returned by
-                ``_evaluate_population()``. Each must have a non-None
-                ``fitness``.
+            fitness_results: The list of evaluated ``PromptCandidate``
+                objects returned by ``_evaluate_population()``. Each
+                must have a non-None ``fitness``.
 
         Returns:
             A 4-tuple of ``(best_candidate, best_score, average_score,
@@ -462,36 +630,29 @@ class EvolutionEngine:
             minimum of every candidate's ``FitnessVector.average()``.
 
         Raises:
-            TypeError: If ``evaluated_population`` is not a list.
-            ValueError: If ``evaluated_population`` is empty.
+            TypeError: If ``fitness_results`` is not a list.
+            ValueError: If ``fitness_results`` is empty.
             RuntimeError: If any candidate has no ``FitnessVector``.
         """
-        if not isinstance(evaluated_population, list):
-            raise TypeError("evaluated_population must be a list of PromptCandidate.")
-        if not evaluated_population:
-            raise ValueError("evaluated_population must not be empty.")
+        if not isinstance(fitness_results, list):
+            raise TypeError("fitness_results must be a list of PromptCandidate.")
+        if not fitness_results:
+            raise ValueError("fitness_results must not be empty.")
 
         average_scores: list[float] = []
-        for candidate in evaluated_population:
+        for candidate in fitness_results:
             if candidate.fitness is None:
                 raise RuntimeError(
                     f"Candidate '{candidate.id}' has no FitnessVector; "
                     "cannot compute generation statistics."
                 )
+            average_scores.append(candidate.fitness.average())
 
-        scores = {
-        candidate: candidate.fitness.average()
-            for candidate in evaluated_population
-                }
-
-        best_candidate = max(scores, key=scores.get)
-        best_score = scores[best_candidate]
-        average_score = sum(scores.values()) / len(scores)
-        worst_score = min(scores.values())
-
-        return (
-            best_candidate,
-            best_score,
-            average_score,
-            worst_score,
+        best_candidate = max(
+            fitness_results, key=lambda candidate: candidate.fitness.average()
         )
+        best_score = max(average_scores)
+        average_score = sum(average_scores) / len(average_scores)
+        worst_score = min(average_scores)
+
+        return (best_candidate, best_score, average_score, worst_score)

@@ -132,8 +132,8 @@ class PromptGenerator:
             prompt=instruction,
             temperature=request.temperature,
         )
-        clean_text = self._cleaner(raw_output)
-        self._validator(clean_text, request)
+        clean_text = self._cleaner.clean(raw_output)
+        self._validator.validate(clean_text, request)
 
         candidate_id = self._generate_candidate_id()
 

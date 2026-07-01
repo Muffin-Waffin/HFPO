@@ -227,7 +227,7 @@ class OutputManager:
         if generation < 0:
             raise ValueError("generation must be non-negative.")
 
-        candidate_ids: list[str] = [candidate.id for candidate in population.candidates]
+        candidate_ids: list[str] = [candidate.id for candidate in population]
 
         checkpoint_data = {
             "generation": generation,

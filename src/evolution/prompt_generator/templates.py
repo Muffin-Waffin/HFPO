@@ -10,8 +10,18 @@ prompt string using the predefined mutation and crossover templates.
 """
 
 from .models import PromptGenerationRequest
-from .prompts.crossover import CROSSOVER_TEMPLATE
-from .prompts.mutation import MUTATION_TEMPLATE
+# from .prompts.crossover import CROSSOVER_TEMPLATE
+import random
+
+from .prompts.mutation.reasoning import MUTATION_TEMPLATE as REASONING_TEMPLATE
+from .prompts.mutation.elimination import MUTATION_TEMPLATE as ELIMINATION_TEMPLATE
+from .prompts.mutation.differential import MUTATION_TEMPLATE as DIFFERENTIAL_TEMPLATE
+from .prompts.mutation.evidence import MUTATION_TEMPLATE as EVIDENCE_TEMPLATE
+from .prompts.mutation.probability import MUTATION_TEMPLATE as PROBABILITY_TEMPLATE
+from .prompts.mutation.guideline import MUTATION_TEMPLATE as GUIDELINE_TEMPLATE
+from .prompts.mutation.role import MUTATION_TEMPLATE as ROLE_TEMPLATE
+from .prompts.mutation.aggressive import MUTATION_TEMPLATE as AGGRESSIVE_TEMPLATE
+
 
 
 class PromptTemplateBuilder:
@@ -55,46 +65,54 @@ class PromptTemplateBuilder:
                 "request must be a PromptGenerationRequest, got "
                 f"{type(request).__name__}."
             )
-        if request.parent_b is not None:
-            return self._build_crossover(request)
+        # if request.parent_b is not None:
+            # return self._build_crossover(request)
         return self._build_mutation(request)
+    
+    
 
     def _build_mutation(self, request: PromptGenerationRequest) -> str:
-        """Formats the mutation template for a request.
+        """Formats a randomly selected mutation template."""
+        MUTATION_TEMPLATES = [
+        ("reasoning", REASONING_TEMPLATE),
+        ("elimination", ELIMINATION_TEMPLATE),
+        ("differential", DIFFERENTIAL_TEMPLATE),
+        ("evidence", EVIDENCE_TEMPLATE),
+        ("probability", PROBABILITY_TEMPLATE),
+        ("guideline", GUIDELINE_TEMPLATE),
+        ("role", ROLE_TEMPLATE),
+        ("aggressive", AGGRESSIVE_TEMPLATE),
+    ]
+        operator_name, template = random.choice(MUTATION_TEMPLATES)
 
-        Args:
-            request: The generation request providing the task
-                description and the single parent prompt to mutate.
+        # Save which operator was used (useful for logging)
+        self._last_mutation_operator = operator_name
 
-        Returns:
-            The MUTATION_TEMPLATE formatted with the request's task
-            description and parent_a's prompt text.
-        """
-        return MUTATION_TEMPLATE.format(
+        return template.format(
             task_description=request.task_description,
             parent_prompt=request.parent_a.text,
         )
 
-    def _build_crossover(self, request: PromptGenerationRequest) -> str:
-        """Formats the crossover template for a request.
+    # def _build_crossover(self, request: PromptGenerationRequest) -> str:
+    #     """Formats the crossover template for a request.
 
-        Args:
-            request: The generation request providing the task
-                description and both parent prompts to combine.
+    #     Args:
+    #         request: The generation request providing the task
+    #             description and both parent prompts to combine.
 
-        Returns:
-            The CROSSOVER_TEMPLATE formatted with the request's task
-            description and both parents' prompt text.
+    #     Returns:
+    #         The CROSSOVER_TEMPLATE formatted with the request's task
+    #         description and both parents' prompt text.
 
-        Raises:
-            RuntimeError: If request is missing parent_b.
-        """
-        if request.parent_b is None:
-            raise RuntimeError(
-                "Crossover request is missing parent_b."
-            )
-        return CROSSOVER_TEMPLATE.format(
-            task_description=request.task_description,
-            parent_a=request.parent_a.text,
-            parent_b=request.parent_b.text,
-        )
+    #     Raises:
+    #         RuntimeError: If request is missing parent_b.
+    #     """
+    #     if request.parent_b is None:
+    #         raise RuntimeError(
+    #             "Crossover request is missing parent_b."
+    #         )
+    #     return CROSSOVER_TEMPLATE.format(
+    #         task_description=request.task_description,
+    #         parent_a=request.parent_a.text,
+    #         parent_b=request.parent_b.text,
+        # )

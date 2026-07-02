@@ -29,6 +29,7 @@ from __future__ import annotations
 import time
 from typing import Any
 
+from src.evolution.prompt_logger import PromptLogger
 from src.core.population import Population
 from src.core.prompt_candidate import PromptCandidate
 from src.evolution.elitism import Elitism
@@ -87,6 +88,7 @@ class EvolutionEngine:
         "_num_generations",
         "_task_description",
         "_temperature",
+        "_prompt_logger",
     )
 
     def __init__(
@@ -169,7 +171,9 @@ class EvolutionEngine:
         self._num_generations = num_generations
         self._task_description = task_description
         self._temperature = temperature
-
+        self._prompt_logger = PromptLogger(
+            "results/hfpo_run/generated_prompts.jsonl"
+        )
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
@@ -257,6 +261,7 @@ class EvolutionEngine:
                 f"Generation {generation + 1} completed "
                 f"in {elapsed_time_seconds:.2f} seconds."
             )
+        return self._population
     # ------------------------------------------------------------------
     # Private orchestration helpers
     # ------------------------------------------------------------------
@@ -509,8 +514,8 @@ class EvolutionEngine:
             raise ValueError("generation must be non-negative.")
 
         offspring: list[PromptCandidate] = []
-        print(f"Generating {offspring_needed} offspring...")
         offspring_needed = self._population.max_population_size - len(elites)
+        print(f"Generating {offspring_needed} offspring...")
         existing_prompt_texts=set(self._population.texts())
         for _ in range(offspring_needed):
             if len(self._population) >= 2:
@@ -542,6 +547,12 @@ class EvolutionEngine:
 
             result = self._prompt_generator.generate(request)
             offspring.append(result.candidate)
+            self._prompt_logger.log(
+                generation=request.generation,
+                child=result.candidate,
+                parent_a=parent_a,
+                parent_b=request.parent_b,
+            )
             print(
                 f"Generated offspring "
                 f"{len(offspring)}/{offspring_needed}"

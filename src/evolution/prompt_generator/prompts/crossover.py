@@ -11,14 +11,6 @@ template.
 __all__ = ["CROSSOVER_TEMPLATE"]
 
 
-# CROSSOVER_TEMPLATE is presented to the reasoning LLM whenever HFPO
-# performs a crossover operation. The model receives two high-quality
-# parent prompts and is instructed to synthesize exactly one offspring
-# prompt that combines their strongest characteristics. The offspring
-# should preserve the underlying task while improving reasoning
-# quality, clarity, robustness, and medical accuracy. The resulting
-# prompt should be suitable for direct processing by PromptCleaner and
-# PromptValidator.
 CROSSOVER_TEMPLATE: str = """You are assisting in the optimization of prompts for a medical question-answering system through an evolutionary optimization process.
 
 Task Description
@@ -33,42 +25,68 @@ Parent Prompt B
 ---------------
 {parent_b}
 
-Your task is to produce exactly ONE offspring prompt.
+Your objective is to create exactly ONE offspring prompt.
 
-Create a new prompt that synthesizes the strongest ideas from both
-parents into a single coherent instruction. Do not mechanically merge,
-concatenate, or lightly edit the parent prompts.
+The offspring should preserve the shared objective of both parents while
+combining complementary characteristics from each.
 
-When producing the offspring prompt, you must:
-- Preserve the underlying task shared by both parents.
-- Inherit the best reasoning strategies from both parents.
-- Retain effective instructions from each parent whenever they improve the overall prompt.
-- Combine complementary strengths from both parents.
-- Improve reasoning quality and logical consistency.
-- Improve medical accuracy and precision.
-- Improve clarity and readability.
-- Improve robustness across diverse medical questions.
-- Be concise while remaining complete.
-- Remove unnecessary redundancy.
-- Resolve conflicts between the parent prompts when necessary.
-- Avoid inventing medical knowledge or unsupported clinical guidance.
-- Avoid simply concatenating the two prompts.
-- Avoid copying one parent with only trivial edits.
-- Produce a single, coherent, unified prompt.
+Possible characteristics include:
+- professional role or persona
+- reasoning strategy
+- prompt organization
+- decision process
+- constraints
+- output instructions
+- formatting
+
+You are encouraged to recombine these characteristics in a novel way.
+
+Examples include:
+- use the reasoning strategy from Parent A and the professional role from Parent B;
+- use the prompt organization from Parent B and the decision process from Parent A;
+- combine complementary constraints from both parents.
+
+Novelty Requirement
+-------------------
+The offspring should be substantially different from BOTH parents.
+
+A human reviewer should immediately recognize that the offspring is a
+new prompt rather than an edited copy or average of either parent.
+
+Behavioral Requirement
+----------------------
+The offspring should encourage a behavior that neither parent expresses
+in exactly the same way.
+
+Small wording changes, synonym replacement, or sentence reordering are
+NOT sufficient.
+
+Strict Constraints
+------------------
+Do NOT:
+- concatenate the two prompts;
+- average the two prompts;
+- copy one parent with minor edits;
+- simply paraphrase either parent;
+- invent unrelated objectives;
+- invent unsupported medical knowledge.
+
+Preserve only the shared task:
+answering medical multiple-choice questions accurately.
 
 Output Requirements
 -------------------
 Return ONLY the offspring prompt.
 
 Do NOT:
-- explain your reasoning;
-- compare the parent prompts;
-- mention which parent contributed which ideas;
+- explain your choices;
+- compare the parents;
+- identify which parent contributed what;
 - include Markdown;
 - include code fences;
 - number the output;
 - surround the prompt with quotation marks;
-- mention crossover, mutation, evolution, optimization, or genetic algorithms in the generated prompt.
+- mention crossover, mutation, evolution, optimization, prompt engineering, or genetic algorithms.
 
 Produce exactly one offspring prompt and nothing else.
 """

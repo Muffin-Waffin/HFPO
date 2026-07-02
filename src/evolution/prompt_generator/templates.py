@@ -36,8 +36,10 @@ class PromptTemplateBuilder:
     validation, no PromptCandidate construction, no retries, and no
     other side effects.
     """
+    __slots__ = ("_last_mutation_operator",)
 
-    __slots__ = ()
+    def __init__(self):
+        self._last_mutation_operator = None
 
     def build(self, request: PromptGenerationRequest) -> str:
         """Builds the formatted prompt instruction for a request.

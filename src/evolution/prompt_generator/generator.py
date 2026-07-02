@@ -127,7 +127,7 @@ class PromptGenerator:
 
         start_time = time.monotonic()
 
-        instruction = self._template_builder.build(request)
+        mutation_operator, instruction = self._template_builder.build(request)
         raw_output = self._llm.generate(
             prompt=instruction,
             temperature=request.temperature,
@@ -135,22 +135,32 @@ class PromptGenerator:
         clean_text = self._cleaner.clean(raw_output)
         self._validator.validate(clean_text, request)
 
+        # candidate_id = self._generate_candidate_id()
+
+        # is_crossover = request.is_crossover()
+        # origin = "crossover" if is_crossover else "mutation"
+
+        # if is_crossover:
+        #     parent_ids = [request.parent_a.id, request.parent_b.id]
+        # else:
+        #     parent_ids = [request.parent_a.id]
+
         candidate_id = self._generate_candidate_id()
 
-        is_crossover = request.is_crossover()
-        origin = "crossover" if is_crossover else "mutation"
+        origin = "mutation"
 
-        if is_crossover:
-            parent_ids = [request.parent_a.id, request.parent_b.id]
-        else:
-            parent_ids = [request.parent_a.id]
+        parent_ids = [request.parent_a.id]
 
+        # ancestry_ids = self._lineage_tracker.build_ancestry(parent_ids)
         ancestry_ids = self._lineage_tracker.build_ancestry(parent_ids)
 
         elapsed_ms = (time.monotonic() - start_time) * 1000
 
         metadata = self._create_metadata(
-            origin, request.temperature, elapsed_ms
+            origin,
+            request.temperature,
+            elapsed_ms,
+            mutation_operator,
         )
         candidate = self._create_candidate(
             candidate_id=candidate_id,
@@ -179,6 +189,7 @@ class PromptGenerator:
         origin: str,
         temperature: float,
         elapsed_ms: float,
+        mutation_operator: str | None,
     ) -> GenerationMetadata:
         """Creates the GenerationMetadata describing this generation.
 
@@ -200,6 +211,7 @@ class PromptGenerator:
             temperature=temperature,
             attempts=1,
             template_used=origin,
+            mutation_operator=mutation_operator,
             generation_time_ms=elapsed_ms,
         )
 

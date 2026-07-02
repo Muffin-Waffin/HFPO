@@ -29,6 +29,7 @@ class PromptLogger:
         child: PromptCandidate,
         parent_a: PromptCandidate,
         parent_b: PromptCandidate | None,
+        
     ) -> None:
         """Append one generated prompt to the log."""
 
@@ -49,6 +50,7 @@ class PromptLogger:
                 if parent_b is not None
                 else None
             ),
+            "metadata": child.metadata,
             "generated": {
                 "id": child.id,
                 "text": child.text,

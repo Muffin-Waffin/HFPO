@@ -41,7 +41,7 @@ class PromptTemplateBuilder:
     def __init__(self):
         self._last_mutation_operator = None
 
-    def build(self, request: PromptGenerationRequest) -> str:
+    def build(self, request: PromptGenerationRequest) -> tuple[str, str]:
         """Builds the formatted prompt instruction for a request.
 
         Selects the crossover template if the request represents a
@@ -87,14 +87,12 @@ class PromptTemplateBuilder:
     ]
         operator_name, template = random.choice(MUTATION_TEMPLATES)
 
-        # Save which operator was used (useful for logging)
-        self._last_mutation_operator = operator_name
-
-        return template.format(
+        instruction = template.format(
             task_description=request.task_description,
             parent_prompt=request.parent_a.text,
         )
 
+        return operator_name, instruction
     # def _build_crossover(self, request: PromptGenerationRequest) -> str:
     #     """Formats the crossover template for a request.
 

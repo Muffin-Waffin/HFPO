@@ -32,6 +32,7 @@ class GenerationMetadata:
     attempts: int
     template_used: str
     generation_time_ms: float
+    mutation_operator: str | None = None
 
     def __post_init__(self) -> None:
         """Validates field invariants after initialization.
@@ -69,6 +70,7 @@ class GenerationMetadata:
             "temperature": self.temperature,
             "attempts": self.attempts,
             "template_used": self.template_used,
+            "mutation_operator": self.mutation_operator,
             "generation_time_ms": self.generation_time_ms,
         }
 

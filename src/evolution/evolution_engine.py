@@ -27,6 +27,7 @@ replace the population, each generation.
 from __future__ import annotations
 
 import time
+import random
 from typing import Any
 
 from src.evolution.prompt_logger import PromptLogger
@@ -89,6 +90,10 @@ class EvolutionEngine:
         "_task_description",
         "_temperature",
         "_prompt_logger",
+        "_mutation_rate",
+        "_crossover_rate",
+        "_operator_rng",
+        "_start_generation",
     )
 
     def __init__(
@@ -102,6 +107,9 @@ class EvolutionEngine:
         num_generations: int,
         task_description: str,
         temperature: float = 0.7,
+        mutation_rate: float = 0.3,
+        crossover_rate: float = 0.7,
+        start_generation: int = 0,
     ) -> None:
         """Initializes the EvolutionEngine with all required collaborators.
 
@@ -128,14 +136,18 @@ class EvolutionEngine:
             temperature: Sampling temperature passed through to every
                 ``PromptGenerationRequest``. Must be non-negative.
                 Defaults to 0.7.
+            start_generation: The generation number to resume from.
+                When resuming, this should be set to the last
+                completed generation + 1. Defaults to 0.
 
         Raises:
             TypeError: If any collaborator is not an instance of its
                 expected type, if ``num_generations`` is not an
                 integer, or if ``task_description`` is not a string.
             ValueError: If ``num_generations`` is not positive, if
-                ``task_description`` is empty or whitespace, or if
-                ``temperature`` is negative.
+                ``task_description`` is empty or whitespace, if
+                ``temperature`` is negative, or if ``start_generation``
+                is out of range.
         """
         if not isinstance(population, Population):
             raise TypeError("population must be a Population instance.")
@@ -161,6 +173,29 @@ class EvolutionEngine:
             raise ValueError(
                 f"temperature must be >= 0, got {temperature}."
             )
+        if mutation_rate < 0:
+            raise ValueError(
+                f"mutation_rate must be >= 0, got {mutation_rate}."
+            )
+        if crossover_rate < 0:
+            raise ValueError(
+                f"crossover_rate must be >= 0, got {crossover_rate}."
+            )
+        if mutation_rate + crossover_rate <= 0:
+            raise ValueError(
+                "mutation_rate + crossover_rate must be > 0."
+            )
+        if not isinstance(start_generation, int) or isinstance(start_generation, bool):
+            raise TypeError("start_generation must be an integer.")
+        if start_generation < 0:
+            raise ValueError(
+                f"start_generation must be >= 0, got {start_generation}."
+            )
+        if start_generation >= num_generations:
+            raise ValueError(
+                f"start_generation ({start_generation}) must be < "
+                f"num_generations ({num_generations})."
+            )
 
         self._population = population
         self._federated_server = federated_server
@@ -171,6 +206,10 @@ class EvolutionEngine:
         self._num_generations = num_generations
         self._task_description = task_description
         self._temperature = temperature
+        self._mutation_rate = mutation_rate
+        self._crossover_rate = crossover_rate
+        self._start_generation = start_generation
+        self._operator_rng = random.Random()
         self._prompt_logger = PromptLogger(
             "results/hfpo_run/generated_prompts.jsonl"
         )
@@ -208,7 +247,13 @@ class EvolutionEngine:
                 candidate is left without a FitnessVector.
         """
         self._initialize()
-        for generation in range(self._num_generations):
+        remaining = self._num_generations - self._start_generation
+        if self._start_generation > 0:
+            print(
+                f"Resuming from generation {self._start_generation + 1}"
+                f" ({remaining} generations remaining)..."
+            )
+        for generation in range(self._start_generation, self._num_generations):
             print(f"\n{'=' * 80}")
             print(f"Generation {generation + 1}/{self._num_generations}")
             print(f"{'=' * 80}")
@@ -255,6 +300,11 @@ class EvolutionEngine:
             self._population = self._build_next_population(
                 elites,
                 offspring,
+            )
+
+            print("Saving population checkpoint...")
+            self._output_manager.save_population_checkpoint(
+                self._population, generation + 1
             )
 
             print(
@@ -515,44 +565,63 @@ class EvolutionEngine:
 
         offspring: list[PromptCandidate] = []
         offspring_needed = self._population.max_population_size - len(elites)
+        max_retries = 5
         print(f"Generating {offspring_needed} offspring...")
         existing_prompt_texts=set(self._population.texts())
         for _ in range(offspring_needed):
-            if len(self._population) >= 2:
+            generated = False
+            for attempt in range(max_retries):
                 parent_a = self._tournament_selector.select_parents(
                     self._population,
                     1,
                 )[0]
-                parent_b = self._select_distinct_second_parent(parent_a)
-                request = PromptGenerationRequest(
-                    parent_a=parent_a,
-                    parent_b=parent_b,
-                    generation=self._population.generation + 1,
-                    task_description=self._task_description,
-                    temperature=self._temperature,
-                    existing_prompt_texts=existing_prompt_texts)
-            else:
-                parent = self._tournament_selector.select_parents(
-                    self._population,
-                    1,
-                )[0]
-                request = PromptGenerationRequest(
-                    parent_a=parent,
-                    parent_b=None,
-                    generation=self._population.generation + 1,
-                    task_description=self._task_description,
-                    temperature=self._temperature,
-                    existing_prompt_texts=existing_prompt_texts,
+
+                use_crossover = (
+                    len(self._population) >= 2
+                    and self._operator_rng.random()
+                    < self._crossover_rate / (self._mutation_rate + self._crossover_rate)
                 )
 
-            result = self._prompt_generator.generate(request)
-            offspring.append(result.candidate)
-            self._prompt_logger.log(
-                generation=request.generation,
-                child=result.candidate,
-                parent_a=parent_a,
-                parent_b=request.parent_b,
-            )
+                if use_crossover:
+                    parent_b = self._select_distinct_second_parent(parent_a)
+                    request = PromptGenerationRequest(
+                        parent_a=parent_a,
+                        parent_b=parent_b,
+                        generation=self._population.generation + 1,
+                        task_description=self._task_description,
+                        temperature=self._temperature,
+                        existing_prompt_texts=existing_prompt_texts)
+                else:
+                    request = PromptGenerationRequest(
+                        parent_a=parent_a,
+                        parent_b=None,
+                        generation=self._population.generation + 1,
+                        task_description=self._task_description,
+                        temperature=self._temperature,
+                        existing_prompt_texts=existing_prompt_texts,
+                    )
+
+                try:
+                    result = self._prompt_generator.generate(request)
+                    offspring.append(result.candidate)
+                    existing_prompt_texts.add(result.candidate.text)
+                    self._prompt_logger.log(
+                        generation=request.generation,
+                        child=result.candidate,
+                        parent_a=parent_a,
+                        parent_b=request.parent_b,
+                    )
+                    generated = True
+                    break
+                except ValueError as e:
+                    print(
+                        f"  Attempt {attempt + 1}/{max_retries} failed: {e}"
+                    )
+            if not generated:
+                raise RuntimeError(
+                    f"Failed to generate a valid offspring after "
+                    f"{max_retries} attempts."
+                )
             print(
                 f"Generated offspring "
                 f"{len(offspring)}/{offspring_needed}"

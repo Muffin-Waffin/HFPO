@@ -139,6 +139,28 @@ class FitnessVector:
         """
         return dict(self.scores)
 
+    @classmethod
+    def from_dict(cls, data: dict[str, float]) -> "FitnessVector":
+        """Reconstruct a FitnessVector from its dictionary representation.
+
+        Args:
+            data: A mapping from hospital ID to normalized evaluation
+                score, as produced by ``as_dict()``.
+
+        Returns:
+            A new FitnessVector instance.
+
+        Raises:
+            TypeError: If ``data`` is not a dict.
+            ValueError: If ``data`` is empty or contains out-of-range
+                scores (propagated from the constructor).
+        """
+        if not isinstance(data, dict):
+            raise TypeError(
+                f"data must be a dict, got {type(data).__name__}."
+            )
+        return cls(scores=dict(data))
+
     def __str__(self) -> str:
         """Return a concise, human-readable summary of the fitness vector.
 

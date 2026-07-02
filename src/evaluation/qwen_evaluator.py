@@ -97,7 +97,19 @@ class QwenEvaluator:
         if not prompt_text.strip():
             raise ValueError("prompt_text must not be empty.")
 
-        score, _prediction, _clean_response = scorer.score_sample(
+        score, _prediction, _clean_response = self.score_sample_details(
+            prompt_text,
+            sample,
+        )
+
+        return score
+
+    def score_sample_details(self, prompt_text: str, sample: Any) -> tuple[int, object, str]:
+        """Scores one sample and returns score, parsed prediction, and response."""
+        if not prompt_text.strip():
+            raise ValueError("prompt_text must not be empty.")
+
+        score, prediction, clean_response = scorer.score_sample(
             self._model,
             self._tokenizer,
             prompt_text,
@@ -109,5 +121,5 @@ class QwenEvaluator:
                 "scorer.score_sample() must return exactly 0 or 1."
             )
 
-        return score
+        return score, prediction, clean_response
     

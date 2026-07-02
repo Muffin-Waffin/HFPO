@@ -150,6 +150,7 @@ class HospitalClient:
         )
         num_correct = 0
         num_total = 0
+        predictions: list[object] = []
 
         for index, sample in enumerate(self.dataset, start=1):
 
@@ -166,8 +167,17 @@ class HospitalClient:
                     f"{index}/{len(self.dataset)} samples"
                 )
 
-            num_correct += self.evaluator.score_sample(prompt.text, sample)
+            if hasattr(self.evaluator, "score_sample_details"):
+                score, prediction, _clean_response = self.evaluator.score_sample_details(
+                    prompt.text,
+                    sample,
+                )
+            else:
+                score = self.evaluator.score_sample(prompt.text, sample)
+                prediction = None
+            num_correct += score
             num_total += 1
+            predictions.append(prediction)
         print(
             f"[{self.hospital_id}] "
             f"Finished prompt {prompt.id[:8]}"
@@ -188,6 +198,7 @@ class HospitalClient:
             score=evaluation_score,
             num_correct=num_correct,
             num_total=num_total,
+            metadata={"predictions": predictions},
         )
 
     def evaluate_population(

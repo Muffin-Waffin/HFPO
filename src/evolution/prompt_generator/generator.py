@@ -135,23 +135,13 @@ class PromptGenerator:
         clean_text = self._cleaner.clean(raw_output)
         self._validator.validate(clean_text, request)
 
-        # candidate_id = self._generate_candidate_id()
-
-        # is_crossover = request.is_crossover()
-        # origin = "crossover" if is_crossover else "mutation"
-
-        # if is_crossover:
-        #     parent_ids = [request.parent_a.id, request.parent_b.id]
-        # else:
-        #     parent_ids = [request.parent_a.id]
-
         candidate_id = self._generate_candidate_id()
-
-        origin = "mutation"
-
-        parent_ids = [request.parent_a.id]
-
-        # ancestry_ids = self._lineage_tracker.build_ancestry(parent_ids)
+        is_crossover = request.is_crossover()
+        origin = "crossover" if is_crossover else "mutation"
+        if is_crossover:
+            parent_ids = [request.parent_a.id, request.parent_b.id]
+        else:
+            parent_ids = [request.parent_a.id]
         ancestry_ids = self._lineage_tracker.build_ancestry(parent_ids)
 
         elapsed_ms = (time.monotonic() - start_time) * 1000

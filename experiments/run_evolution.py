@@ -28,6 +28,7 @@ below rather than by editing ``configs/config.py``.
 
 from __future__ import annotations
 
+import argparse
 import uuid
 from typing import Any
 
@@ -225,6 +226,16 @@ def _build_seed_population(max_population_size: int) -> Population:
 
 def main() -> None:
     """Runs one complete HFPO evolutionary optimization experiment."""
+    parser = argparse.ArgumentParser(
+        description="HFPO Evolutionary Prompt Optimization"
+    )
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Resume from the latest checkpoint instead of starting fresh.",
+    )
+    args = parser.parse_args()
+
     model, tokenizer = load_model()
 
     llm = _QwenReasoningLLM(
@@ -265,29 +276,6 @@ def main() -> None:
             )
         )
 
-    # hospitals = []
-
-    # for dataset_name in HOSPITAL_DATASET_NAMES:
-    #     dataset = load_dataset(dataset_name, split=DATASET_SPLIT)
-
-    #     # ---------------- Debug mode ----------------
-    #     if hasattr(dataset, "select"):
-    #         dataset = dataset.select(range(min(10, len(dataset))))
-    #     else:
-    #         dataset = dataset[:10]
-    #     # --------------------------------------------
-
-    #     hospitals.append(
-    #         HospitalClient(
-    #             hospital_id=dataset_name,
-    #             dataset=dataset,
-    #             evaluator=QwenEvaluator(
-    #                 model=model,
-    #                 tokenizer=tokenizer,
-    #             ),
-    #         )
-    #     )
-
     aggregator = Aggregator()
     evaluation_cache = EvaluationCache()
     lineage_tracker = LineageTracker()
@@ -302,9 +290,41 @@ def main() -> None:
         evaluation_version=EVALUATION_VERSION,
     )
 
-    population = _build_seed_population(config.GA_POPULATION_SIZE)
-    for candidate in population:
-        lineage_tracker.register(candidate)
+    output_manager = OutputManager(output_directory=OUTPUT_DIRECTORY)
+
+    start_generation = 0
+
+    if args.resume:
+        latest_gen = output_manager.find_latest_population_checkpoint()
+        if latest_gen is None:
+            print("No checkpoint found. Starting from scratch.")
+        else:
+            print(f"Found checkpoint for generation {latest_gen}.")
+            population = output_manager.load_population_checkpoint(latest_gen)
+            print(
+                f"Loaded population: {len(population)} candidates, "
+                f"generation {population.generation}"
+            )
+
+            for candidate in population:
+                lineage_tracker.register(candidate)
+
+            for candidate in population:
+                if candidate.fitness is not None:
+                    evaluation_cache.set(
+                        candidate.text,
+                        config.MODEL_NAME,
+                        FEDERATION_DATASET_LABEL,
+                        EVALUATION_VERSION,
+                        candidate.fitness,
+                    )
+
+            start_generation = population.generation
+            print(f"Resuming from generation {start_generation + 1}.")
+    else:
+        population = _build_seed_population(config.GA_POPULATION_SIZE)
+        for candidate in population:
+            lineage_tracker.register(candidate)
 
     prompt_generator = PromptGenerator(
         llm=llm,
@@ -325,8 +345,6 @@ def main() -> None:
         ranking_strategy="average",
     )
 
-    output_manager = OutputManager(output_directory=OUTPUT_DIRECTORY)
-
     engine = EvolutionEngine(
         population=population,
         federated_server=federated_server,
@@ -337,6 +355,9 @@ def main() -> None:
         num_generations=config.GA_GENERATIONS,
         task_description=TASK_DESCRIPTION,
         temperature=config.TEMPERATURE,
+        mutation_rate=config.GA_MUTATION_RATE,
+        crossover_rate=config.GA_CROSSOVER_RATE,
+        start_generation=start_generation,
     )
 
     final_population = engine.run()

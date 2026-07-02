@@ -239,6 +239,125 @@ class OutputManager:
         self._write_json(path, checkpoint_data)
         return path
 
+    def save_population_checkpoint(
+        self, population: Population, generation: int
+    ) -> Path:
+        """Writes a full population checkpoint with complete candidate data.
+
+        Writes ``checkpoints/population_checkpoint_{N:03d}.json``,
+        where ``N`` is the supplied generation. Each candidate is
+        serialized via ``PromptCandidate.as_dict()``, preserving text,
+        fitness, lineage, and metadata. This enables resuming an
+        evolutionary run from the saved generation.
+
+        Args:
+            population: The Population to checkpoint.
+            generation: The generation index this checkpoint
+                corresponds to. Must be a non-negative integer.
+
+        Returns:
+            The Path of the file that was written.
+
+        Raises:
+            TypeError: If ``population`` is not a Population instance,
+                or ``generation`` is not an integer.
+            ValueError: If ``generation`` is negative.
+        """
+        if not isinstance(population, Population):
+            raise TypeError("population must be a Population instance.")
+        if not isinstance(generation, int) or isinstance(generation, bool):
+            raise TypeError("generation must be an integer.")
+        if generation < 0:
+            raise ValueError("generation must be non-negative.")
+
+        checkpoint_data = {
+            "generation": generation,
+            "max_population_size": population.max_population_size,
+            "candidates": [
+                candidate.as_dict() for candidate in population
+            ],
+        }
+
+        path = (
+            self._checkpoint_directory
+            / f"population_checkpoint_{generation:03d}.json"
+        )
+        self._write_json(path, checkpoint_data)
+        return path
+
+    def load_population_checkpoint(self, generation: int) -> Population:
+        """Loads a full population checkpoint from disk.
+
+        Reads ``checkpoints/population_checkpoint_{N:03d}.json`` and
+        reconstructs the ``Population`` with all ``PromptCandidate``
+        objects, including their text, fitness, lineage, and metadata.
+
+        Args:
+            generation: The generation index to load. Must be a
+                non-negative integer.
+
+        Returns:
+            The reconstructed Population.
+
+        Raises:
+            TypeError: If ``generation`` is not an integer.
+            ValueError: If ``generation`` is negative, or the
+                checkpoint file is missing or malformed.
+        """
+        if not isinstance(generation, int) or isinstance(generation, bool):
+            raise TypeError("generation must be an integer.")
+        if generation < 0:
+            raise ValueError("generation must be non-negative.")
+
+        path = (
+            self._checkpoint_directory
+            / f"population_checkpoint_{generation:03d}.json"
+        )
+        if not path.exists():
+            raise ValueError(
+                f"No population checkpoint found for generation "
+                f"{generation} at '{path}'."
+            )
+
+        with path.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        candidates = [
+            PromptCandidate.from_dict(candidate_data)
+            for candidate_data in data["candidates"]
+        ]
+
+        return Population(
+            prompts=candidates,
+            generation=data["generation"],
+            max_population_size=data["max_population_size"],
+        )
+
+    def find_latest_population_checkpoint(self) -> int | None:
+        """Finds the highest-numbered population checkpoint on disk.
+
+        Scans ``checkpoints/`` for files matching
+        ``population_checkpoint_{N:03d}.json`` and returns the
+        generation number of the latest one found.
+
+        Returns:
+            The generation number of the latest population checkpoint,
+            or ``None`` if no population checkpoints exist.
+        """
+        import re
+
+        pattern = re.compile(r"^population_checkpoint_(\d{3})\.json$")
+        latest_generation: int | None = None
+
+        for file_path in self._checkpoint_directory.iterdir():
+            match = pattern.match(file_path.name)
+            if match:
+                gen = int(match.group(1))
+                if latest_generation is None or gen > latest_generation:
+                    latest_generation = gen
+
+        return latest_generation
+
     def summary(self) -> dict:
         """Returns the directory layout managed by this instance.
 

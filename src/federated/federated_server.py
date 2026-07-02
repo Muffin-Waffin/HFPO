@@ -22,6 +22,10 @@ federated learning framework involved.
 
 from __future__ import annotations
 
+import json
+from datetime import datetime
+from pathlib import Path
+
 from src.core.evaluation_cache import EvaluationCache
 from src.core.evaluation_record import EvaluationRecord
 from src.core.lineage_tracker import LineageTracker
@@ -133,6 +137,8 @@ class FederatedServer:
         self._model_name: str = model_name
         self._dataset_name: str = dataset_name
         self._evaluation_version: str = evaluation_version
+        self._diagnostics_path = Path("results/hfpo_run/parent_child_diagnostics.jsonl")
+        self._diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
 
     @property
     def hospitals(self) -> list[HospitalClient]:
@@ -248,8 +254,108 @@ class FederatedServer:
                 )
 
         self.register_population(population)
+        self._log_parent_child_diagnostics(population)
         print("Federated evaluation complete.")
         return population
+
+    def _log_parent_child_diagnostics(
+        self,
+        population: list[PromptCandidate],
+    ) -> None:
+        """Log parent fitness to child fitness deltas and prediction agreement."""
+        for child in population:
+            if not child.parent_ids or child.fitness is None:
+                continue
+
+            child_predictions = child.metadata.get("evaluation_predictions", {})
+            for parent_id in child.parent_ids:
+                if not self._lineage_tracker.exists(parent_id):
+                    continue
+
+                parent = self._lineage_tracker.get(parent_id)
+                if parent.fitness is None:
+                    continue
+
+                parent_predictions = parent.metadata.get("evaluation_predictions", {})
+                agreement = self._prediction_agreement(
+                    parent_predictions,
+                    child_predictions,
+                )
+
+                record = {
+                    "timestamp": datetime.utcnow().isoformat() + "Z",
+                    "child_id": child.id,
+                    "child_generation": child.generation,
+                    "child_origin": child.origin,
+                    "parent_id": parent.id,
+                    "parent_generation": parent.generation,
+                    "parent_origin": parent.origin,
+                    "parent_fitness": parent.fitness.as_dict(),
+                    "child_fitness": child.fitness.as_dict(),
+                    "fitness_delta": {
+                        "average": child.fitness.average() - parent.fitness.average(),
+                        "minimum": child.fitness.minimum() - parent.fitness.minimum(),
+                        "maximum": child.fitness.maximum() - parent.fitness.maximum(),
+                    },
+                    "prediction_agreement": agreement,
+                }
+
+                with self._diagnostics_path.open("a", encoding="utf-8") as file:
+                    json.dump(record, file, ensure_ascii=False)
+                    file.write("\n")
+
+    def _prediction_agreement(
+        self,
+        parent_predictions: object,
+        child_predictions: object,
+    ) -> dict[str, object]:
+        """Compute exact prediction agreement by hospital and overall."""
+        if not isinstance(parent_predictions, dict) or not isinstance(
+            child_predictions,
+            dict,
+        ):
+            return {"available": False, "reason": "missing_predictions"}
+
+        per_hospital: dict[str, object] = {}
+        total_matches = 0
+        total_compared = 0
+
+        for hospital_id in sorted(set(parent_predictions) & set(child_predictions)):
+            parent_values = parent_predictions[hospital_id]
+            child_values = child_predictions[hospital_id]
+            if not isinstance(parent_values, list) or not isinstance(child_values, list):
+                continue
+
+            compared = min(len(parent_values), len(child_values))
+            if compared == 0:
+                continue
+
+            matches = sum(
+                1
+                for parent_value, child_value in zip(
+                    parent_values[:compared],
+                    child_values[:compared],
+                )
+                if parent_value == child_value
+            )
+            per_hospital[hospital_id] = {
+                "agreement": matches / compared,
+                "matches": matches,
+                "compared": compared,
+            }
+            total_matches += matches
+            total_compared += compared
+
+        if total_compared == 0:
+            return {"available": False, "reason": "no_overlap"}
+
+        return {
+            "available": True,
+            "overall": total_matches / total_compared,
+            "matches": total_matches,
+            "compared": total_compared,
+            "by_hospital": per_hospital,
+        }
 
 
     def broadcast(

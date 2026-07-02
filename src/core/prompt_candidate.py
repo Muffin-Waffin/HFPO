@@ -155,6 +155,44 @@ class PromptCandidate:
             "metadata": self.metadata,
         }
 
+    @classmethod
+    def from_dict(cls, data: dict[str, object]) -> "PromptCandidate":
+        """Reconstruct a PromptCandidate from its dictionary representation.
+
+        Args:
+            data: A dictionary as produced by ``as_dict()``.
+
+        Returns:
+            A new PromptCandidate instance.
+
+        Raises:
+            TypeError: If ``data`` is not a dict.
+            ValueError: If required fields are missing or invalid
+                (propagated from the constructor).
+        """
+        if not isinstance(data, dict):
+            raise TypeError(
+                f"data must be a dict, got {type(data).__name__}."
+            )
+
+        fitness_data = data.get("fitness")
+        fitness = (
+            FitnessVector.from_dict(fitness_data)
+            if fitness_data is not None
+            else None
+        )
+
+        return cls(
+            id=str(data["id"]),
+            text=str(data["text"]),
+            generation=int(data["generation"]),
+            parent_ids=list(data["parent_ids"]),
+            ancestry_ids=list(data["ancestry_ids"]),
+            origin=str(data["origin"]),
+            fitness=fitness,
+            metadata=dict(data.get("metadata", {})),
+        )
+
     def __str__(self) -> str:
         """Return a concise, human-readable summary of this prompt.
 

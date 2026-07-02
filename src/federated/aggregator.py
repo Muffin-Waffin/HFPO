@@ -95,6 +95,7 @@ class Aggregator:
                 )
 
             scores: dict[str, float] = {}
+            predictions_by_hospital: dict[str, object] = {}
             for record in records:
                 if record.hospital_id in scores:
                     raise ValueError(
@@ -102,8 +103,14 @@ class Aggregator:
                         f"from hospital '{record.hospital_id}'."
                     )
                 scores[record.hospital_id] = record.score
+                if "predictions" in record.metadata:
+                    predictions_by_hospital[record.hospital_id] = list(
+                        record.metadata["predictions"]
+                    )
 
             prompt.fitness = FitnessVector(scores=scores)
+            if predictions_by_hospital:
+                prompt.metadata["evaluation_predictions"] = predictions_by_hospital
 
         return population
 

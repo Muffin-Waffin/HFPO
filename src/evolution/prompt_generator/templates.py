@@ -10,7 +10,7 @@ prompt string using the predefined mutation and crossover templates.
 """
 
 from .models import PromptGenerationRequest
-# from .prompts.crossover import CROSSOVER_TEMPLATE
+from .prompts.crossover import CROSSOVER_TEMPLATE
 import random
 
 from .prompts.mutation.reasoning import MUTATION_TEMPLATE as REASONING_TEMPLATE
@@ -67,8 +67,8 @@ class PromptTemplateBuilder:
                 "request must be a PromptGenerationRequest, got "
                 f"{type(request).__name__}."
             )
-        # if request.parent_b is not None:
-            # return self._build_crossover(request)
+        if request.parent_b is not None:
+            return self._build_crossover(request)
         return self._build_mutation(request)
     
     
@@ -93,26 +93,15 @@ class PromptTemplateBuilder:
         )
 
         return operator_name, instruction
-    # def _build_crossover(self, request: PromptGenerationRequest) -> str:
-    #     """Formats the crossover template for a request.
-
-    #     Args:
-    #         request: The generation request providing the task
-    #             description and both parent prompts to combine.
-
-    #     Returns:
-    #         The CROSSOVER_TEMPLATE formatted with the request's task
-    #         description and both parents' prompt text.
-
-    #     Raises:
-    #         RuntimeError: If request is missing parent_b.
-    #     """
-    #     if request.parent_b is None:
-    #         raise RuntimeError(
-    #             "Crossover request is missing parent_b."
-    #         )
-    #     return CROSSOVER_TEMPLATE.format(
-    #         task_description=request.task_description,
-    #         parent_a=request.parent_a.text,
-    #         parent_b=request.parent_b.text,
-        # )
+    def _build_crossover(self, request: PromptGenerationRequest) -> tuple[str, str]:
+        """Formats the crossover template for a request."""
+        if request.parent_b is None:
+            raise RuntimeError(
+                "Crossover request is missing parent_b."
+            )
+        instruction = CROSSOVER_TEMPLATE.format(
+            task_description=request.task_description,
+            parent_a=request.parent_a.text,
+            parent_b=request.parent_b.text,
+        )
+        return "crossover", instruction

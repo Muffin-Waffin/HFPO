@@ -13,11 +13,11 @@ __all__ = ["MUTATION_TEMPLATE"]
 
 # This template is presented to the reasoning LLM whenever HFPO performs
 # a reasoning-strategy mutation. The model receives a single parent prompt
-# and is instructed to produce exactly one variant that changes how the
-# downstream model is asked to reason about medical multiple-choice
-# questions while preserving the parent's underlying objective. The
-# resulting text should be suitable for direct processing by
-# PromptCleaner and PromptValidator.
+# and its performance summary, and is instructed to produce exactly one
+# variant that changes how the downstream model is asked to reason about
+# medical multiple-choice questions while preserving the parent's
+# underlying objective. The resulting text should be suitable for direct
+# processing by PromptCleaner and PromptValidator.
 MUTATION_TEMPLATE: str = """You are assisting in the optimization of prompts for a medical question-answering system through an evolutionary optimization process.
 
 Task Description
@@ -28,7 +28,19 @@ Parent Prompt
 -------------
 {parent_prompt}
 
+{parent_performance}
+
 Your objective is to create exactly ONE new version of the parent prompt that changes the reasoning strategy used by the answering model.
+
+The parent prompt has already demonstrated useful behavior. Avoid rewriting it completely.
+
+Identify one aspect that is likely limiting performance. Make one meaningful improvement while preserving the rest of the prompt.
+
+Guidance based on the performance summary:
+- Preserve instructions that likely contribute to the strongest objective.
+- Attempt to improve the weakest objective without unnecessarily rewriting the prompt.
+- Avoid purely stylistic edits.
+- Keep the prompt concise.
 
 The new prompt should:
 - Preserve the original task of answering medical multiple-choice questions.

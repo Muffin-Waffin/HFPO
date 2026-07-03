@@ -13,11 +13,11 @@ __all__ = ["MUTATION_TEMPLATE"]
 
 # This template is presented to the reasoning LLM whenever HFPO performs
 # an aggressive, high-diversity mutation. The model receives a single
-# parent prompt and is instructed to produce exactly one substantially
-# different variant, free to change wording, structure, ordering,
-# reasoning strategy, and role, while preserving only the parent's
-# underlying objective. The resulting text should be suitable for
-# direct processing by PromptCleaner and PromptValidator.
+# parent prompt and its performance summary, and is instructed to produce
+# exactly one substantially different variant, free to change wording,
+# structure, ordering, reasoning strategy, and role, while preserving
+# only the parent's underlying objective. The resulting text should be
+# suitable for direct processing by PromptCleaner and PromptValidator.
 MUTATION_TEMPLATE: str = """You are assisting in the optimization of prompts for a medical question-answering system through an evolutionary optimization process.
 
 Task Description
@@ -27,6 +27,10 @@ Task Description
 Parent Prompt
 -------------
 {parent_prompt}
+
+Parent Performance
+------------------
+{parent_performance}
 
 Your objective is to create exactly ONE substantially different version of the parent prompt.
 
@@ -38,6 +42,8 @@ The new prompt should:
 - Avoid introducing instructions unrelated to answering the medical question.
 - Avoid changing the underlying objective or the fact that a single answer must be produced.
 - Avoid inventing or hallucinating medical knowledge that is not implied by the parent prompt.
+
+The parent prompt has already demonstrated useful behavior. Avoid rewriting it completely unless the performance data suggests a major change is needed. Identify one aspect that is likely limiting performance and make one meaningful improvement while preserving the rest of the prompt.
 
 Strict Constraint
 ------------------

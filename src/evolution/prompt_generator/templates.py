@@ -9,7 +9,7 @@ logic. It only converts a PromptGenerationRequest into a formatted
 prompt string using the predefined mutation and crossover templates.
 """
 
-from .models import PromptGenerationRequest
+from .models import PromptGenerationRequest, ParentPerformance
 from .prompts.crossover import CROSSOVER_TEMPLATE
 import random
 
@@ -21,7 +21,6 @@ from .prompts.mutation.probability import MUTATION_TEMPLATE as PROBABILITY_TEMPL
 from .prompts.mutation.guideline import MUTATION_TEMPLATE as GUIDELINE_TEMPLATE
 from .prompts.mutation.role import MUTATION_TEMPLATE as ROLE_TEMPLATE
 from .prompts.mutation.aggressive import MUTATION_TEMPLATE as AGGRESSIVE_TEMPLATE
-
 
 
 class PromptTemplateBuilder:
@@ -70,10 +69,54 @@ class PromptTemplateBuilder:
         if request.parent_b is not None:
             return self._build_crossover(request)
         return self._build_mutation(request)
-    
-    
 
-    def _build_mutation(self, request: PromptGenerationRequest) -> str:
+    def _format_performance_summary(self, performance: ParentPerformance | None, operator_name: str | None = None) -> str:
+        """Format a performance summary for inclusion in the prompt template."""
+        if performance is None:
+            return "Parent Performance Summary\n--------------------------\n(No performance data available.)"
+        
+        lines = [
+            "Parent Performance Summary",
+            "--------------------------",
+            f"Average Fitness: {performance.average_fitness:.3f}",
+            "",
+            "Per-Objective Fitness:",
+        ]
+        
+        for obj, score in performance.per_objective.items():
+            lines.append(f"  {obj}: {score:.3f}")
+        
+        lines.extend([
+            "",
+            f"Strongest Objective: {performance.best_objective} ({performance.per_objective[performance.best_objective]:.3f})",
+            f"Weakest Objective: {performance.worst_objective} ({performance.per_objective[performance.worst_objective]:.3f})",
+        ])
+        
+        # Add interpretation
+        scores = list(performance.per_objective.values())
+        if len(scores) > 1:
+            score_range = max(scores) - min(scores)
+            if score_range > 0.15:
+                lines.extend([
+                    "",
+                    "Interpretation: Performance is inconsistent across objectives.",
+                    f"  {performance.best_objective} is substantially higher than {performance.worst_objective}.",
+                ])
+            else:
+                lines.extend([
+                    "",
+                    "Interpretation: Performance is relatively consistent across objectives.",
+                ])
+        
+        if operator_name:
+            lines.extend([
+                "",
+                f"Current Mutation Operator: {operator_name}",
+            ])
+        
+        return "\n".join(lines)
+
+    def _build_mutation(self, request: PromptGenerationRequest) -> tuple[str, str]:
         """Formats a randomly selected mutation template."""
         MUTATION_TEMPLATES = [
         ("reasoning", REASONING_TEMPLATE),
@@ -86,13 +129,19 @@ class PromptTemplateBuilder:
         ("aggressive", AGGRESSIVE_TEMPLATE),
     ]
         operator_name, template = random.choice(MUTATION_TEMPLATES)
+        
+        performance_summary = self._format_performance_summary(
+            request.parent_a_performance, operator_name
+        )
 
         instruction = template.format(
             task_description=request.task_description,
             parent_prompt=request.parent_a.text,
+            parent_performance=performance_summary,
         )
 
         return operator_name, instruction
+
     def _build_crossover(self, request: PromptGenerationRequest) -> tuple[str, str]:
         """Formats the crossover template for a request."""
         if request.parent_b is None:

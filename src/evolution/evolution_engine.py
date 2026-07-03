@@ -37,7 +37,7 @@ from src.evolution.elitism import Elitism
 from src.evolution.generation_snapshot import GenerationSnapshot
 from src.evolution.output_manager import OutputManager
 from src.evolution.prompt_generator.generator import PromptGenerator
-from src.evolution.prompt_generator.models import PromptGenerationRequest
+from src.evolution.prompt_generator.models import PromptGenerationRequest, ParentPerformance
 from src.evolution.tournament_selector import TournamentSelector
 from src.federated.federated_server import FederatedServer
 
@@ -504,6 +504,12 @@ class EvolutionEngine:
 
         return self._elitism.select_elites(self._population)
 
+    def _compute_performance_summary(self, candidate: PromptCandidate) -> ParentPerformance | None:
+        """Compute a performance summary for a candidate from its FitnessVector."""
+        if candidate.fitness is None:
+            return None
+        return ParentPerformance.from_fitness_vector(candidate.fitness)
+
     def _generate_offspring(
         self, elites: list[PromptCandidate], generation: int
     ) -> list[PromptCandidate]:
@@ -567,7 +573,7 @@ class EvolutionEngine:
         offspring_needed = self._population.max_population_size - len(elites)
         max_retries = 5
         print(f"Generating {offspring_needed} offspring...")
-        existing_prompt_texts=set(self._population.texts())
+        existing_prompt_texts = set(self._population.texts())
         for _ in range(offspring_needed):
             generated = False
             for attempt in range(max_retries):
@@ -575,6 +581,8 @@ class EvolutionEngine:
                     self._population,
                     1,
                 )[0]
+
+                parent_a_performance = self._compute_performance_summary(parent_a)
 
                 use_crossover = (
                     len(self._population) >= 2
@@ -584,13 +592,18 @@ class EvolutionEngine:
 
                 if use_crossover:
                     parent_b = self._select_distinct_second_parent(parent_a)
+                    parent_b_performance = self._compute_performance_summary(parent_b)
                     request = PromptGenerationRequest(
                         parent_a=parent_a,
                         parent_b=parent_b,
                         generation=self._population.generation + 1,
                         task_description=self._task_description,
                         temperature=self._temperature,
-                        existing_prompt_texts=existing_prompt_texts)
+                        existing_prompt_texts=existing_prompt_texts,
+                        parent_a_performance=parent_a_performance,
+                        parent_b_performance=parent_b_performance,
+                        mutation_operator=None,
+                    )
                 else:
                     request = PromptGenerationRequest(
                         parent_a=parent_a,
@@ -599,6 +612,8 @@ class EvolutionEngine:
                         task_description=self._task_description,
                         temperature=self._temperature,
                         existing_prompt_texts=existing_prompt_texts,
+                        parent_a_performance=parent_a_performance,
+                        mutation_operator=None,
                     )
 
                 try:

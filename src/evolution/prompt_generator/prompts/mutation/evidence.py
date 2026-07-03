@@ -28,6 +28,10 @@ Parent Prompt
 -------------
 {parent_prompt}
 
+Parent Performance
+------------------
+{parent_performance}
+
 Your objective is to create exactly ONE new version of the parent prompt that changes the reasoning strategy to evidence-based reasoning.
 
 The new prompt should:
@@ -41,6 +45,8 @@ The new prompt should:
 - Avoid introducing unrelated objectives.
 - Avoid changing the requirement that exactly one answer must be selected.
 - Avoid inventing or hallucinating medical knowledge.
+
+The parent prompt has already demonstrated useful behavior. Avoid rewriting it completely. Identify one aspect that is likely limiting performance and make one meaningful improvement while preserving the rest of the prompt.
 
 Operator Constraint
 -------------------

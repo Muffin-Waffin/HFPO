@@ -10,6 +10,7 @@ other business logic of any kind.
 from dataclasses import dataclass
 
 from src.core.prompt_candidate import PromptCandidate
+from src.core.fitness_vector import FitnessVector
 
 
 @dataclass(slots=True, frozen=True)
@@ -90,6 +91,63 @@ class GenerationMetadata:
 
 
 @dataclass(slots=True, frozen=True)
+class ParentPerformance:
+    """Structured performance summary of a parent prompt.
+
+    Attributes:
+        average_fitness: Mean fitness across all objectives.
+        per_objective: Mapping of objective name (dataset/hospital) to score.
+        best_objective: Name of the highest-scoring objective.
+        worst_objective: Name of the lowest-scoring objective.
+    """
+
+    average_fitness: float
+    per_objective: dict[str, float]
+    best_objective: str
+    worst_objective: str
+
+    def __post_init__(self) -> None:
+        if not self.per_objective:
+            raise ValueError("per_objective must not be empty.")
+        if self.best_objective not in self.per_objective:
+            raise ValueError(f"best_objective '{self.best_objective}' not in per_objective.")
+        if self.worst_objective not in self.per_objective:
+            raise ValueError(f"worst_objective '{self.worst_objective}' not in per_objective.")
+
+    @classmethod
+    def from_fitness_vector(cls, fitness: FitnessVector) -> "ParentPerformance":
+        """Create from a FitnessVector."""
+        scores = fitness.scores()
+        if not scores:
+            raise ValueError("FitnessVector has no scores.")
+        best = max(scores, key=scores.get)
+        worst = min(scores, key=scores.get)
+        return cls(
+            average_fitness=fitness.average(),
+            per_objective=scores,
+            best_objective=best,
+            worst_objective=worst,
+        )
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "average_fitness": self.average_fitness,
+            "per_objective": self.per_objective,
+            "best_objective": self.best_objective,
+            "worst_objective": self.worst_objective,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, object]) -> "ParentPerformance":
+        return cls(
+            average_fitness=float(data["average_fitness"]),
+            per_objective=dict(data["per_objective"]),
+            best_objective=str(data["best_objective"]),
+            worst_objective=str(data["worst_objective"]),
+        )
+
+
+@dataclass(slots=True, frozen=True)
 class PromptGenerationRequest:
     """Everything needed to generate one new prompt.
 
@@ -114,6 +172,9 @@ class PromptGenerationRequest:
     task_description: str
     temperature: float
     existing_prompt_texts: set[str]
+    parent_a_performance: ParentPerformance | None = None
+    parent_b_performance: ParentPerformance | None = None
+    mutation_operator: str | None = None
 
     def __post_init__(self) -> None:
         """Validates field invariants and defensively copies state.
@@ -146,6 +207,10 @@ class PromptGenerationRequest:
             raise ValueError(
                 "parent_b must not have the same id as parent_a."
             )
+        if self.parent_a_performance is not None and not isinstance(self.parent_a_performance, ParentPerformance):
+            raise ValueError("parent_a_performance must be a ParentPerformance instance or None.")
+        if self.parent_b_performance is not None and not isinstance(self.parent_b_performance, ParentPerformance):
+            raise ValueError("parent_b_performance must be a ParentPerformance instance or None.")
         object.__setattr__(
             self, "existing_prompt_texts", set(self.existing_prompt_texts)
         )

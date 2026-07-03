@@ -58,7 +58,7 @@ import random
 # ---------------------------------------------------------------------------
 # Experiment-level configuration.
 #
-# configs/config.py defines model and GA hyperparameters (MODEL_NAME,
+# configs/config.py defines model and GA hyperparameters (DEFAULT_MODEL,
 # MAX_NEW_TOKENS, TEMPERATURE, GA_POPULATION_SIZE, GA_GENERATIONS,
 # GA_TOURNAMENT_SIZE). It does not define which datasets back each
 # hospital, how many hospitals participate, the elite count, the
@@ -124,7 +124,7 @@ class _QwenReasoningLLM:
         print("=" * 80)
         print("HFPO Evolution")
         print("=" * 80)
-        print(f"Model: {config.MODEL_NAME}")
+        print(f"Model: {config.DEFAULT_MODEL}")
         print(f"Population Size: {config.GA_POPULATION_SIZE}")
         print(f"Generations: {config.GA_GENERATIONS}")
         print(f"Tournament Size: {config.GA_TOURNAMENT_SIZE}")
@@ -285,7 +285,7 @@ def main() -> None:
         aggregator=aggregator,
         evaluation_cache=evaluation_cache,
         lineage_tracker=lineage_tracker,
-        model_name=config.MODEL_NAME,
+        model_name=config.DEFAULT_MODEL,
         dataset_name=FEDERATION_DATASET_LABEL,
         evaluation_version=EVALUATION_VERSION,
     )
@@ -313,7 +313,7 @@ def main() -> None:
                 if candidate.fitness is not None:
                     evaluation_cache.set(
                         candidate.text,
-                        config.MODEL_NAME,
+                        config.DEFAULT_MODEL,
                         FEDERATION_DATASET_LABEL,
                         EVALUATION_VERSION,
                         candidate.fitness,

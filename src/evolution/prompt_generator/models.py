@@ -117,7 +117,7 @@ class ParentPerformance:
     @classmethod
     def from_fitness_vector(cls, fitness: FitnessVector) -> "ParentPerformance":
         """Create from a FitnessVector."""
-        scores = fitness.scores()
+        scores = fitness.scores
         if not scores:
             raise ValueError("FitnessVector has no scores.")
         best = max(scores, key=scores.get)

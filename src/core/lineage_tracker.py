@@ -50,16 +50,20 @@ class LineageTracker:
         if not prompt_id.strip():
             raise ValueError("LineageTracker prompt_id must not be empty.")
 
-    def register(self, prompt: PromptCandidate) -> None:
+    def register(self, prompt: PromptCandidate, allow_missing_parents: bool = False) -> None:
         """Register a PromptCandidate and its direct parent relationships.
 
         Args:
             prompt: The `PromptCandidate` to register.
+            allow_missing_parents: If True, allow registration even if parent
+                IDs are not yet registered (useful when loading from checkpoints
+                that may not contain the full lineage history).
 
         Raises:
             ValueError: If a prompt with the same ID has already been
                 registered, or if any declared parent ID does not exist in
-                the tracker and the prompt's origin is not "seed".
+                the tracker and the prompt's origin is not "seed" and
+                allow_missing_parents is False.
         """
         if prompt.id in self._nodes:
             raise ValueError(
@@ -70,10 +74,15 @@ class LineageTracker:
         if prompt.origin != "seed":
             for parent_id in prompt.parent_ids:
                 if parent_id not in self._nodes:
-                    raise ValueError(
-                        f"Cannot register PromptCandidate '{prompt.id}': "
-                        f"parent '{parent_id}' has not been registered."
-                    )
+                    if not allow_missing_parents:
+                        raise ValueError(
+                            f"Cannot register PromptCandidate '{prompt.id}': "
+                            f"parent '{parent_id}' has not been registered."
+                        )
+                    # Parent missing - create a minimal placeholder
+                    # This can happen when loading checkpoints that don't
+                    # contain the full lineage history
+                    pass
 
         self._nodes[prompt.id] = prompt
         self._parents[prompt.id] = list(prompt.parent_ids)

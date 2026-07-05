@@ -10,17 +10,19 @@ prompt string using the predefined mutation and crossover templates.
 """
 
 from .models import PromptGenerationRequest, ParentPerformance
-from .prompts.crossover import CROSSOVER_TEMPLATE
+from .prompts.prompt_utils.crossover import CROSSOVER_TEMPLATE
 import random
+from .thinking_directions import THINKING_DIRECTIONS
+from .prompts.prompt_utils.mutation import MUTATION_TEMPLATE
 
-from .prompts.mutation.reasoning import MUTATION_TEMPLATE as REASONING_TEMPLATE
-from .prompts.mutation.elimination import MUTATION_TEMPLATE as ELIMINATION_TEMPLATE
-from .prompts.mutation.differential import MUTATION_TEMPLATE as DIFFERENTIAL_TEMPLATE
-from .prompts.mutation.evidence import MUTATION_TEMPLATE as EVIDENCE_TEMPLATE
-from .prompts.mutation.probability import MUTATION_TEMPLATE as PROBABILITY_TEMPLATE
-from .prompts.mutation.guideline import MUTATION_TEMPLATE as GUIDELINE_TEMPLATE
-from .prompts.mutation.role import MUTATION_TEMPLATE as ROLE_TEMPLATE
-from .prompts.mutation.aggressive import MUTATION_TEMPLATE as AGGRESSIVE_TEMPLATE
+# from .prompts.mutation.reasoning import MUTATION_TEMPLATE as REASONING_TEMPLATE
+# from .prompts.mutation.elimination import MUTATION_TEMPLATE as ELIMINATION_TEMPLATE
+# from .prompts.mutation.differential import MUTATION_TEMPLATE as DIFFERENTIAL_TEMPLATE
+# from .prompts.mutation.evidence import MUTATION_TEMPLATE as EVIDENCE_TEMPLATE
+# from .prompts.mutation.probability import MUTATION_TEMPLATE as PROBABILITY_TEMPLATE
+# from .prompts.mutation.guideline import MUTATION_TEMPLATE as GUIDELINE_TEMPLATE
+# from .prompts.mutation.role import MUTATION_TEMPLATE as ROLE_TEMPLATE
+# from .prompts.mutation.aggressive import MUTATION_TEMPLATE as AGGRESSIVE_TEMPLATE
 
 # Fixed mutation template that wraps the evolving strategy
 FIXED_MUTATION_TEMPLATE: str = """You are assisting in the optimization of prompts for a medical question-answering system through an evolutionary optimization process.
@@ -149,43 +151,39 @@ class PromptTemplateBuilder:
         
         return "\n".join(lines)
 
-    def _build_mutation(self, request: PromptGenerationRequest) -> tuple[str, str]:
-        """Formats a mutation template using either adaptive or fixed strategies."""
+    def _build_mutation(
+        self,
+        request: PromptGenerationRequest,
+    ) -> tuple[str, str]:
+        """Build the mutation instruction."""
+
         performance_summary = self._format_performance_summary(
-            request.parent_a_performance, None
+            request.parent_a_performance,
+            None,
         )
 
         if self._mutation_manager is not None:
-            # Adaptive mutation: select strategy from evolving population
+            # Adaptive mutation (future)
             selected = self._mutation_manager.select()
             self._last_mutation_operator = selected.id
-            strategy = selected.strategy
-        else:
-            # Backward compatibility: random fixed template
-            MUTATION_TEMPLATES = [
-                ("reasoning", REASONING_TEMPLATE),
-                ("elimination", ELIMINATION_TEMPLATE),
-                ("differential", DIFFERENTIAL_TEMPLATE),
-                ("evidence", EVIDENCE_TEMPLATE),
-                ("probability", PROBABILITY_TEMPLATE),
-                ("guideline", GUIDELINE_TEMPLATE),
-                ("role", ROLE_TEMPLATE),
-                ("aggressive", AGGRESSIVE_TEMPLATE),
-            ]
-            operator_name, template = random.choice(MUTATION_TEMPLATES)
-            self._last_mutation_operator = operator_name
-            # Use the full template as the "strategy"
-            strategy = template
+            thinking_direction = selected.strategy
 
-        instruction = FIXED_MUTATION_TEMPLATE.format(
+        else:
+            thinking_direction = "\n".join(
+                f"- {direction}"
+                for direction in random.sample(THINKING_DIRECTIONS, k=2)
+            )
+
+            self._last_mutation_operator = "random_thinking_directions"
+
+        instruction = MUTATION_TEMPLATE.format(
             task_description=request.task_description,
             parent_prompt=request.parent_a.text,
             parent_performance=performance_summary,
-            strategy=strategy,
+            thinking_direction=thinking_direction,
         )
 
         return self._last_mutation_operator, instruction
-
     def _build_crossover(self, request: PromptGenerationRequest) -> tuple[str, str]:
         """Formats the crossover template for a request."""
         if request.parent_b is None:

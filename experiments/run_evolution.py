@@ -254,6 +254,35 @@ def _build_mutation_population() -> MutationPromptManager:
     )
 
 
+def _topological_sort_candidates(candidates: list[PromptCandidate]) -> list[PromptCandidate]:
+    """Sort candidates so parents come before children."""
+    id_to_candidate = {c.id: c for c in candidates}
+    visited = set()
+    temp = set()
+    result = []
+
+    def visit(candidate_id: str):
+        if candidate_id in temp:
+            # Cycle detected, but shouldn't happen in valid lineage
+            return
+        if candidate_id in visited:
+            return
+        temp.add(candidate_id)
+        candidate = id_to_candidate.get(candidate_id)
+        if candidate:
+            for parent_id in candidate.parent_ids:
+                if parent_id in id_to_candidate:
+                    visit(parent_id)
+        temp.remove(candidate_id)
+        visited.add(candidate_id)
+        result.append(id_to_candidate[candidate_id])
+
+    for candidate in candidates:
+        visit(candidate.id)
+
+    return result
+
+
 def main() -> None:
     """Runs one complete HFPO evolutionary optimization experiment."""
     parser = argparse.ArgumentParser(
@@ -330,14 +359,91 @@ def main() -> None:
             print("No checkpoint found. Starting from scratch.")
         else:
             print(f"Found checkpoint for generation {latest_gen}.")
+            
+            # Load all available generations to get full lineage
+            all_candidates = []
+            for gen in range(latest_gen + 1):
+                try:
+                    gen_population = output_manager.load_population_checkpoint(gen)
+                    all_candidates.extend(gen_population)
+                except ValueError:
+                    # Checkpoint doesn't exist for this generation (e.g., gen 0)
+                    if gen == 0:
+                        # Build seed population for generation 0
+                        seed_population = _build_seed_population(config.GA_POPULATION_SIZE)
+                        all_candidates.extend(seed_population)
+                    else:
+                        # Skip missing generations
+                        pass
+            
+            print(f"Loaded {len(all_candidates)} candidates from generations 0 to {latest_gen}")
+            
             population = output_manager.load_population_checkpoint(latest_gen)
             print(
-                f"Loaded population: {len(population)} candidates, "
+                f"Current population: {len(population)} candidates, "
                 f"generation {population.generation}"
             )
 
-            for candidate in population:
-                lineage_tracker.register(candidate)
+            # Check if evolution is already complete
+            if latest_gen >= config.GA_GENERATIONS:
+                print(f"Evolution already complete (ran {config.GA_GENERATIONS} generations, "
+                      f"checkpoint at generation {latest_gen}). Printing final results.")
+                
+                # Sort all candidates topologically so parents are registered before children
+                candidates_sorted = _topological_sort_candidates(all_candidates)
+                for candidate in candidates_sorted:
+                    lineage_tracker.register(candidate, allow_missing_parents=True)
+
+                for candidate in population:
+                    if candidate.fitness is not None:
+                        evaluation_cache.set(
+                            candidate.text,
+                            config.DEFAULT_MODEL,
+                            FEDERATION_DATASET_LABEL,
+                            EVALUATION_VERSION,
+                            candidate.fitness,
+                        )
+
+                # Print final results and exit
+                evaluated_candidates = [
+                    candidate for candidate in population if candidate.fitness is not None
+                ]
+
+                print("HFPO evolutionary run complete.")
+                print(f"Generations run: {config.GA_GENERATIONS}")
+                print(f"Final population size: {len(population)}")
+
+                if evaluated_candidates:
+                    best_candidate = max(
+                        evaluated_candidates,
+                        key=lambda candidate: candidate.fitness.average(),
+                    )
+                    print(
+                        "Best known candidate (an elite carried into the final "
+                        f"population): {best_candidate.id}"
+                    )
+                    print(
+                        f"Best known average fitness: {best_candidate.fitness.average():.4f}"
+                    )
+                    print("Best known prompt:")
+                    print(best_candidate.text)
+                else:
+                    print(
+                        "No evaluated candidates remain in the final population; see "
+                        "per-generation snapshots and best-prompt reports under "
+                        f"'{OUTPUT_DIRECTORY}' for the full evolutionary history."
+                    )
+
+                print(
+                    "Full per-generation snapshots and best-prompt reports were "
+                    f"written under '{OUTPUT_DIRECTORY}'."
+                )
+                return
+
+            # Sort all candidates topologically so parents are registered before children
+            candidates_sorted = _topological_sort_candidates(all_candidates)
+            for candidate in candidates_sorted:
+                lineage_tracker.register(candidate, allow_missing_parents=True)
 
             for candidate in population:
                 if candidate.fitness is not None:

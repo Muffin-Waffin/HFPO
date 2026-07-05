@@ -38,4 +38,34 @@ SEED_PROMPTS: list[str] = [
     (
         "Think briefly before selecting the best answer."
     ),
+    # (
+    # "Think like a physician solving an unfamiliar case."
+    # ),
+    # (
+    #     "Be cautious and avoid making unsupported assumptions."
+    # ),
+    # (
+    #     "Identify the key medical clue before choosing an answer."
+    # ),
+    # (
+    #     "Consider each option before making a final decision."
+    # ),
+    # (
+    #     "Prioritize patient safety when selecting the answer."
+    # ),
+    # (
+    #     "Choose the answer that is best supported by the information given."
+    # ),
+    # (
+    #     "Solve the question systematically rather than relying on intuition."
+    # ),
+    # (
+    #     "Focus only on the evidence presented in the question."
+    # ),
+    # (
+    #     "Decide which option is most medically justified."
+    # ),
+    # (
+    #     "Answer as accurately as possible using sound clinical judgment."
+    # ),
 ]

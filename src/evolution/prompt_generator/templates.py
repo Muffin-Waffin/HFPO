@@ -22,6 +22,38 @@ from .prompts.mutation.guideline import MUTATION_TEMPLATE as GUIDELINE_TEMPLATE
 from .prompts.mutation.role import MUTATION_TEMPLATE as ROLE_TEMPLATE
 from .prompts.mutation.aggressive import MUTATION_TEMPLATE as AGGRESSIVE_TEMPLATE
 
+# Fixed mutation template that wraps the evolving strategy
+FIXED_MUTATION_TEMPLATE: str = """You are assisting in the optimization of prompts for a medical question-answering system through an evolutionary optimization process.
+
+Task Description
+----------------
+{task_description}
+
+Parent Prompt
+-------------
+{parent_prompt}
+
+{parent_performance}
+
+Mutation Strategy
+-----------------
+{strategy}
+
+Output Requirements
+-------------------
+Return ONLY the new prompt.
+
+Do NOT:
+- explain your changes;
+- compare the new prompt with the parent;
+- include Markdown;
+- include code fences;
+- number the output;
+- surround the prompt with quotation marks;
+- mention mutation, evolution, optimization, prompt engineering, or genetic algorithms in the generated prompt.
+
+Produce exactly one new prompt and nothing else."""
+
 
 class PromptTemplateBuilder:
     """Builds formatted LLM instruction strings from generation
@@ -35,10 +67,11 @@ class PromptTemplateBuilder:
     validation, no PromptCandidate construction, no retries, and no
     other side effects.
     """
-    __slots__ = ("_last_mutation_operator",)
+    __slots__ = ("_last_mutation_operator", "_mutation_manager")
 
-    def __init__(self):
+    def __init__(self, mutation_manager=None):
         self._last_mutation_operator = None
+        self._mutation_manager = mutation_manager
 
     def build(self, request: PromptGenerationRequest) -> tuple[str, str]:
         """Builds the formatted prompt instruction for a request.
@@ -117,30 +150,41 @@ class PromptTemplateBuilder:
         return "\n".join(lines)
 
     def _build_mutation(self, request: PromptGenerationRequest) -> tuple[str, str]:
-        """Formats a randomly selected mutation template."""
-        MUTATION_TEMPLATES = [
-        ("reasoning", REASONING_TEMPLATE),
-        ("elimination", ELIMINATION_TEMPLATE),
-        ("differential", DIFFERENTIAL_TEMPLATE),
-        ("evidence", EVIDENCE_TEMPLATE),
-        ("probability", PROBABILITY_TEMPLATE),
-        ("guideline", GUIDELINE_TEMPLATE),
-        ("role", ROLE_TEMPLATE),
-        ("aggressive", AGGRESSIVE_TEMPLATE),
-    ]
-        operator_name, template = random.choice(MUTATION_TEMPLATES)
-        
+        """Formats a mutation template using either adaptive or fixed strategies."""
         performance_summary = self._format_performance_summary(
-            request.parent_a_performance, operator_name
+            request.parent_a_performance, None
         )
 
-        instruction = template.format(
+        if self._mutation_manager is not None:
+            # Adaptive mutation: select strategy from evolving population
+            selected = self._mutation_manager.select()
+            self._last_mutation_operator = selected.id
+            strategy = selected.strategy
+        else:
+            # Backward compatibility: random fixed template
+            MUTATION_TEMPLATES = [
+                ("reasoning", REASONING_TEMPLATE),
+                ("elimination", ELIMINATION_TEMPLATE),
+                ("differential", DIFFERENTIAL_TEMPLATE),
+                ("evidence", EVIDENCE_TEMPLATE),
+                ("probability", PROBABILITY_TEMPLATE),
+                ("guideline", GUIDELINE_TEMPLATE),
+                ("role", ROLE_TEMPLATE),
+                ("aggressive", AGGRESSIVE_TEMPLATE),
+            ]
+            operator_name, template = random.choice(MUTATION_TEMPLATES)
+            self._last_mutation_operator = operator_name
+            # Use the full template as the "strategy"
+            strategy = template
+
+        instruction = FIXED_MUTATION_TEMPLATE.format(
             task_description=request.task_description,
             parent_prompt=request.parent_a.text,
             parent_performance=performance_summary,
+            strategy=strategy,
         )
 
-        return operator_name, instruction
+        return self._last_mutation_operator, instruction
 
     def _build_crossover(self, request: PromptGenerationRequest) -> tuple[str, str]:
         """Formats the crossover template for a request."""

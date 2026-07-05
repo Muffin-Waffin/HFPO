@@ -37,6 +37,8 @@ from src.core.lineage_tracker import LineageTracker
 from src.core.evaluation_cache import EvaluationCache
 from src.core.population import Population
 from src.core.prompt_candidate import PromptCandidate
+from src.core.mutation_prompt_candidate import MutationPromptCandidate
+from src.core.mutation_prompt_manager import MutationPromptManager
 from src.core.seed_prompts import SEED_PROMPTS
 from src.data.loader import load_dataset
 from src.evaluation.qwen_evaluator import QwenEvaluator
@@ -87,6 +89,19 @@ TASK_DESCRIPTION: str = (
 )
 
 
+# Seed mutation strategies (Generation 0) - compact strategies, not full templates
+SEED_MUTATION_STRATEGIES: tuple[str, ...] = (
+    "Preserve successful instructions. Modify only one aspect of the prompt that is likely responsible for poor performance.",
+    "Make the smallest meaningful change capable of improving the weakest objective.",
+    "Compress redundant instructions while preserving behavior.",
+    "Explore a substantially different reasoning approach without changing the task.",
+    "Replace one reasoning pattern with an alternative while preserving the prompt's strengths.",
+    "Improve clarity and remove ambiguity before adding new instructions.",
+    "Preserve structure but experiment with instruction ordering and emphasis.",
+    "Identify assumptions made by the parent prompt and replace one with an alternative.",
+)
+
+
 class _QwenReasoningLLM:
     """Adapts a loaded Qwen model and tokenizer to the ReasoningLLM
     protocol.
@@ -130,9 +145,11 @@ class _QwenReasoningLLM:
         print(f"Tournament Size: {config.GA_TOURNAMENT_SIZE}")
         print(f"Mutation Rate: {config.GA_MUTATION_RATE}")
         print(f"Crossover Rate: {config.GA_CROSSOVER_RATE}")
+        if config.USE_ADAPTIVE_MUTATION:
+            print(f"Adaptive Mutation: ENABLED (evolve every {config.MUTATION_EVOLUTION_INTERVAL} gens)")
+        else:
+            print("Adaptive Mutation: DISABLED (using fixed templates)")
         print("=" * 80)
-
-        # print(f"Loaded {dataset_name}: {len(dataset)} samples")
 
     def generate(self, prompt: str, temperature: float) -> str:
         """Generates text from a single-turn chat-formatted prompt.
@@ -191,36 +208,49 @@ def _build_seed_population(max_population_size: int) -> Population:
         A new Population containing one PromptCandidate per entry in
         SEED_PROMPTS.
     """
-    # seed_candidates = [
-    #     PromptCandidate(
-    #         id=str(uuid.uuid4()),
-    #         text=prompt_text,
-    #         generation=0,
-    #         parent_ids=[],
-    #         ancestry_ids=[],
-    #         origin="seed",
-    #         fitness=None,
-    #     )
-    #     for prompt_text in SEED_PROMPTS
-    # ]
-
     seed_candidates = [
-    PromptCandidate(
-        id=str(uuid.uuid4()),
-        text=prompt_text,
-        generation=0,
-        parent_ids=[],
-        ancestry_ids=[],
-        origin="seed",
-        fitness=None,
-    )
-    for prompt_text in SEED_PROMPTS
+        PromptCandidate(
+            id=str(uuid.uuid4()),
+            text=prompt_text,
+            generation=0,
+            parent_ids=[],
+            ancestry_ids=[],
+            origin="seed",
+            fitness=None,
+        )
+        for prompt_text in SEED_PROMPTS
     ]
 
     return Population(
         prompts=seed_candidates,
         generation=0,
         max_population_size=max_population_size,
+    )
+
+
+def _build_mutation_population() -> MutationPromptManager:
+    """Builds the Generation-0 mutation prompt population from seed strategies.
+
+    Returns:
+        A MutationPromptManager containing one MutationPromptCandidate per
+        seed strategy.
+    """
+    mutation_candidates = [
+        MutationPromptCandidate(
+            id=str(uuid.uuid4()),
+            strategy=strategy,
+            generation=0,
+            parent_ids=[],
+        )
+        for strategy in SEED_MUTATION_STRATEGIES
+    ]
+
+    return MutationPromptManager(
+        candidates=mutation_candidates,
+        tournament_size=config.MUTATION_TOURNAMENT_SIZE,
+        elite_count=config.MUTATION_ELITE_COUNT,
+        min_children_before_evolution=config.MIN_CHILDREN_FOR_RANKING,
+        random_seed=config.RANDOM_SEED,
     )
 
 
@@ -326,9 +356,17 @@ def main() -> None:
         for candidate in population:
             lineage_tracker.register(candidate)
 
+    # Build mutation prompt population (or None if adaptive mutation disabled)
+    mutation_manager = None
+    if config.USE_ADAPTIVE_MUTATION:
+        mutation_manager = _build_mutation_population()
+        print(f"Initialized mutation population with {len(mutation_manager.candidates)} strategies")
+
+    template_builder = PromptTemplateBuilder(mutation_manager=mutation_manager)
+
     prompt_generator = PromptGenerator(
         llm=llm,
-        template_builder=PromptTemplateBuilder(),
+        template_builder=template_builder,
         cleaner=PromptCleaner(),
         validator=PromptValidator(),
         lineage_tracker=lineage_tracker,
@@ -358,6 +396,9 @@ def main() -> None:
         mutation_rate=config.GA_MUTATION_RATE,
         crossover_rate=config.GA_CROSSOVER_RATE,
         start_generation=start_generation,
+        mutation_manager=mutation_manager,
+        mutation_evolution_interval=config.MUTATION_EVOLUTION_INTERVAL,
+        min_children_for_evolution=config.MIN_CHILDREN_FOR_RANKING,
     )
 
     final_population = engine.run()

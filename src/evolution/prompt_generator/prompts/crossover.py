@@ -1,20 +1,19 @@
 """Crossover prompt template for the Prompt Generator subsystem.
 
-This module defines the crossover prompt template shown to the
-reasoning LLM whenever the genetic algorithm performs a crossover
-operation between two parent prompts. It contains no generation
-logic, no API calls, no PromptCandidate creation, no validation, and
-no cleaning. It only defines a reusable, format()-style prompt
-template.
+This module defines the crossover prompt template used whenever HFPO
+creates one offspring from two parent prompts.
+
+The template intentionally minimizes reasoning instructions and instead
+focuses the model on producing a single high-quality instruction prompt.
 """
 
 __all__ = ["CROSSOVER_TEMPLATE"]
 
 
-CROSSOVER_TEMPLATE: str = """You are assisting in the optimization of prompts for a medical question-answering system through an evolutionary optimization process.
+CROSSOVER_TEMPLATE: str = """You are improving prompts for a medical multiple-choice question answering system.
 
-Task Description
-----------------
+Task
+----
 {task_description}
 
 Parent Prompt A
@@ -25,68 +24,42 @@ Parent Prompt B
 ---------------
 {parent_b}
 
-Your objective is to create exactly ONE offspring prompt.
+Objective
+---------
+Both parent prompts successfully perform the same underlying task, but
+each may contain useful strengths.
 
-The offspring should preserve the shared objective of both parents while
-combining complementary characteristics from each.
+Create ONE new prompt that naturally preserves the strongest qualities
+of both parents while remaining coherent and internally consistent.
 
-Possible characteristics include:
-- professional role or persona
-- reasoning strategy
-- prompt organization
-- decision process
-- constraints
-- output instructions
-- formatting
+The offspring should read as though it were written by a single author.
+It should NOT look like two prompts stitched together.
 
-You are encouraged to recombine these characteristics in a novel way.
-
-Examples include:
-- use the reasoning strategy from Parent A and the professional role from Parent B;
-- use the prompt organization from Parent B and the decision process from Parent A;
-- combine complementary constraints from both parents.
-
-Novelty Requirement
--------------------
-The offspring should be substantially different from BOTH parents.
-
-A human reviewer should immediately recognize that the offspring is a
-new prompt rather than an edited copy or average of either parent.
-
-Behavioral Requirement
-----------------------
-The offspring should encourage a behavior that neither parent expresses
-in exactly the same way.
-
-Small wording changes, synonym replacement, or sentence reordering are
-NOT sufficient.
-
-Strict Constraints
-------------------
-Do NOT:
-- concatenate the two prompts;
-- average the two prompts;
-- copy one parent with minor edits;
-- simply paraphrase either parent;
-- invent unrelated objectives;
-- invent unsupported medical knowledge.
-
-Preserve only the shared task:
-answering medical multiple-choice questions accurately.
+Guidelines
+----------
+- Preserve the shared objective of answering medical multiple-choice questions.
+- Keep useful instructions from both parents whenever they improve clarity or reasoning.
+- Remove redundant, conflicting, or unnecessary instructions.
+- Improve clarity, precision, and usefulness whenever possible.
+- Prefer a clean, concise prompt over a longer one.
+- If one parent contains a clearly better way of expressing an idea, use it.
+- It is acceptable to discard weak parts of either parent.
 
 Output Requirements
 -------------------
-Return ONLY the offspring prompt.
+Return ONLY the final prompt.
 
 Do NOT:
-- explain your choices;
+- explain your reasoning;
+- mention Parent A or Parent B;
+- describe which ideas came from which parent;
 - compare the parents;
-- identify which parent contributed what;
+- describe the crossover process;
 - include Markdown;
 - include code fences;
-- number the output;
-- surround the prompt with quotation marks;
+- include quotation marks;
+- include numbered lists;
 - mention crossover, mutation, evolution, optimization, prompt engineering, or genetic algorithms.
 
-Produce exactly one offspring prompt and nothing else.
+The output must be a reusable system prompt and nothing else.
 """

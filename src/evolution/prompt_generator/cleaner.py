@@ -199,6 +199,18 @@ class PromptCleaner:
                 and stripped.endswith(quote)
             ):
                 return stripped[length:-length].strip()
+            
+        PREFIXES = [
+            "Here is the new prompt:",
+            "Here is the prompt:",
+            "New prompt:",
+            "Prompt:",
+            "Offspring prompt:",
+        ]
+   
+        for prefix in PREFIXES:
+            if text.lower().startswith(prefix.lower()):
+                text = text[len(prefix):].lstrip()
 
         return text
 

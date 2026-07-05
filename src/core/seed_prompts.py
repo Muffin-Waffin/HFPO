@@ -9,48 +9,33 @@ the experiment runner before evolutionary optimization begins.
 
 SEED_PROMPTS: list[str] = [
     (
-        "You are a medical expert. "
-        "Answer the following question accurately."
+        "You are a doctor. Answer the question."
     ),
     (
-        "You are an experienced physician preparing for the USMLE. "
-        "Choose the single best answer. "
-        "Return only the correct option."
+        "Choose the correct answer for the following medical question."
     ),
     (
-        "You are a careful clinician. "
-        "Eliminate incorrect options before selecting the best answer. "
-        "Return only the answer letter."
+        "You are taking a medical licensing examination. Select the best answer."
     ),
     (
-        "Think step by step through the medical question before choosing "
-        "the correct answer. "
-        "Return only the answer letter."
+        "You are evaluating a patient. Choose the most appropriate diagnosis or management option."
     ),
     (
-        "You are a medical board examiner. "
-        "Evaluate every option carefully and choose the single best answer."
+        "Use your medical knowledge to answer the question."
     ),
     (
-        "You are a diagnostician. "
-        "Carefully analyze the patient's presentation before selecting the "
-        "best answer."
+        "Answer accurately."
     ),
     (
-        "You are a specialist physician. "
-        "Apply sound clinical reasoning to identify the correct answer."
+        "Choose the safest and most appropriate medical answer."
     ),
     (
-        "Answer as an experienced medical professional taking a licensing "
-        "examination."
+        "Make the best clinical decision based on the information provided."
     ),
     (
-        "Use evidence-based clinical reasoning to evaluate every option "
-        "before selecting the best answer."
+        "Identify the most likely diagnosis or next best step."
     ),
     (
-        "Reason carefully using established medical knowledge. "
-        "Avoid assumptions, eliminate incorrect choices, and select the "
-        "single best answer."
+        "Think briefly before selecting the best answer."
     ),
 ]

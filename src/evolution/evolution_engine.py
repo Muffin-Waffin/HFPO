@@ -10,18 +10,6 @@ prompt generation, fitness computation, or file persistence code.
 All specialized work is delegated to injected collaborator
 components; EvolutionEngine's sole responsibility is to call those
 collaborators in the correct order.
-
-Stage 1 established the orchestration architecture: ``run()`` calls
-every private helper in the correct order, but each helper raised
-``NotImplementedError``. Stage 2 implemented ``_initialize()``,
-``_evaluate_population()``, ``_generation_statistics()``,
-``_create_snapshot()``, and ``_save_outputs()``, making the engine
-capable of executing generation 0 end-to-end. Stage 3 implements
-``_select_elites()``, ``_generate_offspring()``, and
-``_build_next_population()``, and updates ``run()`` to perform the
-complete evolutionary loop across ``_num_generations`` generations:
-evaluate, snapshot, persist, select elites, generate offspring, and
-replace the population, each generation.
 """
 
 from __future__ import annotations
@@ -31,8 +19,11 @@ import random
 from typing import Any
 
 from src.evolution.prompt_logger import PromptLogger
+from src.evolution.mutation_prompt_logger import MutationPromptLogger
 from src.core.population import Population
 from src.core.prompt_candidate import PromptCandidate
+from src.core.mutation_prompt_candidate import MutationPromptCandidate
+from src.core.mutation_prompt_manager import MutationPromptManager
 from src.evolution.elitism import Elitism
 from src.evolution.generation_snapshot import GenerationSnapshot
 from src.evolution.output_manager import OutputManager
@@ -40,6 +31,7 @@ from src.evolution.prompt_generator.generator import PromptGenerator
 from src.evolution.prompt_generator.models import PromptGenerationRequest, ParentPerformance
 from src.evolution.tournament_selector import TournamentSelector
 from src.federated.federated_server import FederatedServer
+from src.evolution.prompt_generator.templates import PromptTemplateBuilder
 
 
 class EvolutionEngine:
@@ -53,30 +45,6 @@ class EvolutionEngine:
     crossover, selection, evaluation, prompt generation, fitness
     computation, or persistence; it only sequences calls to the
     components that do.
-
-    Stage 3 completes the evolutionary loop: ``_select_elites()``
-    delegates to ``_elitism``, ``_generate_offspring()`` delegates to
-    ``_tournament_selector`` and ``_prompt_generator``, and
-    ``_build_next_population()`` assembles the next generation's
-    ``Population``. ``run()`` executes this full cycle once per
-    generation, for ``_num_generations`` generations.
-
-    Attributes:
-        _population: The current Population under optimization.
-        _federated_server: The federated evaluator used to compute
-            per-client fitness for candidates against hospital data.
-        _tournament_selector: Selection strategy used to choose
-            parents/elites from an evaluated population.
-        _elitism: Elitism strategy used to preserve top-performing
-            candidates across generations.
-        _prompt_generator: LLM-backed component used to produce
-            offspring prompts via mutation/crossover operators.
-        _output_manager: Persistence utility used to write snapshots,
-            best-prompt reports, summaries, and checkpoints.
-        _num_generations: Total number of generations to run.
-        _task_description: Description of the task every generated
-            prompt must address.
-        _temperature: Sampling temperature used for prompt generation.
     """
 
     __slots__ = (
@@ -90,10 +58,15 @@ class EvolutionEngine:
         "_task_description",
         "_temperature",
         "_prompt_logger",
+        "_mutation_prompt_logger",
         "_mutation_rate",
         "_crossover_rate",
         "_operator_rng",
         "_start_generation",
+        "_mutation_manager",
+        "_mutation_evolution_interval",
+        "_min_children_for_evolution",
+        "_offspring_mutation_info",
     )
 
     def __init__(
@@ -110,6 +83,9 @@ class EvolutionEngine:
         mutation_rate: float = 0.3,
         crossover_rate: float = 0.7,
         start_generation: int = 0,
+        mutation_manager: MutationPromptManager | None = None,
+        mutation_evolution_interval: int = 5,
+        min_children_for_evolution: int = 10,
     ) -> None:
         """Initializes the EvolutionEngine with all required collaborators.
 
@@ -117,37 +93,6 @@ class EvolutionEngine:
         expected type (which also rejects ``None``) before being
         stored. No algorithmic state is initialized here; that is the
         responsibility of ``_initialize()``.
-
-        Args:
-            population: The initial Population to evolve.
-            federated_server: The federated evaluator responsible for
-                computing per-client fitness for candidates.
-            tournament_selector: Selection strategy used during the
-                evolutionary loop.
-            elitism: Elitism strategy used to preserve top performers.
-            prompt_generator: LLM-backed mutation/crossover operator.
-            output_manager: Persistence utility for experiment
-                outputs.
-            num_generations: Total number of generations to run. Must
-                be a positive integer.
-            task_description: Description of the task every generated
-                prompt must address, passed through to every
-                ``PromptGenerationRequest``. Must not be empty.
-            temperature: Sampling temperature passed through to every
-                ``PromptGenerationRequest``. Must be non-negative.
-                Defaults to 0.7.
-            start_generation: The generation number to resume from.
-                When resuming, this should be set to the last
-                completed generation + 1. Defaults to 0.
-
-        Raises:
-            TypeError: If any collaborator is not an instance of its
-                expected type, if ``num_generations`` is not an
-                integer, or if ``task_description`` is not a string.
-            ValueError: If ``num_generations`` is not positive, if
-                ``task_description`` is empty or whitespace, if
-                ``temperature`` is negative, or if ``start_generation``
-                is out of range.
         """
         if not isinstance(population, Population):
             raise TypeError("population must be a Population instance.")
@@ -196,6 +141,12 @@ class EvolutionEngine:
                 f"start_generation ({start_generation}) must be < "
                 f"num_generations ({num_generations})."
             )
+        if mutation_manager is not None and not isinstance(mutation_manager, MutationPromptManager):
+            raise TypeError("mutation_manager must be a MutationPromptManager instance or None.")
+        if not isinstance(mutation_evolution_interval, int) or mutation_evolution_interval <= 0:
+            raise ValueError("mutation_evolution_interval must be a positive integer.")
+        if not isinstance(min_children_for_evolution, int) or min_children_for_evolution <= 0:
+            raise ValueError("min_children_for_evolution must be a positive integer.")
 
         self._population = population
         self._federated_server = federated_server
@@ -213,6 +164,12 @@ class EvolutionEngine:
         self._prompt_logger = PromptLogger(
             "results/hfpo_run/generated_prompts.jsonl"
         )
+        self._mutation_prompt_logger = MutationPromptLogger(
+            "results/hfpo_run/mutation_history.jsonl"
+        )
+        self._mutation_manager = mutation_manager
+        self._mutation_evolution_interval = mutation_evolution_interval
+        self._min_children_for_evolution = min_children_for_evolution
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
@@ -283,6 +240,10 @@ class EvolutionEngine:
             )
             print(f"Generated {len(offspring)} offspring.")
 
+            # Record mutation prompt statistics after evaluation
+            if self._mutation_manager is not None:
+                self._record_mutation_results(offspring, generation)
+
             elapsed_time_seconds = (
                 time.perf_counter() - generation_start
             )
@@ -302,6 +263,11 @@ class EvolutionEngine:
                 offspring,
             )
 
+            # Evolve mutation prompts periodically
+            if (self._mutation_manager is not None and 
+                (generation + 1) % self._mutation_evolution_interval == 0):
+                self._evolve_mutation_prompts(generation)
+
             print("Saving population checkpoint...")
             self._output_manager.save_population_checkpoint(
                 self._population, generation + 1
@@ -317,20 +283,7 @@ class EvolutionEngine:
     # ------------------------------------------------------------------
 
     def _initialize(self) -> None:
-        """Validates the engine's state before the generational loop runs.
-
-        Confirms that the current population is non-empty and that
-        the engine is configured to run at least one generation.
-        ``Population`` itself refuses to be constructed empty, but it
-        is a mutable container (``clear()``, ``remove()``), so this
-        check defends against the population having been emptied out
-        between construction and ``run()``. No collaborator is
-        invoked here; this is purely a precondition check.
-
-        Raises:
-            ValueError: If the population is empty, or if
-                ``_num_generations`` is not positive.
-        """
+        """Validates the engine's state before the generational loop runs."""
         if len(self._population) == 0:
             raise ValueError(
                 "EvolutionEngine cannot run with an empty population."
@@ -343,36 +296,7 @@ class EvolutionEngine:
             )
 
     def _evaluate_population(self, generation: int) -> list[PromptCandidate]:
-        """Evaluates the current population via the federated server.
-
-        Delegates entirely to
-        ``_federated_server.evaluate_population()``: this method
-        computes no fitness itself. ``FederatedServer`` handles cache
-        lookups, hospital broadcast, aggregation into FitnessVectors,
-        and lineage registration; this method simply invokes it and
-        returns its result unchanged.
-
-        Args:
-            generation: The zero-indexed generation currently being
-                evaluated. Must be a non-negative integer. Not used to
-                select which population is evaluated -- the engine
-                always evaluates ``self._population`` -- but validated
-                here since it identifies which generation this
-                evaluation round belongs to for the caller.
-
-        Returns:
-            The list of ``PromptCandidate`` objects from the current
-            population, each with its ``fitness`` attribute populated
-            by ``_federated_server``.
-
-        Raises:
-            TypeError: If ``generation`` is not an integer.
-            ValueError: If ``generation`` is negative, or propagated
-                from ``_federated_server`` if the population is empty.
-            RuntimeError: Propagated from ``_federated_server`` if
-                federated evaluation fails (e.g. a mismatched response
-                count or a candidate left without a FitnessVector).
-        """
+        """Evaluates the current population via the federated server."""
         if not isinstance(generation, int) or isinstance(generation, bool):
             raise TypeError("generation must be an integer.")
         if generation < 0:
@@ -380,46 +304,58 @@ class EvolutionEngine:
 
         return self._federated_server.evaluate_population(list(self._population))
 
+    def _record_mutation_results(
+        self, 
+        offspring: list[PromptCandidate], 
+        generation: int
+    ) -> None:
+        """Record results for each offspring's mutation prompt."""
+        if not hasattr(self, '_offspring_mutation_info'):
+            return
+            
+        for child in offspring:
+            child_id = child.id
+            if child_id in self._offspring_mutation_info:
+                info = self._offspring_mutation_info[child_id]
+                mutation_prompt = info['mutation_prompt']
+                parent = info['parent']
+                
+                if child.fitness is not None and parent.fitness is not None:
+                    child_fitness = child.fitness.average()
+                    parent_fitness = parent.fitness.average()
+                    improvement = child_fitness - parent_fitness
+                    success = improvement > 0
+                    
+                    mutation_prompt.record_child_result(
+                        parent_id=parent.id,
+                        child_id=child.id,
+                        parent_fitness=parent_fitness,
+                        child_fitness=child_fitness,
+                        generation=generation,
+                    )
+                    
+                    # Log to mutation history
+                    self._mutation_prompt_logger.log(
+                        generation=generation,
+                        mutation_prompt=mutation_prompt,
+                        parent=parent,
+                        child=child,
+                        parent_fitness=parent_fitness,
+                        child_fitness=child_fitness,
+                        improvement=improvement,
+                        success=success,
+                    )
+        
+        # Clear for next generation
+        self._offspring_mutation_info = {}
+
     def _create_snapshot(
         self,
         generation: int,
         fitness_results: list[PromptCandidate],
         elapsed_time_seconds: float,
     ) -> GenerationSnapshot:
-        """Builds a GenerationSnapshot summarizing one generation.
-
-        Computes this generation's reporting statistics via
-        ``_generation_statistics()`` and combines them with the
-        evaluated population, the generation index, and the measured
-        wall-clock time into a single ``GenerationSnapshot``. This
-        method performs no domain validation of its own (e.g. score
-        ranges or population membership); ``GenerationSnapshot``'s own
-        ``__post_init__`` already enforces those invariants, and any
-        violation propagates from there rather than being duplicated
-        here.
-
-        Args:
-            generation: The zero-indexed generation this snapshot
-                describes.
-            fitness_results: The evaluated population for this
-                generation, as returned by ``_evaluate_population()``.
-            elapsed_time_seconds: The wall-clock time taken to
-                evaluate this generation, in seconds.
-
-        Returns:
-            A new ``GenerationSnapshot`` describing this generation.
-
-        Raises:
-            TypeError: If ``generation`` is not an integer, or if
-                ``fitness_results`` is not a list.
-            ValueError: If ``generation`` is negative, or propagated
-                from ``_generation_statistics()`` /
-                ``GenerationSnapshot`` if any field violates its
-                invariants (e.g. an out-of-range score, an empty
-                population, or a generation/population mismatch).
-            RuntimeError: Propagated from ``_generation_statistics()``
-                if any candidate has no ``FitnessVector``.
-        """
+        """Builds a GenerationSnapshot summarizing one generation."""
         if not isinstance(generation, int) or isinstance(generation, bool):
             raise TypeError("generation must be an integer.")
         if generation < 0:
@@ -443,24 +379,7 @@ class EvolutionEngine:
         )
 
     def _save_outputs(self, snapshot: GenerationSnapshot) -> None:
-        """Persists a generation's outputs via the OutputManager.
-
-        Delegates entirely to ``_output_manager``: writes the
-        generation snapshot via ``save_snapshot()`` and the best
-        candidate's prompt report via ``save_best_prompt()``. This
-        method performs no file I/O itself.
-
-        Args:
-            snapshot: The GenerationSnapshot to persist.
-
-        Raises:
-            TypeError: If ``snapshot`` is not a ``GenerationSnapshot``,
-                or propagated from ``_output_manager`` if
-                ``snapshot.best_candidate`` is not a valid
-                PromptCandidate.
-            ValueError: Propagated from ``_output_manager`` if
-                ``snapshot.best_candidate.generation`` is negative.
-        """
+        """Persists a generation's outputs via the OutputManager."""
         if not isinstance(snapshot, GenerationSnapshot):
             raise TypeError(
                 "snapshot must be a GenerationSnapshot."
@@ -470,35 +389,7 @@ class EvolutionEngine:
         self._output_manager.save_best_prompt(snapshot.best_candidate)
 
     def _select_elites(self, fitness_results: Any) -> list[PromptCandidate]:
-        """Selects elite candidates to carry forward unmodified.
-
-        Delegates entirely to
-        ``self._elitism.select_elites(self._population)``. Since
-        federated evaluation mutates each ``PromptCandidate`` in place
-        (setting its ``fitness`` attribute), the candidates referenced
-        by ``self._population`` are already evaluated by the time this
-        method runs; ``fitness_results`` is accepted only to keep
-        ``run()``'s call signature symmetric with the other
-        per-generation steps and is not otherwise used. This method
-        computes no scores and performs no ranking itself; that logic
-        belongs entirely to ``Elitism``.
-
-        Args:
-            fitness_results: The evaluated population produced by
-                ``_evaluate_population()`` for the current generation.
-                Must not be ``None``.
-
-        Returns:
-            The elite ``PromptCandidate`` objects selected by
-            ``_elitism``, ordered from highest to lowest fitness.
-
-        Raises:
-            ValueError: If ``fitness_results`` is ``None``, or
-                propagated from ``_elitism`` if the population is
-                empty or smaller than its configured elite count.
-            RuntimeError: Propagated from ``_elitism`` if any
-                candidate has no ``FitnessVector``.
-        """
+        """Selects elite candidates to carry forward unmodified."""
         if fitness_results is None:
             raise ValueError("fitness_results must not be None.")
 
@@ -513,55 +404,7 @@ class EvolutionEngine:
     def _generate_offspring(
         self, elites: list[PromptCandidate], generation: int
     ) -> list[PromptCandidate]:
-        
-        """Generates offspring candidates via the PromptGenerator.
-
-        Produces enough offspring that ``len(elites) + len(offspring)``
-        equals ``self._population.max_population_size``. For each
-        offspring, obtains parents from ``_tournament_selector`` (two
-        distinct parents when the population has at least two
-        members, one parent otherwise), builds a
-        ``PromptGenerationRequest``, and delegates the actual
-        mutation/crossover work to ``_prompt_generator.generate()``.
-        This method performs no mutation or crossover itself; it only
-        constructs requests and delegates.
-
-        ``TournamentSelector.select_parents()`` runs independent
-        tournaments with replacement, so two calls can legitimately
-        return the same winning candidate. ``PromptGenerationRequest``
-        forbids ``parent_b`` sharing an ID with ``parent_a``, so for
-        crossover offspring this method re-selects ``parent_b`` until
-        it differs from ``parent_a``, bounded by
-        ``len(self._population)`` attempts. Neither
-        ``TournamentSelector`` nor ``PromptGenerationRequest`` is
-        modified to accommodate this; the responsibility for
-        guaranteeing distinct crossover parents belongs to
-        ``EvolutionEngine``.
-
-        Args:
-            elites: The elite candidates selected by
-                ``_select_elites()``. Must not be ``None``.
-            generation: The zero-indexed generation offspring are
-                being produced for. Must be a non-negative integer.
-
-        Returns:
-            A list of newly generated ``PromptCandidate`` objects,
-            with length equal to
-            ``self._population.max_population_size - len(elites)``.
-
-        Raises:
-            TypeError: If ``generation`` is not an integer.
-            ValueError: If ``elites`` is ``None`` or ``generation`` is
-                negative, or propagated from
-                ``PromptGenerationRequest`` / ``_tournament_selector``
-                / ``_prompt_generator`` for invalid intermediate
-                state.
-            RuntimeError: If no ``parent_b`` distinct from
-                ``parent_a`` can be found within
-                ``len(self._population)`` attempts, or propagated from
-                ``_tournament_selector`` if any sampled candidate has
-                no ``FitnessVector``.
-        """
+        """Generates offspring candidates via the PromptGenerator."""
         if elites is None:
             raise ValueError("elites must not be None.")
         if not isinstance(generation, int) or isinstance(generation, bool):
@@ -574,6 +417,10 @@ class EvolutionEngine:
         max_retries = 5
         print(f"Generating {offspring_needed} offspring...")
         existing_prompt_texts = set(self._population.texts())
+        
+        # Track which mutation prompt generated each offspring
+        self._offspring_mutation_info = {}
+        
         for _ in range(offspring_needed):
             generated = False
             for attempt in range(max_retries):
@@ -620,6 +467,20 @@ class EvolutionEngine:
                     result = self._prompt_generator.generate(request)
                     offspring.append(result.candidate)
                     existing_prompt_texts.add(result.candidate.text)
+                    
+                    # Track mutation prompt used (for mutation, not crossover)
+                    if not use_crossover and self._mutation_manager is not None:
+                        # Get the mutation prompt that was selected
+                        template_builder = self._prompt_generator._template_builder
+                        if hasattr(template_builder, '_last_mutation_operator'):
+                            operator_id = template_builder._last_mutation_operator
+                            if operator_id in self._mutation_manager._candidates:
+                                mutation_prompt = self._mutation_manager._candidates[operator_id]
+                                self._offspring_mutation_info[result.candidate.id] = {
+                                    'mutation_prompt': mutation_prompt,
+                                    'parent': parent_a,
+                                }
+                    
                     self._prompt_logger.log(
                         generation=request.generation,
                         child=result.candidate,
@@ -647,28 +508,7 @@ class EvolutionEngine:
     def _select_distinct_second_parent(
         self, parent_a: PromptCandidate
     ) -> PromptCandidate:
-        """Selects a second crossover parent distinct from ``parent_a``.
-
-        Repeatedly runs ``_tournament_selector.select_parents()`` for
-        a single winner until one is found whose ID differs from
-        ``parent_a.id``, bounded by ``len(self._population)`` attempts.
-        This exists because ``TournamentSelector`` samples with
-        replacement across independent tournaments and may legitimately
-        return the same candidate twice, while
-        ``PromptGenerationRequest`` forbids a crossover request whose
-        two parents share an ID.
-
-        Args:
-            parent_a: The first crossover parent, already selected.
-
-        Returns:
-            A ``PromptCandidate`` whose ID differs from
-            ``parent_a.id``.
-
-        Raises:
-            RuntimeError: If no distinct candidate is found within
-                ``len(self._population)`` attempts.
-        """
+        """Selects a second crossover parent distinct from ``parent_a``."""
         max_attempts = len(self._population)
 
         for _ in range(max_attempts):
@@ -689,30 +529,7 @@ class EvolutionEngine:
         elites: list[PromptCandidate],
         offspring: list[PromptCandidate],
     ) -> Population:
-        """Assembles the next generation's Population.
-
-        Combines ``elites`` and ``offspring`` into a brand-new
-        ``Population`` instance with an incremented generation index.
-        The existing ``self._population`` is not modified; a new
-        instance is constructed and returned for the caller to assign.
-
-        Args:
-            elites: The elite candidates preserved from the current
-                generation. Must not be ``None``.
-            offspring: The newly generated candidates produced by
-                ``_generate_offspring()``. Must not be ``None``.
-
-        Returns:
-            A new ``Population`` containing ``elites + offspring``, at
-            generation ``self._population.generation + 1``, with the
-            same ``max_population_size`` as the current population.
-
-        Raises:
-            ValueError: If ``elites`` or ``offspring`` is ``None``, or
-                propagated from ``Population`` if the combined list is
-                empty, exceeds ``max_population_size``, or contains
-                duplicate candidate IDs.
-        """
+        """Assembles the next generation's Population."""
         if elites is None:
             raise ValueError("elites must not be None.")
         if offspring is None:
@@ -724,37 +541,31 @@ class EvolutionEngine:
             max_population_size=self._population.max_population_size,
         )
 
+    def _evolve_mutation_prompts(self, generation: int) -> None:
+        """Evolve mutation prompts using meta-mutation."""
+        if self._mutation_manager is None:
+            return
+            
+        print("Evolving mutation prompts...")
+        try:
+            # We need the LLM and template builder from the prompt generator
+            llm = self._prompt_generator._llm
+            template_builder = self._prompt_generator._template_builder
+            
+            self._mutation_manager.evolve(
+                llm=llm,
+                task_description=self._task_description,
+                generation=generation,
+                template_builder=template_builder,
+            )
+            print("Mutation prompt evolution complete.")
+        except Exception as e:
+            print(f"Warning: Mutation prompt evolution failed: {e}")
+
     def _generation_statistics(
         self, fitness_results: list[PromptCandidate]
     ) -> tuple[PromptCandidate, float, float, float]:
-        """Computes reporting statistics for an evaluated generation.
-
-        Ranks candidates by ``FitnessVector.average()`` for reporting
-        purposes only. This is intentionally independent of the
-        ranking strategy configured on ``_tournament_selector`` or
-        ``_elitism`` ("average", "minimum", or "weighted"); those
-        strategies govern *selection*, while this method governs what
-        gets *reported* in the generation snapshot and is not
-        configurable at this stage. Performs no file writing and does
-        not mutate ``fitness_results``.
-
-        Args:
-            fitness_results: The list of evaluated ``PromptCandidate``
-                objects returned by ``_evaluate_population()``. Each
-                must have a non-None ``fitness``.
-
-        Returns:
-            A 4-tuple of ``(best_candidate, best_score, average_score,
-            worst_score)``, where ``best_candidate`` is the candidate
-            with the highest ``FitnessVector.average()``, and the
-            three scores are, respectively, the maximum, mean, and
-            minimum of every candidate's ``FitnessVector.average()``.
-
-        Raises:
-            TypeError: If ``fitness_results`` is not a list.
-            ValueError: If ``fitness_results`` is empty.
-            RuntimeError: If any candidate has no ``FitnessVector``.
-        """
+        """Computes reporting statistics for an evaluated generation."""
         if not isinstance(fitness_results, list):
             raise TypeError("fitness_results must be a list of PromptCandidate.")
         if not fitness_results:

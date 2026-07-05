@@ -18,6 +18,8 @@ import time
 import random
 from typing import Any
 
+
+from src.evolution.similarity import too_similar
 from src.evolution.prompt_logger import PromptLogger
 from src.evolution.mutation_prompt_logger import MutationPromptLogger
 from src.core.population import Population
@@ -465,9 +467,18 @@ class EvolutionEngine:
 
                 try:
                     result = self._prompt_generator.generate(request)
+
+                    if too_similar(
+                        result.candidate.text,
+                        existing_prompt_texts,
+                        threshold=0.95,
+                    ):
+                        print("Too similar, regenerating...")
+                        continue
+
                     offspring.append(result.candidate)
                     existing_prompt_texts.add(result.candidate.text)
-                    
+                                        
                     # Track mutation prompt used (for mutation, not crossover)
                     if not use_crossover and self._mutation_manager is not None:
                         # Get the mutation prompt that was selected

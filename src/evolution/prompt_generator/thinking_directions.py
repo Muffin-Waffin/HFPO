@@ -1,43 +1,43 @@
 THINKING_DIRECTIONS = [
 
-    "Improve diagnostic reasoning.",
+    "Rewrite the prompt so the model identifies the key clinical findings before answering.",
 
-    "Increase instruction clarity while remaining concise.",
+    "Rewrite the prompt so the model first generates a differential diagnosis before selecting the final answer.",
 
-    "Encourage careful elimination of implausible options before answering.",
+    "Rewrite the prompt so the model systematically eliminates incorrect options before choosing one.",
 
-    "Strengthen evidence-based reasoning.",
+    "Rewrite the prompt so the model prioritizes patient safety when multiple answers appear plausible.",
 
-    "Improve robustness for ambiguous medical questions.",
+    "Rewrite the prompt from the perspective of an experienced attending physician supervising a trainee.",
 
-    "Reduce unnecessary wording without changing meaning.",
+    "Rewrite the prompt from the perspective of a clinician working under time pressure in the emergency department.",
 
-    "Rewrite the prompt from a different perspective while preserving its objective.",
+    "Rewrite the prompt so the model verifies its conclusion before producing the final answer.",
 
-    "Encourage stepwise clinical reasoning only when it improves decision quality.",
+    "Rewrite the prompt so the model reasons from symptoms to diagnosis rather than from diagnosis to symptoms.",
 
-    "Improve consistency across different medical question types.",
+    "Rewrite the prompt so the model focuses on distinguishing similar diseases with overlapping presentations.",
 
-    "Increase precision without increasing prompt length.",
+    "Rewrite the prompt so the model gives greater weight to the most clinically significant findings.",
 
-    "Experiment with a different reasoning strategy.",
+    "Rewrite the prompt using a completely different instructional style while preserving the original objective.",
 
-    "Improve calibration before selecting the final answer.",
+    "Rewrite the prompt so the model relies on established medical guidelines and standard clinical practice.",
 
-    "Improve the balance between accuracy and efficiency.",
+    "Rewrite the prompt so the instruction is shorter while preserving all essential behavior.",
 
-    "Strengthen the logical flow of the instruction.",
+    "Rewrite the prompt so it is more robust to ambiguous or incomplete clinical information.",
 
-    "Make the prompt more general without reducing its effectiveness.",
+    "Rewrite the prompt so it encourages careful consideration without unnecessary verbosity.",
 
-    "Improve the prompt's ability to handle difficult clinical reasoning tasks.",
+    "Rewrite the prompt so the model evaluates every answer option before making a decision.",
 
-    "Encourage deeper analysis before committing to an answer.",
+    "Rewrite the prompt so the model actively questions its initial intuition before selecting an answer.",
 
-    "Reduce ambiguity while preserving flexibility.",
+    "Rewrite the prompt so the model distinguishes common conditions from dangerous alternatives.",
 
-    "Improve the organization of the instruction.",
+    "Rewrite the prompt so the model minimizes overconfidence when evidence is limited.",
 
-    "Emphasize selecting the single best answer based on the available evidence.",
+    "Rewrite the prompt using a novel reasoning strategy that is substantially different from the original prompt while preserving the same task."
 
 ]

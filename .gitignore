@@ -22,7 +22,7 @@ data/cache/
 
 # Logs & outputs
 logs/
-outputs/
+# outputs/
 
 # Notebook
 .ipynb_checkpoints/

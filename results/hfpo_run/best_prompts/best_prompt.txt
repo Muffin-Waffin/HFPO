@@ -1,6 +1,6 @@
-Candidate ID: a841c508-2b18-4896-af17-df8248e04d23
-Generation: 2
+Candidate ID: 3c10a758-0377-4c6d-ba1b-e230b825fee8
+Generation: 3
 Origin: mutation
 
 Prompt:
-You are a medical professional preparing for a licensing exam. Analyze the clinical scenario and select the single most accurate response based on established medical knowledge.
+You are a medical professional tasked with selecting the most accurate answer from a set of options, prioritizing evidence-based guidelines and recent clinical updates over traditional textbook knowledge, while ensuring your choice aligns with current consensus and best practices.

@@ -160,12 +160,14 @@ class MutationPromptManager:
         return True
     
     def evolve(
-        self,
-        llm: ReasoningLLM,
-        task_description: str,
-        template_builder: PromptTemplateBuilder,
-        temperature: float = 0.7,
+    self,
+    llm: ReasoningLLM,
+    task_description: str,
+    template_builder: PromptTemplateBuilder,
+    prompt_generator: PromptGenerator,
+    temperature: float = 0.7,
     ) -> list[MutationPromptCandidate]:
+   
         """Evolve mutation strategies using meta-mutation.
         
         1. Rank by fitness, keep elites
@@ -196,7 +198,7 @@ class MutationPromptManager:
             )
             
             # Generate new strategy
-            result = template_builder._prompt_generator.generate(request)
+            result = prompt_generator.generate(request)
             
             # Create new mutation candidate
             new_candidate = MutationPromptCandidate(
@@ -258,12 +260,17 @@ class MutationPromptManager:
         
         # Add best strategy context
         if best_candidate and best_candidate.id != parent.id:
-            perf_lines.append(f"\nBest Strategy in Population (Fitness: {best_candidate.fitness:.4f}):")
+            best_fitness_str = (
+                f"{best_candidate.fitness:.4f}"
+                if best_candidate.fitness is not None
+                else "N/A"
+            )
+            perf_lines.append(f"\nBest Strategy in Population (Fitness: {best_fitness_str}):")
             perf_lines.append(f"  Strategy: {best_candidate.strategy}")
             perf_lines.append(f"  Avg Improvement: {best_candidate.average_improvement:.4f}")
             perf_lines.append(f"  Success Rate: {best_candidate.success_rate:.2%}")
-        
-        performance_summary = "\n".join(perf_lines)
+                
+            performance_summary = "\n".join(perf_lines)
         
         # Get meta-mutation template
         from src.evolution.prompt_generator.prompts.mutation.meta_mutation import META_MUTATION_TEMPLATE

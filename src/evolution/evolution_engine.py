@@ -556,22 +556,21 @@ class EvolutionEngine:
         """Evolve mutation prompts using meta-mutation."""
         if self._mutation_manager is None:
             return
-            
+
         print("Evolving mutation prompts...")
-        try:
-            # We need the LLM and template builder from the prompt generator
-            llm = self._prompt_generator._llm
-            template_builder = self._prompt_generator._template_builder
-            
-            self._mutation_manager.evolve(
-                llm=llm,
-                task_description=self._task_description,
-                generation=generation,
-                template_builder=template_builder,
-            )
-            print("Mutation prompt evolution complete.")
-        except Exception as e:
-            print(f"Warning: Mutation prompt evolution failed: {e}")
+        # TEMPORARY: re-raise instead of swallowing, until evolve() has
+        # been confirmed to run clean at least once. Restore the
+        # try/except Warning pattern below once confirmed working.
+        llm = self._prompt_generator._llm
+        template_builder = self._prompt_generator._template_builder
+
+        self._mutation_manager.evolve(
+            llm=llm,
+            task_description=self._task_description,
+            template_builder=template_builder,
+            prompt_generator=self._prompt_generator,
+        )
+        print("Mutation prompt evolution complete.")
 
     def _generation_statistics(
         self, fitness_results: list[PromptCandidate]

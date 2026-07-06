@@ -174,7 +174,7 @@ TEMPERATURE = 0.2         # CHANGE: 0.0 (deterministic) to 1.0 (creative)
 #   - Tournament selection implementation details
 # ============================================================================
 GA_POPULATION_SIZE = 10
-GA_GENERATIONS = 5
+GA_GENERATIONS = 10
 GA_MUTATION_RATE = 0.6
 GA_CROSSOVER_RATE = 0.5
 GA_TOURNAMENT_SIZE = 3

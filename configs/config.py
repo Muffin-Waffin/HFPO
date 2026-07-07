@@ -62,6 +62,7 @@
 #   - Increase max_new_tokens = more KV cache = more VRAM per generation
 # ============================================================================
 MODEL_REGISTRY = {
+
     "qwen3-8b": {
         "model_name": "Qwen/Qwen3-8B",              # HF model ID - CHANGE to use different model
         "load_in_4bit": True,                        # 4-bit quantization (CHANGE only if >24GB VRAM)
@@ -106,6 +107,17 @@ MODEL_REGISTRY = {
         "max_new_tokens": 256,                       # CHANGE based on VRAM
         "temperature": 0.2,                          # CHANGE: 0.0-1.0
     },
+    "II-medical": {
+        "model_name": "Intelligent-Internet/II-Medical-8B",  # CHANGE for different Mistral
+        "load_in_4bit": True,                        # CHANGE only if >24GB VRAM
+        "quant_type": "nf4",                         # DO NOT CHANGE
+        "compute_dtype": "float16",                  # CHANGE to "bfloat16" on Ampere+
+        "use_double_quant": True,                    # DO NOT CHANGE
+        "dtype": "float16",                          # Must match compute_dtype
+        "device_map": "auto",                        # DO NOT CHANGE
+        "max_new_tokens": 256,                       # CHANGE based on VRAM
+        "temperature": 0.2,                          # CHANGE: 0.0-1.0
+    },
 }
 
 # ============================================================================
@@ -115,7 +127,7 @@ MODEL_REGISTRY = {
 #   Options: "qwen3-8b", "phi-4", "llama3-8b", "mistral-7b"
 # WHAT NOT TO CHANGE: Must match a key in MODEL_REGISTRY exactly
 # ============================================================================
-DEFAULT_MODEL = "qwen3-8b"
+DEFAULT_MODEL = "II-medical"
 
 # ============================================================================
 # GENERATION PARAMETERS (used as defaults, can be overridden per-experiment)
@@ -179,7 +191,7 @@ GA_MUTATION_RATE = 0.35
 GA_CROSSOVER_RATE = 0.65
 GA_TOURNAMENT_SIZE = 3
 EVALUATION_SUBSET_SIZE = 150
-RANDOM_SEED = 50
+RANDOM_SEED = 42
 
 # Adaptive Mutation Configuration
 USE_ADAPTIVE_MUTATION = True

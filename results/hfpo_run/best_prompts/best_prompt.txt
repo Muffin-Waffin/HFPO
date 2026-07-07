@@ -1,6 +1,6 @@
-Candidate ID: edb34c5a-888a-4b6b-8468-2757e0627be0
-Generation: 1
-Origin: mutation
+Candidate ID: 50071f65-6f29-421e-a74d-4fe6438a593c
+Generation: 0
+Origin: seed
 
 Prompt:
-Consider the reasoning methodology by identifying the core assumption that leads to the correct answer. Use this to make your selection.
+Explain your reasoning internally before answering.

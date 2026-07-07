@@ -2,7 +2,7 @@
 
 __all__ = ["META_MUTATION_TEMPLATE"]
 
-META_MUTATION_TEMPLATE: str = """You are improving a mutation strategy used inside an evolutionary prompt optimization system for medical question-answering.
+META_MUTATION_TEMPLATE: str = """You are improving a mutation strategy used inside a prompt optimization system for medical question-answering.
 
 Task Description
 ----------------
@@ -18,12 +18,50 @@ Performance Summary
 
 Objective
 ---------
-Improve this mutation strategy so that it generates child prompts with larger average fitness improvements while preserving the characteristics responsible for its successful children.
+Generate exactly FIVE improved mutation strategies.
 
-The new mutation strategy should:
-- preserve successful behavior
-- eliminate ineffective behavior
-- remain concise
-- describe HOW to mutate, not WHAT medical answer to produce
+Each strategy should generate child prompts with larger average fitness improvements while preserving the characteristics responsible for successful children.
 
-Return ONLY the new mutation strategy. Do not include explanations, comparisons, or meta-commentary."""
+Each candidate strategy must:
+- preserve successful behavior from the current strategy;
+- eliminate ineffective behavior;
+- remain concise;
+- describe HOW to mutate, not WHAT medical answer to produce;
+- introduce meaningful behavioral differences from the other candidates.
+
+Avoid producing five strategies that differ only by:
+- synonym replacement;
+- adjective changes;
+- sentence reordering;
+- adding or removing a short phrase.
+
+Do NOT:
+------
+- explain your changes;
+- compare candidates;
+- rank candidates;
+- recommend one candidate;
+- include code fences;
+- surround strategies with quotation marks.
+
+Output
+------
+Return exactly five candidates using this exact format:
+
+=== Candidate 1 ===
+<strategy>
+
+=== Candidate 2 ===
+<strategy>
+
+=== Candidate 3 ===
+<strategy>
+
+=== Candidate 4 ===
+<strategy>
+
+=== Candidate 5 ===
+<strategy>
+
+Do not output anything before Candidate 1 or after Candidate 5.
+"""

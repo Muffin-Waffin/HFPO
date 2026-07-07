@@ -16,6 +16,7 @@ class MutationPromptCandidate:
     """
 
     id: str
+    name: str                     # Short human-readable label
     strategy: str                 # The compact mutation strategy text
     generation: int
     parent_ids: list[str]
@@ -42,6 +43,8 @@ class MutationPromptCandidate:
     def __post_init__(self) -> None:
         if not self.id:
             self.id = str(uuid.uuid4())
+        if not self.name.strip():
+            raise ValueError("Mutation strategy name must not be empty.")
         if not self.strategy.strip():
             raise ValueError("Mutation strategy text must not be empty.")
         if self.generation < 0:
@@ -130,6 +133,7 @@ class MutationPromptCandidate:
     def as_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
+            "name": self.name,
             "strategy": self.strategy,
             "generation": self.generation,
             "parent_ids": self.parent_ids,
@@ -154,6 +158,7 @@ class MutationPromptCandidate:
     def from_dict(cls, data: dict[str, Any]) -> "MutationPromptCandidate":
         candidate = cls(
             id=data["id"],
+            name=data.get("name", data["strategy"].split(".")[0].strip()),
             strategy=data["strategy"],
             generation=data["generation"],
             parent_ids=data["parent_ids"],
@@ -172,8 +177,9 @@ class MutationPromptCandidate:
         return candidate
 
     def __str__(self) -> str:
+        fitness_str = f"{self.fitness:.4f}" if self.fitness is not None else "N/A"
         return (
-            f"MutationPromptCandidate(id={self.id[:8]}, gen={self.generation}, "
-            f"fitness={self.fitness:.4f}, avg_imp={self.average_improvement:.4f}, "
+            f"MutationPromptCandidate(id={self.id[:8]}, name={self.name!r}, gen={self.generation}, "
+            f"fitness={fitness_str}, avg_imp={self.average_improvement:.4f}, "
             f"success_rate={self.success_rate:.2f}, selected={self.times_selected})"
         )

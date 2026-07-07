@@ -6,13 +6,11 @@ from dataclasses import dataclass
 from random import Random
 from typing import Any
 import statistics
+import uuid
+from pathlib import Path
 
 from src.core.mutation_prompt_candidate import MutationPromptCandidate
 from src.core.prompt_candidate import PromptCandidate
-from src.evolution.tournament_selector import TournamentSelector
-from src.evolution.prompt_generator.generator import PromptGenerator
-from src.evolution.prompt_generator.models import PromptGenerationRequest
-from src.evolution.prompt_generator.templates import PromptTemplateBuilder
 from src.evolution.prompt_generator.interfaces import ReasoningLLM
 
 
@@ -65,11 +63,7 @@ class MutationPromptManager:
             c.id: c for c in candidates
         }
         self._generation = 0
-        self._tournament_selector = TournamentSelector(
-            tournament_size=tournament_size,
-            ranking_strategy="average",  # We'll use custom scoring
-            random_seed=random_seed,
-        )
+        self._tournament_size = tournament_size
         self._elite_count = elite_count
         self._min_children = min_children_before_evolution
         self._ranking_strategy = ranking_strategy or MutationRankingStrategy()
@@ -103,7 +97,7 @@ class MutationPromptManager:
         # Run tournament
         contestant_ids = self._rng.sample(
             list(self._candidates.keys()),
-            min(self._tournament_selector.tournament_size, len(self._candidates))
+            min(self._tournament_size, len(self._candidates))
         )
         contestants = [self._candidates[cid] for cid in contestant_ids]
         
@@ -160,20 +154,32 @@ class MutationPromptManager:
         return True
     
     def evolve(
-    self,
-    llm: ReasoningLLM,
-    task_description: str,
-    template_builder: PromptTemplateBuilder,
-    prompt_generator: PromptGenerator,
-    temperature: float = 0.7,
+        self,
+        llm: ReasoningLLM,
+        task_description: str,
+        template_builder=None,
+        prompt_generator=None,
+        temperature: float = 0.7,
     ) -> list[MutationPromptCandidate]:
-   
         """Evolve mutation strategies using meta-mutation.
         
+        Calls the LLM directly with the meta-mutation template to
+        generate 5 candidate strategies, then selects the most novel
+        one via similarity comparison.
+        
         1. Rank by fitness, keep elites
-        2. Mutate bottom half
+        2. For each non-elite, generate 5 candidates via LLM and pick the best
         3. Return new population
         """
+        from src.evolution.prompt_generator.candidate_parser import CandidateParser
+        from src.evolution.prompt_generator.similarity_selector import PromptSimilaritySelector
+        from src.evolution.prompt_generator.cleaner import PromptCleaner
+        from src.evolution.prompt_generator.prompts.mutation.meta_mutation import META_MUTATION_TEMPLATE
+
+        candidate_parser = CandidateParser()
+        similarity_selector = PromptSimilaritySelector()
+        cleaner = PromptCleaner()
+
         # Rank by fitness
         ranked = sorted(
             self._candidates.values(),
@@ -189,41 +195,82 @@ class MutationPromptManager:
         # Build context for meta-mutation
         best_candidate = ranked[0] if ranked else None
         
+        max_retries = 5
+
         for parent in to_mutate:
-            # Build meta-mutation request
-            request = self._build_meta_mutation_request(
-                parent=parent,
-                best_candidate=best_candidate,
+            # Build performance summary
+            performance_summary = self._build_performance_summary(
+                parent, best_candidate
+            )
+
+            # Build meta-mutation instruction
+            instruction = META_MUTATION_TEMPLATE.format(
                 task_description=task_description,
+                current_strategy=parent.strategy,
+                performance_summary=performance_summary,
             )
-            
-            # Generate new strategy
-            result = prompt_generator.generate(request)
-            
-            # Create new mutation candidate
-            new_candidate = MutationPromptCandidate(
-                id=str(uuid.uuid4()),
-                strategy=result.candidate.text,
-                generation=self._generation + 1,
-                parent_ids=[parent.id],
-                age=0,
-                metadata={"origin": "meta_mutation", "parent_fitness": parent.fitness},
-            )
-            new_candidates.append(new_candidate)
+
+            generated = False
+            for attempt in range(max_retries):
+                try:
+                    print(f"  Meta-mutating strategy {parent.id[:8]}... (attempt {attempt + 1}/{max_retries})")
+
+                    # Call LLM directly
+                    raw_output = llm.generate(
+                        prompt=instruction,
+                        temperature=temperature,
+                    )
+
+                    # Parse candidates (resilient: returns 1-5 candidates)
+                    candidates = candidate_parser.parse(raw_output)
+
+                    # Select the most novel candidate
+                    selected_strategy = similarity_selector.select(
+                        parent_prompt=parent.strategy,
+                        candidates=candidates,
+                    )
+
+                    # Clean the selected strategy
+                    clean_strategy = cleaner.clean(selected_strategy)
+
+                    if not clean_strategy.strip():
+                        print(f"    Empty strategy after cleaning, retrying...")
+                        continue
+
+                    # Create new mutation candidate
+                    # Derive name from parent, suffixed with generation
+                    new_name = f"{parent.name} v{self._generation + 1}"
+                    new_candidate = MutationPromptCandidate(
+                        id=str(uuid.uuid4()),
+                        name=new_name,
+                        strategy=clean_strategy,
+                        generation=self._generation + 1,
+                        parent_ids=[parent.id],
+                        age=0,
+                        metadata={"origin": "meta_mutation", "parent_fitness": parent.fitness},
+                    )
+                    new_candidates.append(new_candidate)
+                    generated = True
+                    break
+
+                except Exception as e:
+                    print(f"    Attempt {attempt + 1}/{max_retries} failed: {e}")
+
+            if not generated:
+                # Keep the parent if all retries failed
+                print(f"  WARNING: Failed to meta-mutate strategy {parent.id[:8]}, keeping parent.")
+                new_candidates.append(parent)
         
         # Replace population
         self._candidates = {c.id: c for c in new_candidates}
         return new_candidates
-    
-    def _build_meta_mutation_request(
+
+    def _build_performance_summary(
         self,
         parent: MutationPromptCandidate,
         best_candidate: MutationPromptCandidate | None,
-        task_description: str,
-    ) -> PromptGenerationRequest:
-        """Build request for meta-mutation of a strategy."""
-        
-        # Format parent strategy performance
+    ) -> str:
+        """Build a performance summary string for the meta-mutation template."""
         perf_lines = [
             f"Current Strategy: {parent.strategy}",
             f"Generation: {parent.generation}",
@@ -269,28 +316,8 @@ class MutationPromptManager:
             perf_lines.append(f"  Strategy: {best_candidate.strategy}")
             perf_lines.append(f"  Avg Improvement: {best_candidate.average_improvement:.4f}")
             perf_lines.append(f"  Success Rate: {best_candidate.success_rate:.2%}")
-                
-            performance_summary = "\n".join(perf_lines)
         
-        # Get meta-mutation template
-        from src.evolution.prompt_generator.prompts.mutation.meta_mutation import META_MUTATION_TEMPLATE
-        
-        instruction = META_MUTATION_TEMPLATE.format(
-            task_description=task_description,
-            current_strategy=parent.strategy,
-            performance_summary=performance_summary,
-        )
-        
-        return PromptGenerationRequest(
-            parent_a=parent,  # Using parent as the "source"
-            parent_b=None,
-            generation=self._generation + 1,
-            task_description=task_description,
-            temperature=0.7,
-            existing_prompt_texts=set(),
-            parent_a_performance=None,  # Not used for meta-mutation
-            mutation_operator="meta_mutation",
-        )
+        return "\n".join(perf_lines)
     
     def get_summary(self) -> dict[str, Any]:
         """Get population summary for logging."""
@@ -303,7 +330,6 @@ class MutationPromptManager:
     def save_population(self, path: str) -> None:
         """Save mutation population to JSON."""
         import json
-        from pathlib import Path
         
         data = {
             "generation": self._generation,
@@ -321,7 +347,3 @@ class MutationPromptManager:
         manager = cls(candidates=candidates, **kwargs)
         manager._generation = data["generation"]
         return manager
-
-
-import uuid
-from pathlib import Path

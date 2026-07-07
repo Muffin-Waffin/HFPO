@@ -558,17 +558,11 @@ class EvolutionEngine:
             return
 
         print("Evolving mutation prompts...")
-        # TEMPORARY: re-raise instead of swallowing, until evolve() has
-        # been confirmed to run clean at least once. Restore the
-        # try/except Warning pattern below once confirmed working.
         llm = self._prompt_generator._llm
-        template_builder = self._prompt_generator._template_builder
 
         self._mutation_manager.evolve(
             llm=llm,
             task_description=self._task_description,
-            template_builder=template_builder,
-            prompt_generator=self._prompt_generator,
         )
         print("Mutation prompt evolution complete.")
 

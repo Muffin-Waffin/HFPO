@@ -95,16 +95,24 @@ TASK_DESCRIPTION: str = (
 )
 
 
-# Seed mutation strategies (Generation 0) - compact strategies, not full templates
-SEED_MUTATION_STRATEGIES: tuple[str, ...] = (
-    "Preserve successful instructions. Modify only one aspect of the prompt that is likely responsible for poor performance.",
-    "Make the smallest meaningful change capable of improving the weakest objective.",
-    "Compress redundant instructions while preserving behavior.",
-    "Explore a substantially different reasoning approach without changing the task.",
-    "Replace one reasoning pattern with an alternative while preserving the prompt's strengths.",
-    "Improve clarity and remove ambiguity before adding new instructions.",
-    "Preserve structure but experiment with instruction ordering and emphasis.",
-    "Identify assumptions made by the parent prompt and replace one with an alternative.",
+# Seed mutation strategies (Generation 0) - (name, strategy) pairs
+SEED_MUTATION_STRATEGIES: tuple[tuple[str, str], ...] = (
+    ("Targeted Fix",
+     "Preserve successful instructions. Modify only one aspect of the prompt that is likely responsible for poor performance."),
+    ("Minimal Change",
+     "Make the smallest meaningful change capable of improving the weakest objective."),
+    ("Compression",
+     "Compress redundant instructions while preserving behavior."),
+    ("Reasoning Shift",
+     "Explore a substantially different reasoning approach without changing the task."),
+    ("Pattern Swap",
+     "Replace one reasoning pattern with an alternative while preserving the prompt's strengths."),
+    ("Clarity First",
+     "Improve clarity and remove ambiguity before adding new instructions."),
+    ("Reorder and Emphasize",
+     "Preserve structure but experiment with instruction ordering and emphasis."),
+    ("Assumption Challenge",
+     "Identify assumptions made by the parent prompt and replace one with an alternative."),
 )
 
 
@@ -244,11 +252,12 @@ def _build_mutation_population() -> MutationPromptManager:
     mutation_candidates = [
         MutationPromptCandidate(
             id=str(uuid.uuid4()),
+            name=name,
             strategy=strategy,
             generation=0,
             parent_ids=[],
         )
-        for strategy in SEED_MUTATION_STRATEGIES
+        for name, strategy in SEED_MUTATION_STRATEGIES
     ]
 
     return MutationPromptManager(

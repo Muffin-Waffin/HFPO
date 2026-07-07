@@ -1,4 +1,4 @@
-CROSSOVER_TEMPLATE = """You are designing a new prompt for a medical multiple-choice question answering system.
+CROSSOVER_TEMPLATE = """You are designing new prompts for a medical multiple-choice question answering system.
 
 Task
 ----
@@ -12,11 +12,11 @@ Parent Prompt B
 ---------------
 {parent_b}
 
-Your objective is to design ONE new prompt inspired by both parents. You can be creative.
+Your objective is to design FIVE new prompts inspired by both parents. You can be creative.
 
 Reasoning Process (perform internally)
 --------------------------------------
-Before writing the new prompt:
+Before writing each new prompt:
 
 1. Identify the strongest ideas or behaviors encouraged by Parent A.
 2. Identify the strongest ideas or behaviors encouraged by Parent B.
@@ -27,7 +27,7 @@ Do NOT reveal this reasoning.
 
 Design Principles
 -----------------
-The offspring should:
+Each offspring should:
 
 - preserve the shared objective of answering medical multiple-choice questions;
 - combine useful behaviors from both parents;
@@ -36,7 +36,7 @@ The offspring should:
 - improve clarity whenever possible;
 - avoid unnecessary complexity.
 
-The offspring should NOT:
+Each offspring should NOT:
 
 - copy sentences from either parent;
 - concatenate the parents;
@@ -45,22 +45,52 @@ The offspring should NOT:
 - describe the crossover process;
 - mention Parent A or Parent B.
 
-Imagine that someone reading the offspring has never seen either parent.
+All five prompts should explore DIFFERENT ways of combining ideas from both parents.
 
-They should recognize it as a well-written prompt, not as a combination of two prompts.
+Avoid producing five prompts that differ only by:
+- synonym replacement;
+- adjective changes;
+- sentence reordering;
+- adding or removing a short phrase.
 
-Output Requirements
--------------------
-Return ONLY the new prompt.
+Instead, vary aspects such as:
+- instruction ordering;
+- reasoning process;
+- role or perspective;
+- emphasis;
+- decision strategy;
+- level of explicitness.
 
-Do not include:
+Do NOT:
+------
+- explain your changes;
+- compare candidates;
+- rank candidates;
+- recommend one candidate;
+- mention prompt engineering, mutation, evolution, optimization, or genetic algorithms;
+- generate a medical case or patient vignette;
+- answer the medical question yourself;
+- include code fences;
+- surround prompts with quotation marks.
 
-- introductions;
-- explanations;
-- reasoning;
-- markdown;
-- quotation marks;
-- phrases like "Here is the new prompt";
-- phrases like "The combined prompt";
-- any text before or after the prompt itself.
+Output
+------
+Return exactly five candidates using this exact format:
+
+=== Candidate 1 ===
+<prompt>
+
+=== Candidate 2 ===
+<prompt>
+
+=== Candidate 3 ===
+<prompt>
+
+=== Candidate 4 ===
+<prompt>
+
+=== Candidate 5 ===
+<prompt>
+
+Do not output anything before Candidate 1 or after Candidate 5.
 """

@@ -187,10 +187,12 @@ class PromptTemplateBuilder:
         if self._mutation_manager is not None:
             selected = self._mutation_manager.select()
 
-            strategy_name = selected.id
-            strategy_description = selected.strategy
+            # Store UUID for metadata/logging
+            self._last_mutation_operator = selected.id
 
-            self._last_mutation_operator = strategy_name
+            # LLM sees human-readable name, never the UUID
+            strategy_name = selected.name
+            strategy_description = selected.strategy
 
         else:
             strategy_name, strategy_description = random.choice(

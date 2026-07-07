@@ -22,10 +22,11 @@ Generate exactly FIVE evolved prompts.
 
 Each prompt should preserve the original task while naturally encouraging the reasoning methodology described above.
 
-All five prompts should explore DIFFERENT ways of incorporating this reasoning methodology.
+Each candidate should differ substantially from the others.
 
-Your job is ONLY to generate candidate prompts.
-Do NOT choose, rank, compare, or recommend among them.
+Avoid producing candidates that only differ by wording.
+
+Candidates should explore different reasoning behaviour, instruction organization, decision strategy, level of explicitness, and response constraints.
 
 Requirements
 ------------
@@ -38,19 +39,7 @@ Each candidate prompt must:
 - Remain concise and coherent.
 - Preserve useful characteristics of the parent prompt where appropriate.
 
-Avoid producing five prompts that differ only by:
-- synonym replacement;
-- adjective changes;
-- sentence reordering;
-- adding or removing a short phrase.
-
-Instead, vary aspects such as:
-- instruction ordering;
-- reasoning process;
-- role or perspective;
-- emphasis;
-- decision strategy;
-- level of explicitness.
+A reader should not be able to tell that two candidates came from the same generation request. If candidates share sentence structure, they are too similar.
 
 Do NOT:
 ------

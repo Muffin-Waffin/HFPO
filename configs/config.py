@@ -173,12 +173,12 @@ TEMPERATURE = 0.2         # CHANGE: 0.0 (deterministic) to 1.0 (creative)
 #   - Adaptive mutation internal mechanics (selection, ranking algorithms)
 #   - Tournament selection implementation details
 # ============================================================================
-GA_POPULATION_SIZE = 10
+GA_POPULATION_SIZE = 6
 GA_GENERATIONS = 10
 GA_MUTATION_RATE = 0.6
 GA_CROSSOVER_RATE = 0.5
 GA_TOURNAMENT_SIZE = 3
-EVALUATION_SUBSET_SIZE = 100
+EVALUATION_SUBSET_SIZE = 10
 RANDOM_SEED = 50
 
 # Adaptive Mutation Configuration

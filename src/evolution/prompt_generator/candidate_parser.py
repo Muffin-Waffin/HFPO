@@ -8,7 +8,7 @@ __all__ = ["CandidateParser"]
 
 
 class CandidateParser:
-    """Parses the five candidate prompts returned by the mutation LLM.
+    """Parses candidate prompts returned by the LLM.
 
     Expected format:
 
@@ -22,6 +22,11 @@ class CandidateParser:
 
     === Candidate 5 ===
     <prompt>
+
+    If the LLM returns fewer than 5 but at least 1 valid candidate,
+    the parser returns whatever it found. If it finds 0 candidates
+    in the expected format, it falls back to treating the entire
+    raw output as a single candidate.
     """
 
     _PATTERN = re.compile(
@@ -30,18 +35,17 @@ class CandidateParser:
     )
 
     def parse(self, text: str) -> list[str]:
-        """Extracts the five candidate prompts.
+        """Extracts candidate prompts from LLM output.
 
         Args:
             text: Raw LLM output.
 
         Returns:
-            A list containing exactly five candidate prompts.
+            A list of candidate prompt strings (1 to 5).
 
         Raises:
-            ValueError:
-                If the output does not contain exactly five candidates
-                numbered 1 through 5.
+            TypeError: If text is not a string.
+            ValueError: If no candidates can be extracted at all.
         """
         if not isinstance(text, str):
             raise TypeError(
@@ -50,29 +54,26 @@ class CandidateParser:
 
         matches = self._PATTERN.findall(text)
 
-        if len(matches) != 5:
-            raise ValueError(
-                f"Expected 5 candidates, found {len(matches)}."
-            )
+        if not matches:
+            # Fallback: treat the entire output as a single candidate
+            cleaned = text.strip()
+            if not cleaned:
+                raise ValueError(
+                    "Expected candidates in '=== Candidate N ===' format, "
+                    "but output was empty."
+                )
+            return [cleaned]
 
         candidates: list[str] = []
 
-        for expected_index, (number, prompt) in enumerate(matches, start=1):
-            number = int(number)
-
-            if number != expected_index:
-                raise ValueError(
-                    f"Expected Candidate {expected_index}, "
-                    f"found Candidate {number}."
-                )
-
+        for number_str, prompt in matches:
             cleaned = prompt.strip()
+            if cleaned:
+                candidates.append(cleaned)
 
-            if not cleaned:
-                raise ValueError(
-                    f"Candidate {number} is empty."
-                )
-
-            candidates.append(cleaned)
+        if not candidates:
+            raise ValueError(
+                "Found candidate headers but all candidate bodies were empty."
+            )
 
         return candidates

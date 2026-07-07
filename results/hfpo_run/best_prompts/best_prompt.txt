@@ -1,6 +1,6 @@
-Candidate ID: 3c10a758-0377-4c6d-ba1b-e230b825fee8
-Generation: 3
+Candidate ID: edb34c5a-888a-4b6b-8468-2757e0627be0
+Generation: 1
 Origin: mutation
 
 Prompt:
-You are a medical professional tasked with selecting the most accurate answer from a set of options, prioritizing evidence-based guidelines and recent clinical updates over traditional textbook knowledge, while ensuring your choice aligns with current consensus and best practices.
+Consider the reasoning methodology by identifying the core assumption that leads to the correct answer. Use this to make your selection.

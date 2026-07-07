@@ -12,7 +12,7 @@ prompt string using the predefined mutation and crossover templates.
 from .models import PromptGenerationRequest, ParentPerformance
 from .prompts.prompt_utils.crossover import CROSSOVER_TEMPLATE
 import random
-from .thinking_directions import THINKING_DIRECTIONS
+from .thinking_directions import MUTATION_METHODS
 from .prompts.prompt_utils.mutation import MUTATION_TEMPLATE
 
 # from .prompts.mutation.reasoning import MUTATION_TEMPLATE as REASONING_TEMPLATE
@@ -25,7 +25,7 @@ from .prompts.prompt_utils.mutation import MUTATION_TEMPLATE
 # from .prompts.mutation.aggressive import MUTATION_TEMPLATE as AGGRESSIVE_TEMPLATE
 
 # Fixed mutation template that wraps the evolving strategy
-FIXED_MUTATION_TEMPLATE: str = """You are assisting in the optimization of prompts for a medical question-answering system through an evolutionary optimization process.
+FIXED_MUTATION_TEMPLATE: str = """You are assisting in the optimization of prompts for a medical multiple-choice question-answering system.
 
 Task Description
 ----------------
@@ -35,27 +35,49 @@ Parent Prompt
 -------------
 {parent_prompt}
 
-{parent_performance}
+Reasoning Method
+----------------
+{strategy_name}
 
-Mutation Strategy
------------------
-{strategy}
+Description
+-----------
+{strategy_description}
+
+Objective
+---------
+Rewrite the parent prompt so that it naturally encourages the reasoning methodology described above while preserving the original medical multiple-choice question-answering task.
+
+The rewritten prompt should:
+- preserve the original objective;
+- remain a reusable system instruction;
+- introduce meaningful behavioral changes rather than cosmetic wording changes;
+- remain concise and coherent;
+- preserve useful characteristics of the parent prompt when appropriate.
+
+Avoid producing prompts that differ only by:
+- synonym replacement;
+- adjective changes;
+- sentence reordering;
+- adding or removing a short phrase.
 
 Output Requirements
 -------------------
-Return ONLY the new prompt.
+Return ONLY the rewritten prompt.
 
 Do NOT:
 - explain your changes;
-- compare the new prompt with the parent;
+- compare the rewritten prompt with the parent;
+- mention the reasoning methodology explicitly unless it naturally belongs in the prompt;
+- mention prompt engineering, mutation, evolution, optimization, or genetic algorithms;
+- generate a medical question or patient vignette;
+- answer the question yourself;
 - include Markdown;
 - include code fences;
 - number the output;
-- surround the prompt with quotation marks;
-- mention mutation, evolution, optimization, prompt engineering, or genetic algorithms in the generated prompt.
+- surround the prompt with quotation marks.
 
-Produce exactly one new prompt and nothing else."""
-
+Produce exactly one rewritten prompt and nothing else.
+"""
 
 class PromptTemplateBuilder:
     """Builds formatted LLM instruction strings from generation
@@ -163,24 +185,25 @@ class PromptTemplateBuilder:
         )
 
         if self._mutation_manager is not None:
-            # Adaptive mutation (future)
             selected = self._mutation_manager.select()
-            self._last_mutation_operator = selected.id
-            thinking_direction = selected.strategy
+
+            strategy_name = selected.id
+            strategy_description = selected.strategy
+
+            self._last_mutation_operator = strategy_name
 
         else:
-            thinking_direction = "\n".join(
-                f"- {direction}"
-                for direction in random.sample(THINKING_DIRECTIONS, k=2)
+            strategy_name, strategy_description = random.choice(
+                list(MUTATION_METHODS.items())
             )
 
-            self._last_mutation_operator = "random_thinking_directions"
+            self._last_mutation_operator = strategy_name
 
         instruction = MUTATION_TEMPLATE.format(
             task_description=request.task_description,
             parent_prompt=request.parent_a.text,
-            parent_performance=performance_summary,
-            thinking_direction=thinking_direction,
+            method_name=strategy_name,
+            method_description=strategy_description,
         )
 
         return self._last_mutation_operator, instruction

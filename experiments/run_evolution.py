@@ -54,6 +54,12 @@ from src.federated.aggregator import Aggregator
 from src.federated.federated_server import FederatedServer
 from src.federated.hospital_client import HospitalClient
 from src.llms.loader import load_model
+from src.evolution.prompt_generator.candidate_parser import CandidateParser
+from src.evolution.prompt_generator.similarity_selector import (
+    PromptSimilaritySelector,
+)
+cleaner = PromptCleaner()
+validator = PromptValidator()
 import random
 
 
@@ -473,8 +479,10 @@ def main() -> None:
     prompt_generator = PromptGenerator(
         llm=llm,
         template_builder=template_builder,
-        cleaner=PromptCleaner(),
-        validator=PromptValidator(),
+        candidate_parser=CandidateParser(),
+        similarity_selector=PromptSimilaritySelector(),
+        cleaner=cleaner,
+        validator=validator,
         lineage_tracker=lineage_tracker,
     )
 

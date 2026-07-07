@@ -14,6 +14,9 @@ fitness computation, and no evolutionary loop.
 import time
 import uuid
 
+
+from .candidate_parser import CandidateParser
+from .similarity_selector import PromptSimilaritySelector
 from src.core.prompt_candidate import PromptCandidate
 from src.core.lineage_tracker import LineageTracker
 
@@ -44,6 +47,8 @@ class PromptGenerator:
     __slots__ = (
         "_llm",
         "_template_builder",
+        "_candidate_parser",
+        "_similarity_selector",
         "_cleaner",
         "_validator",
         "_lineage_tracker",
@@ -51,12 +56,14 @@ class PromptGenerator:
 
     def __init__(
         self,
-        llm: ReasoningLLM,
-        template_builder: PromptTemplateBuilder,
-        cleaner: PromptCleaner,
-        validator: PromptValidator,
-        lineage_tracker: LineageTracker,
-    ) -> None:
+        llm,
+        template_builder,
+        candidate_parser,
+        similarity_selector,
+        cleaner,
+        validator,
+        lineage_tracker,
+    ):
         """Initializes the generator with its required collaborators.
 
         Args:
@@ -79,6 +86,11 @@ class PromptGenerator:
             raise ValueError("llm must not be None.")
         if template_builder is None:
             raise ValueError("template_builder must not be None.")
+        if candidate_parser is None:
+            raise ValueError("candidate_parser must not be None.")
+
+        if similarity_selector is None:
+            raise ValueError("similarity_selector must not be None.")
         if cleaner is None:
             raise ValueError("cleaner must not be None.")
         if validator is None:
@@ -88,6 +100,8 @@ class PromptGenerator:
 
         self._llm = llm
         self._template_builder = template_builder
+        self._candidate_parser = candidate_parser
+        self._similarity_selector = similarity_selector
         self._cleaner = cleaner
         self._validator = validator
         self._lineage_tracker = lineage_tracker
@@ -128,15 +142,30 @@ class PromptGenerator:
         start_time = time.monotonic()
 
         mutation_operator, instruction = self._template_builder.build(request)
+
         raw_output = self._llm.generate(
             prompt=instruction,
             temperature=request.temperature,
         )
-        clean_text = self._cleaner.clean(raw_output)
+
+        # Parse the five generated candidates
+        candidates = self._candidate_parser.parse(raw_output)
+
+        # Select the most novel candidate
+        selected_prompt = self._similarity_selector.select(
+            parent_prompt=request.parent_a.text,
+            candidates=candidates,
+        )
+
+        # Clean the selected prompt
+        clean_text = self._cleaner.clean(selected_prompt)
+
+        # Validate the cleaned prompt
         self._validator.validate(clean_text, request)
 
         candidate_id = self._generate_candidate_id()
         is_crossover = request.is_crossover()
+
         origin = "crossover" if is_crossover else "mutation"
         if is_crossover:
             parent_ids = [request.parent_a.id, request.parent_b.id]

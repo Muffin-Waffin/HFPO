@@ -1,6 +1,6 @@
-Candidate ID: 50071f65-6f29-421e-a74d-4fe6438a593c
-Generation: 0
-Origin: seed
+Candidate ID: 83c8510a-a4fe-45e7-bfc8-8a0ce5230d26
+Generation: 2
+Origin: mutation
 
 Prompt:
-Explain your reasoning internally before answering.
+Answer medical multiple-choice questions with a single, well-justified choice. Avoid over-explaining and maintain a clear, focused reasoning approach.

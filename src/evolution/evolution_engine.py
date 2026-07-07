@@ -22,6 +22,7 @@ from typing import Any
 from src.evolution.similarity import too_similar
 from src.evolution.prompt_logger import PromptLogger
 from src.evolution.mutation_prompt_logger import MutationPromptLogger
+from src.evolution.prompt_generator.mutation_statistics import MutationStatistics
 from src.core.population import Population
 from src.core.prompt_candidate import PromptCandidate
 from src.core.mutation_prompt_candidate import MutationPromptCandidate
@@ -69,6 +70,8 @@ class EvolutionEngine:
         "_mutation_evolution_interval",
         "_min_children_for_evolution",
         "_offspring_mutation_info",
+        "_mutation_statistics",
+        "_pending_mutation_statistics",
     )
 
     def __init__(
@@ -172,6 +175,8 @@ class EvolutionEngine:
         self._mutation_manager = mutation_manager
         self._mutation_evolution_interval = mutation_evolution_interval
         self._min_children_for_evolution = min_children_for_evolution
+        self._mutation_statistics = MutationStatistics()
+        self._pending_mutation_statistics = {}  # child_id -> (parent_id, mutation_operator, parent_fitness)
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
@@ -275,10 +280,15 @@ class EvolutionEngine:
                 self._population, generation + 1
             )
 
+            # Print mutation strategy statistics
+            self._mutation_statistics.print_report()
+
             print(
                 f"Generation {generation + 1} completed "
                 f"in {elapsed_time_seconds:.2f} seconds."
             )
+        # Persist mutation statistics for this run
+        self._output_manager.save_mutation_statistics(self._mutation_statistics.report())
         return self._population
     # ------------------------------------------------------------------
     # Private orchestration helpers
@@ -304,7 +314,25 @@ class EvolutionEngine:
         if generation < 0:
             raise ValueError("generation must be non-negative.")
 
-        return self._federated_server.evaluate_population(list(self._population))
+        evaluated = self._federated_server.evaluate_population(list(self._population))
+        self._update_mutation_statistics(evaluated)
+        return evaluated
+
+    def _update_mutation_statistics(self, evaluated_population: list[PromptCandidate]) -> None:
+        """Update mutation statistics with fitness deltas for NEW offspring only."""
+        for child in evaluated_population:
+            if child.id not in self._pending_mutation_statistics:
+                continue
+
+            parent_id, mutation_operator, parent_fitness = self._pending_mutation_statistics[child.id]
+            if parent_fitness is None or child.fitness is None:
+                continue
+
+            delta = child.fitness.average() - parent_fitness.average()
+            self._mutation_statistics.update(mutation_operator, delta)
+
+        # Clear for next generation (each mutation counted exactly once)
+        self._pending_mutation_statistics.clear()
 
     def _record_mutation_results(
         self, 
@@ -402,119 +430,127 @@ class EvolutionEngine:
         if candidate.fitness is None:
             return None
         return ParentPerformance.from_fitness_vector(candidate.fitness)
-
+    
     def _generate_offspring(
-        self, elites: list[PromptCandidate], generation: int
-    ) -> list[PromptCandidate]:
-        """Generates offspring candidates via the PromptGenerator."""
-        if elites is None:
-            raise ValueError("elites must not be None.")
-        if not isinstance(generation, int) or isinstance(generation, bool):
-            raise TypeError("generation must be an integer.")
-        if generation < 0:
-            raise ValueError("generation must be non-negative.")
+            self, elites: list[PromptCandidate], generation: int
+        ) -> list[PromptCandidate]:
+            """Generates offspring candidates via the PromptGenerator."""
+            if elites is None:
+                raise ValueError("elites must not be None.")
+            if not isinstance(generation, int) or isinstance(generation, bool):
+                raise TypeError("generation must be an integer.")
+            if generation < 0:
+                raise ValueError("generation must be non-negative.")
 
-        offspring: list[PromptCandidate] = []
-        offspring_needed = self._population.max_population_size - len(elites)
-        max_retries = 5
-        print(f"Generating {offspring_needed} offspring...")
-        existing_prompt_texts = set(self._population.texts())
+            offspring: list[PromptCandidate] = []
+            offspring_needed = self._population.max_population_size - len(elites)
+            max_retries = 5
+            print(f"Generating {offspring_needed} offspring...")
+            existing_prompt_texts = set(self._population.texts())
         
-        # Track which mutation prompt generated each offspring
-        self._offspring_mutation_info = {}
+            # Track which mutation prompt generated each offspring (for mutation prompt evolution)
+            self._offspring_mutation_info = {}
+            # Track offspring for mutation statistics (child_id -> (parent_id, mutation_operator, parent_fitness))
+            self._pending_mutation_statistics = {}
         
-        for _ in range(offspring_needed):
-            generated = False
-            for attempt in range(max_retries):
-                parent_a = self._tournament_selector.select_parents(
-                    self._population,
-                    1,
-                )[0]
+            for _ in range(offspring_needed):
+                generated = False
+                for attempt in range(max_retries):
+                    parent_a = self._tournament_selector.select_parents(
+                        self._population,
+                        1,
+                    )[0]
 
-                parent_a_performance = self._compute_performance_summary(parent_a)
+                    parent_a_performance = self._compute_performance_summary(parent_a)
 
-                use_crossover = (
-                    len(self._population) >= 2
-                    and self._operator_rng.random()
-                    < self._crossover_rate / (self._mutation_rate + self._crossover_rate)
-                )
-
-                if use_crossover:
-                    parent_b = self._select_distinct_second_parent(parent_a)
-                    parent_b_performance = self._compute_performance_summary(parent_b)
-                    request = PromptGenerationRequest(
-                        parent_a=parent_a,
-                        parent_b=parent_b,
-                        generation=self._population.generation + 1,
-                        task_description=self._task_description,
-                        temperature=self._temperature,
-                        existing_prompt_texts=existing_prompt_texts,
-                        parent_a_performance=parent_a_performance,
-                        parent_b_performance=parent_b_performance,
-                        mutation_operator=None,
-                    )
-                else:
-                    request = PromptGenerationRequest(
-                        parent_a=parent_a,
-                        parent_b=None,
-                        generation=self._population.generation + 1,
-                        task_description=self._task_description,
-                        temperature=self._temperature,
-                        existing_prompt_texts=existing_prompt_texts,
-                        parent_a_performance=parent_a_performance,
-                        mutation_operator=None,
+                    use_crossover = (
+                        len(self._population) >= 2
+                        and self._operator_rng.random()
+                        < self._crossover_rate / (self._mutation_rate + self._crossover_rate)
                     )
 
-                try:
-                    result = self._prompt_generator.generate(request)
+                    if use_crossover:
+                        parent_b = self._select_distinct_second_parent(parent_a)
+                        parent_b_performance = self._compute_performance_summary(parent_b)
+                        request = PromptGenerationRequest(
+                            parent_a=parent_a,
+                            parent_b=parent_b,
+                            generation=self._population.generation + 1,
+                            task_description=self._task_description,
+                            temperature=self._temperature,
+                            existing_prompt_texts=existing_prompt_texts,
+                            parent_a_performance=parent_a_performance,
+                            parent_b_performance=parent_b_performance,
+                            mutation_operator=None,
+                        )
+                    else:
+                        request = PromptGenerationRequest(
+                            parent_a=parent_a,
+                            parent_b=None,
+                            generation=self._population.generation + 1,
+                            task_description=self._task_description,
+                            temperature=self._temperature,
+                            existing_prompt_texts=existing_prompt_texts,
+                            parent_a_performance=parent_a_performance,
+                            mutation_operator=None,
+                        )
 
-                    if too_similar(
-                        result.candidate.text,
-                        existing_prompt_texts,
-                        threshold=0.95,
-                    ):
-                        print("Too similar, regenerating...")
-                        continue
+                    try:
+                        result = self._prompt_generator.generate(request)
 
-                    offspring.append(result.candidate)
-                    existing_prompt_texts.add(result.candidate.text)
+                        if too_similar(
+                            result.candidate.text,
+                            existing_prompt_texts,
+                            threshold=0.95,
+                        ):
+                            print("Too similar, regenerating...")
+                            continue
+
+                        offspring.append(result.candidate)
+                        existing_prompt_texts.add(result.candidate.text)
                                         
-                    # Track mutation prompt used (for mutation, not crossover)
-                    if not use_crossover and self._mutation_manager is not None:
-                        # Get the mutation prompt that was selected
-                        template_builder = self._prompt_generator._template_builder
-                        if hasattr(template_builder, '_last_mutation_operator'):
-                            operator_id = template_builder._last_mutation_operator
-                            if operator_id in self._mutation_manager._candidates:
-                                mutation_prompt = self._mutation_manager._candidates[operator_id]
-                                self._offspring_mutation_info[result.candidate.id] = {
-                                    'mutation_prompt': mutation_prompt,
-                                    'parent': parent_a,
-                                }
+                        # Track mutation prompt used (for mutation prompt evolution)
+                        if not use_crossover and self._mutation_manager is not None:
+                            # Get the mutation prompt that was selected
+                            template_builder = self._prompt_generator._template_builder
+                            if hasattr(template_builder, '_last_mutation_operator'):
+                                operator_id = template_builder._last_mutation_operator
+                                if operator_id in self._mutation_manager._candidates:
+                                    mutation_prompt = self._mutation_manager._candidates[operator_id]
+                                    self._offspring_mutation_info[result.candidate.id] = {
+                                        'mutation_prompt': mutation_prompt,
+                                        'parent': parent_a,
+                                    }
                     
-                    self._prompt_logger.log(
-                        generation=request.generation,
-                        child=result.candidate,
-                        parent_a=parent_a,
-                        parent_b=request.parent_b,
+                        # Track offspring for mutation statistics (only mutation-origin)
+                        mutation_operator = result.candidate.metadata.get("mutation_operator")
+                        if mutation_operator and not use_crossover:
+                            parent_fitness = parent_a.fitness
+                            self._pending_mutation_statistics[result.candidate.id] = (parent_a.id, mutation_operator, parent_fitness)
+                    
+                        self._prompt_logger.log(
+                            generation=request.generation,
+                            child=result.candidate,
+                            parent_a=parent_a,
+                            parent_b=request.parent_b,
+                        )
+                        generated = True
+                        break
+                    except ValueError as e:
+                        print(
+                            f"  Attempt {attempt + 1}/{max_retries} failed: {e}"
+                        )
+                if not generated:
+                    raise RuntimeError(
+                        f"Failed to generate a valid offspring after "
+                        f"{max_retries} attempts."
                     )
-                    generated = True
-                    break
-                except ValueError as e:
-                    print(
-                        f"  Attempt {attempt + 1}/{max_retries} failed: {e}"
-                    )
-            if not generated:
-                raise RuntimeError(
-                    f"Failed to generate a valid offspring after "
-                    f"{max_retries} attempts."
+                print(
+                    f"Generated offspring "
+                    f"{len(offspring)}/{offspring_needed}"
                 )
-            print(
-                f"Generated offspring "
-                f"{len(offspring)}/{offspring_needed}"
-            )
-        print("Offspring generation complete.")
-        return offspring
+            print("Offspring generation complete.")
+            return offspring
 
     def _select_distinct_second_parent(
         self, parent_a: PromptCandidate

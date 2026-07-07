@@ -411,6 +411,28 @@ class OutputManager:
     # String representation
     # ------------------------------------------------------------------
 
+    def save_mutation_statistics(self, stats: dict) -> Path:
+        """Writes mutation strategy statistics to disk.
+
+        Writes ``mutation_statistics.json`` in the output directory root.
+        Any existing file at that path is overwritten.
+
+        Args:
+            stats: Dictionary returned by ``MutationStatistics.report()``.
+
+        Returns:
+            The Path of the file that was written.
+        """
+        if not isinstance(stats, dict):
+            raise TypeError("stats must be a dict.")
+        path = self._output_directory / "mutation_statistics.json"
+        self._write_json(path, stats)
+        return path
+
+    # ------------------------------------------------------------------
+    # String representation
+    # ------------------------------------------------------------------
+
     def __str__(self) -> str:
         """Returns a human-readable string representation.
 

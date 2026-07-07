@@ -142,19 +142,19 @@ class PromptGenerator:
         start_time = time.monotonic()
 
         mutation_operator, instruction = self._template_builder.build(request)
-        print("=" * 80)
-        print(instruction)
-        print("=" * 80)
+        # print("=" * 80)
+        # print(instruction)
+        # print("=" * 80)
 
         raw_output = self._llm.generate(
             prompt=instruction,
             temperature=request.temperature,
         )
-        print("=" * 80)
-        print("RAW OUTPUT")
-        print("=" * 80)
-        print(raw_output)
-        print("=" * 80)
+        # print("=" * 80)
+        # print("RAW OUTPUT")
+        # print("=" * 80)
+        # print(raw_output)
+        # print("=" * 80)
 
         # Parse the five generated candidates
         candidates = self._candidate_parser.parse(raw_output)

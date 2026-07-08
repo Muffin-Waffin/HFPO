@@ -23,8 +23,11 @@ federated learning framework involved.
 from __future__ import annotations
 
 import json
+import os
+import time
 from datetime import datetime
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 
 from src.core.evaluation_cache import EvaluationCache
 from src.core.evaluation_record import EvaluationRecord
@@ -84,6 +87,7 @@ class FederatedServer:
         model_name: str,
         dataset_name: str,
         evaluation_version: str,
+        max_parallel_workers: int | None = None,
     ) -> None:
         """Initialize a FederatedServer with its hospitals and dependencies.
 
@@ -100,6 +104,8 @@ class FederatedServer:
             dataset_name: Name of the dataset used for evaluation.
             evaluation_version: Version identifier of the evaluation
                 pipeline.
+            max_parallel_workers: Optional limit on concurrent hospital
+                evaluations. If None (default), uses one worker per hospital.
 
         Raises:
             ValueError: If `hospitals` is empty, if `aggregator`,
@@ -130,6 +136,9 @@ class FederatedServer:
                 "FederatedServer evaluation_version must not be empty."
             )
 
+        if max_parallel_workers is not None and max_parallel_workers < 1:
+            raise ValueError("max_parallel_workers must be >= 1")
+
         self._hospitals: list[HospitalClient] = hospitals
         self._aggregator: Aggregator = aggregator
         self._evaluation_cache: EvaluationCache = evaluation_cache
@@ -137,6 +146,7 @@ class FederatedServer:
         self._model_name: str = model_name
         self._dataset_name: str = dataset_name
         self._evaluation_version: str = evaluation_version
+        self._max_parallel_workers: int | None = max_parallel_workers
         self._diagnostics_path = Path("results/hfpo_run/parent_child_diagnostics.jsonl")
         self._diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -364,21 +374,40 @@ class FederatedServer:
         """Broadcast a population of prompts to every hospital for evaluation.
 
         Each `HospitalClient` independently evaluates the entire supplied
-        population against its own private dataset. No networking,
-        threading, or external federated learning framework is involved;
-        every hospital is called in-process, sequentially.
+        population against its own private dataset. The calls are executed
+        concurrently with a ThreadPoolExecutor; results are returned in the
+        same order as `self.hospitals` so that downstream logic is unchanged.
 
-        Args:
-            population: The list of `PromptCandidate` objects to broadcast.
-
-        Returns:
-            A list containing one list of `EvaluationRecord` objects per
-            hospital, in the same order as `self.hospitals`.
+        Concurrent inference requests can overlap because PyTorch releases
+        the GIL during most tensor operations. Actual speedup depends on
+        GPU utilization, memory availability, and the behavior of
+        `model.generate()`.
         """
-        responses: list[list[EvaluationRecord]] = []
+        if self._max_parallel_workers is None:
+            num_workers = len(self._hospitals)
+        else:
+            num_workers = min(self._max_parallel_workers, len(self._hospitals))
 
-        for hospital in self._hospitals:
-            responses.append(hospital.evaluate_population(population))
+        start = time.perf_counter()
+
+        with ThreadPoolExecutor(max_workers=num_workers) as executor:
+            futures = [
+                executor.submit(hospital.evaluate_population, population)
+                for hospital in self._hospitals
+            ]
+            responses = []
+            for hospital, future in zip(self._hospitals, futures):
+                try:
+                    responses.append(future.result())
+                except Exception as e:
+                    print(f"Hospital {hospital.hospital_id} failed: {e}")
+                    raise
+
+        elapsed = time.perf_counter() - start
+        print(
+            f"Broadcast completed in {elapsed:.2f}s | "
+            f"workers={num_workers} | hospitals={len(self._hospitals)}"
+        )
 
         return responses
 

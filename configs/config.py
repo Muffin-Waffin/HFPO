@@ -127,7 +127,7 @@ MODEL_REGISTRY = {
 #   Options: "qwen3-8b", "phi-4", "llama3-8b", "mistral-7b"
 # WHAT NOT TO CHANGE: Must match a key in MODEL_REGISTRY exactly
 # ============================================================================
-DEFAULT_MODEL = "II-medical"
+DEFAULT_MODEL = "qwen3-8b"
 
 # ============================================================================
 # GENERATION PARAMETERS (used as defaults, can be overridden per-experiment)
@@ -140,7 +140,7 @@ DEFAULT_MODEL = "II-medical"
 #
 # WHAT NOT TO CHANGE: These are runtime defaults; override per-experiment instead
 # ============================================================================
-MAX_NEW_TOKENS = 500      # CHANGE: 128-2048 depending on task & VRAM
+MAX_NEW_TOKENS = 256      # CHANGE: 128-2048 depending on task & VRAM
 TEMPERATURE = 0.2         # CHANGE: 0.0 (deterministic) to 1.0 (creative)
 
 # ============================================================================
@@ -191,7 +191,7 @@ GA_MUTATION_RATE = 0.35
 GA_CROSSOVER_RATE = 0.65
 GA_TOURNAMENT_SIZE = 3
 EVALUATION_SUBSET_SIZE = 150
-RANDOM_SEED = 42
+RANDOM_SEED = 38
 
 # Adaptive Mutation Configuration
 USE_ADAPTIVE_MUTATION = True

@@ -1,6 +1,6 @@
-Candidate ID: 83c8510a-a4fe-45e7-bfc8-8a0ce5230d26
-Generation: 2
-Origin: mutation
+Candidate ID: dd1580d1-35f0-413c-9d40-3a25d4faadf3
+Generation: 0
+Origin: seed
 
 Prompt:
-Answer medical multiple-choice questions with a single, well-justified choice. Avoid over-explaining and maintain a clear, focused reasoning approach.
+Eliminate incorrect options first.

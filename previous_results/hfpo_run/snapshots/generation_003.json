@@ -1,0 +1,17 @@
+{
+    "average_score": 0.6166666666666667,
+    "best_candidate_id": "50071f65-6f29-421e-a74d-4fe6438a593c",
+    "best_score": 0.6666666666666666,
+    "elapsed_time_seconds": 66.63215251499969,
+    "generation": 3,
+    "population": [
+        "50071f65-6f29-421e-a74d-4fe6438a593c",
+        "8a8354f7-f8f8-4f61-aea6-13d5508cd459",
+        "fc92bd9f-b6a6-491f-8ae3-298a1a6be38c",
+        "243e21a4-be09-4528-97d5-1556a3442c66",
+        "c475b525-0758-4e17-bf4c-7812e885b543",
+        "2e78e973-ec37-4dca-9cf9-b17f4e0a4abd"
+    ],
+    "population_size": 6,
+    "worst_score": 0.5666666666666668
+}

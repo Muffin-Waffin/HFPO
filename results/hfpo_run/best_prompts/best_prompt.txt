@@ -1,0 +1,6 @@
+Candidate ID: dd1580d1-35f0-413c-9d40-3a25d4faadf3
+Generation: 0
+Origin: seed
+
+Prompt:
+Eliminate incorrect options first.

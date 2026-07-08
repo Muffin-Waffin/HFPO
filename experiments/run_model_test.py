@@ -1,4 +1,4 @@
-from src.models.loader import load_model
+from src.llms.loader import load_model
 
 import torch
 from configs.config import MAX_NEW_TOKENS

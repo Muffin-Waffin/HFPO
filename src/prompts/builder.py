@@ -58,6 +58,15 @@ def build_prompt(sample: dict) -> str:
     prompt += "Options:\n"
     prompt += _format_choices(sample["choices"])
 
-    prompt += "\n\nAnswer (respond with ONLY one uppercase letter: A, B, C, or D):"
+    if len(sample["choices"]) == 3:
+        prompt += (
+            "\n\nAnswer (respond with ONLY one word: "
+            "yes, no, or maybe):"
+        )
+    else:
+        prompt += (
+            "\n\nAnswer (respond with ONLY one uppercase letter: "
+            "A, B, C, or D):"
+        )
 
     return prompt

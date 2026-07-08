@@ -13,7 +13,6 @@ __pycache__/
 huggingface/
 
 # Models
-models/
 checkpoints/
 weights/
 
@@ -23,8 +22,7 @@ data/cache/
 
 # Logs & outputs
 logs/
-outputs/
-results/
+# outputs/
 
 # Notebook
 .ipynb_checkpoints/

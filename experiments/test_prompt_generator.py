@@ -24,6 +24,9 @@ class FakeLineageTracker:
     def build_ancestry(self, parent_ids: list[str]) -> list[str]:
         return parent_ids.copy()
 
+    def register(self, prompt, allow_missing_parents: bool = False) -> None:
+        pass
+
 
 parent = PromptCandidate(
     id="parent_1",
@@ -43,9 +46,14 @@ request = PromptGenerationRequest(
     existing_prompt_texts={parent.text},
 )
 
+from src.evolution.prompt_generator.candidate_parser import CandidateParser
+from src.evolution.prompt_generator.similarity_selector import PromptSimilaritySelector
+
 generator = PromptGenerator(
     llm=FakeLLM(),
     template_builder=PromptTemplateBuilder(),
+    candidate_parser=CandidateParser(),
+    similarity_selector=PromptSimilaritySelector(),
     cleaner=PromptCleaner(),
     validator=PromptValidator(),
     lineage_tracker=FakeLineageTracker(),

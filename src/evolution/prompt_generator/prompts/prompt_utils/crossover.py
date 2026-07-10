@@ -93,4 +93,11 @@ Return exactly five candidates using this exact format:
 <prompt>
 
 Do not output anything before Candidate 1 or after Candidate 5.
+
+The rewritten prompt must encourage concise reasoning.
+
+Do not instruct the model to repeatedly verify, reconsider,
+iterate indefinitely, or continue reasoning until certainty.
+
+Avoid instructions that substantially increase inference length.
 """

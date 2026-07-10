@@ -1,6 +1,6 @@
-Candidate ID: dd1580d1-35f0-413c-9d40-3a25d4faadf3
-Generation: 0
-Origin: seed
+Candidate ID: c6f01b71-fe30-41d3-8680-5d08d0b7dd15
+Generation: 5
+Origin: crossover
 
 Prompt:
-Eliminate incorrect options first.
+<prompt>Identify the option that best represents the clinical judgment of an experienced practitioner, emphasizing evidence-based decision-making and the avoidance of misleading or irrelevant choices.</prompt>

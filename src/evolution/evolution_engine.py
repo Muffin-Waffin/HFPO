@@ -166,11 +166,12 @@ class EvolutionEngine:
         self._crossover_rate = crossover_rate
         self._start_generation = start_generation
         self._operator_rng = random.Random()
+        output_dir = output_manager._output_directory
         self._prompt_logger = PromptLogger(
-            "results/hfpo_run/generated_prompts.jsonl"
+            output_dir / "generated_prompts.jsonl"
         )
         self._mutation_prompt_logger = MutationPromptLogger(
-            "results/hfpo_run/mutation_history.jsonl"
+            output_dir / "mutation_history.jsonl"
         )
         self._mutation_manager = mutation_manager
         self._mutation_evolution_interval = mutation_evolution_interval
@@ -227,6 +228,10 @@ class EvolutionEngine:
             print("Evaluating population...")
             evaluated_population = self._evaluate_population(generation)
 
+            # Record mutation prompt statistics after evaluation
+            if self._mutation_manager is not None and generation > self._start_generation:
+                self._record_mutation_results(evaluated_population, generation - 1)
+
             best = max(
                 evaluated_population,
                 key=lambda p: p.fitness.average(),
@@ -247,9 +252,7 @@ class EvolutionEngine:
             )
             print(f"Generated {len(offspring)} offspring.")
 
-            # Record mutation prompt statistics after evaluation
-            if self._mutation_manager is not None:
-                self._record_mutation_results(offspring, generation)
+            # Offspring are evaluated in the next generation, where statistics are recorded
 
             elapsed_time_seconds = (
                 time.perf_counter() - generation_start

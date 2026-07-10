@@ -88,6 +88,7 @@ class FederatedServer:
         dataset_name: str,
         evaluation_version: str,
         max_parallel_workers: int | None = None,
+        diagnostics_path: str | Path | None = None,
     ) -> None:
         """Initialize a FederatedServer with its hospitals and dependencies.
 
@@ -147,7 +148,7 @@ class FederatedServer:
         self._dataset_name: str = dataset_name
         self._evaluation_version: str = evaluation_version
         self._max_parallel_workers: int | None = max_parallel_workers
-        self._diagnostics_path = Path("results/hfpo_run/parent_child_diagnostics.jsonl")
+        self._diagnostics_path = Path(diagnostics_path) if diagnostics_path is not None else Path("results/hfpo_run/parent_child_diagnostics.jsonl")
         self._diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
 
     @property
@@ -422,6 +423,12 @@ class FederatedServer:
         for prompt in population:
             if not self._lineage_tracker.exists(prompt.id):
                 self._lineage_tracker.register(prompt)
+            else:
+                registered = self._lineage_tracker.get(prompt.id)
+                if prompt.fitness is not None:
+                    registered.fitness = prompt.fitness
+                if prompt.metadata:
+                    registered.metadata.update(prompt.metadata)
 
     def hospital_summary(self) -> list[dict[str, object]]:
         """Return a logging-friendly summary of every hospital.

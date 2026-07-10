@@ -1,0 +1,6 @@
+Candidate ID: 12d0a74d-a536-4339-831a-a4ab2509d4e2
+Generation: 7
+Origin: mutation
+
+Prompt:
+Focus on the clarity and precision of each answer choice, prioritizing the option that aligns most directly with current clinical guidelines and scientific consensus.

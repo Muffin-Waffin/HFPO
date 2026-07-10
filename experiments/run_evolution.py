@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import uuid
+from pathlib import Path
 from typing import Any
 
 from configs import config
@@ -362,6 +363,7 @@ def main() -> None:
         model_name=config.DEFAULT_MODEL,
         dataset_name=FEDERATION_DATASET_LABEL,
         evaluation_version=EVALUATION_VERSION,
+        diagnostics_path=Path(OUTPUT_DIRECTORY) / "parent_child_diagnostics.jsonl",
     )
 
     output_manager = OutputManager(output_directory=OUTPUT_DIRECTORY)

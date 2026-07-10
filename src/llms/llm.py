@@ -20,6 +20,8 @@ def load_llm(model_key: str = None):
     config = get_model_config(model_key)
 
     tokenizer = AutoTokenizer.from_pretrained(config["model_name"])
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
 
     quant_config = BitsAndBytesConfig(
         load_in_4bit=config["load_in_4bit"],

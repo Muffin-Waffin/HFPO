@@ -1,0 +1,31 @@
+{
+    "average_score": 0.6785,
+    "best_candidate_id": "45eda1f7-feaa-451a-944e-ebd75a6a7c6f",
+    "best_score": 0.7266666666666667,
+    "elapsed_time_seconds": 2451.86494417199,
+    "generation": 4,
+    "population": [
+        "45eda1f7-feaa-451a-944e-ebd75a6a7c6f",
+        "7ce84c85-786d-48fd-87bc-1d1b94a89808",
+        "de6f12b3-e627-4f05-84f8-3a454fce6b19",
+        "52b6f181-f1f7-4288-a481-a19f56ad963d",
+        "f371c533-ef7b-46e4-8653-a3429d231eb8",
+        "edbc5348-c83c-439a-abfc-806443ca5a81",
+        "00dc4d19-93a5-4076-899c-7bfb610b3960",
+        "dc7d98cf-f8f7-40ab-b004-4a3dbd82b8e3",
+        "c127d6a4-2b07-4386-9603-bf51d19bc4de",
+        "990adfa7-2f85-48a8-ac5b-941ac2a7ee2a",
+        "ee6c781d-3411-4a34-a1be-8b2d39fafac9",
+        "bdcc695b-a11f-46d8-aed2-39e596cfd0d8",
+        "f9a9ad00-9fc8-4da1-b4c8-4cd2d3992572",
+        "3da8908f-a20a-47bf-9dcf-0b96ef4e7dc2",
+        "80556d96-f37b-45bc-96f9-c46b4a77e037",
+        "42daba27-8579-482c-8835-8f781e7e3dff",
+        "2b239647-208b-4869-abee-2b84bb4e274e",
+        "0963b90b-5b0f-4363-aca8-34fed02998ab",
+        "6b4cf16a-c283-41b0-85e2-45f9043c28a8",
+        "e7a3bac9-603b-4319-a6f1-08366f45a022"
+    ],
+    "population_size": 20,
+    "worst_score": 0.6266666666666666
+}

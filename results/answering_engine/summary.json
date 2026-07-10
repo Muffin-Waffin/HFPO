@@ -1,0 +1,38 @@
+[
+  {
+    "dataset": "medqa",
+    "model": "qwen3-8b",
+    "prompt_id": "c6f01b71-fe30-41d3-8680-5d08d0b7dd15",
+    "accuracy": 0.6111547525530243,
+    "precision": 0.609702375777813,
+    "recall": 0.6065373202003495,
+    "macro_f1": 0.6072276031862752,
+    "average_latency": 0.21567016743680092,
+    "average_tokens": 2.0,
+    "total_questions": 1273
+  },
+  {
+    "dataset": "pubmedqa",
+    "model": "qwen3-8b",
+    "prompt_id": "c6f01b71-fe30-41d3-8680-5d08d0b7dd15",
+    "accuracy": 0.745,
+    "precision": 0.5829800851300734,
+    "recall": 0.5897543742025347,
+    "macro_f1": 0.5838561502420142,
+    "average_latency": 0.26347618183118177,
+    "average_tokens": 2.0,
+    "total_questions": 1000
+  },
+  {
+    "dataset": "medmcqa",
+    "model": "qwen3-8b",
+    "prompt_id": "c6f01b71-fe30-41d3-8680-5d08d0b7dd15",
+    "accuracy": 0.5409992828113794,
+    "precision": 0.5448246545477998,
+    "recall": 0.5260972541605737,
+    "macro_f1": 0.5315907097331606,
+    "average_latency": 0.16578151062456825,
+    "average_tokens": 2.0,
+    "total_questions": 4183
+  }
+]

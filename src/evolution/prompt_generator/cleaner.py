@@ -75,6 +75,7 @@ class PromptCleaner:
         result = self._remove_numbering(result)
         result = self._remove_bullets(result)
         result = self._collapse_blank_lines(result)
+        result = self._remove_prompt_tags(result)
         result = self._remove_surrounding_quotes(result)
         result = self._trim_lines(result)
         return result.strip()
@@ -172,6 +173,22 @@ class PromptCleaner:
             one.
         """
         return re.sub(r"\n[ \t]*\n(?:[ \t]*\n)+", "\n\n", text)
+
+    def _remove_prompt_tags(self, text: str) -> str:
+        """Removes ``<prompt>`` and ``</prompt>`` XML tags.
+
+        Strips opening (``<prompt>``) and closing (``</prompt>``)
+        tags, including any attributes the opening tag may contain.
+        Only the tags themselves are removed; the content between
+        them is left intact.
+
+        Args:
+            text: Text that may contain ``<prompt>`` tags.
+
+        Returns:
+            The text with ``<prompt>`` tags removed.
+        """
+        return re.sub(r"</?prompt[^>]*>", "", text)
 
     def _remove_surrounding_quotes(self, text: str) -> str:
         """Removes quotes surrounding the entire text.

@@ -67,33 +67,33 @@ MODEL_REGISTRY = {
         "model_name": "Qwen/Qwen3-8B",              # HF model ID - CHANGE to use different model
         "load_in_4bit": True,                        # 4-bit quantization (CHANGE only if >24GB VRAM)
         "quant_type": "nf4",                         # DO NOT CHANGE - nf4 is optimal for 4-bit
-        "compute_dtype": "float16",                  # CHANGE to "bfloat16" only on Ampere+ GPUs
+        "compute_dtype": "bfloat16",                  # CHANGE to "bfloat16" only on Ampere+ GPUs
         "use_double_quant": True,                    # DO NOT CHANGE - saves ~0.5GB VRAM
-        "dtype": "float16",                          # Must match compute_dtype
+        "dtype": "bfloat16",                          # Must match compute_dtype
         "device_map": "auto",                        # DO NOT CHANGE unless manual GPU mapping
-        "max_new_tokens": 256,                       # CHANGE: Higher = longer output, more VRAM
+        "max_new_tokens": 128,                       # CHANGE: Higher = longer output, more VRAM
         "temperature": 0.2,                          # CHANGE: 0.0=deterministic, 1.0=creative
     },
     "phi-4": {
         "model_name": "microsoft/phi-4",             # CHANGE to use different Phi model
         "load_in_4bit": True,                        # CHANGE only if >24GB VRAM
         "quant_type": "nf4",                         # DO NOT CHANGE
-        "compute_dtype": "float16",                  # CHANGE to "bfloat16" only on Ampere+
+        "compute_dtype": "bfloat16",                  # CHANGE to "bfloat16" only on Ampere+
         "use_double_quant": True,                    # DO NOT CHANGE
-        "dtype": "float16",                          # Must match compute_dtype
+        "dtype": "bfloat16",                          # Must match compute_dtype
         "device_map": "auto",                        # DO NOT CHANGE
-        "max_new_tokens": 256,                       # CHANGE based on VRAM
+        "max_new_tokens": 128,                       # CHANGE based on VRAM
         "temperature": 0.2,                          # CHANGE: 0.0-1.0
     },
     "llama3-8b": {
         "model_name": "meta-llama/Meta-Llama-3-8B-Instruct",  # CHANGE for different Llama variant
         "load_in_4bit": True,                        # CHANGE only if >24GB VRAM
         "quant_type": "nf4",                         # DO NOT CHANGE
-        "compute_dtype": "float16",                  # CHANGE to "bfloat16" on Ampere+
+        "compute_dtype": "bfloat16",                  # CHANGE to "bfloat16" on Ampere+
         "use_double_quant": True,                    # DO NOT CHANGE
-        "dtype": "float16",                          # Must match compute_dtype
+        "dtype": "bfloat16",                          # Must match compute_dtype
         "device_map": "auto",                        # DO NOT CHANGE
-        "max_new_tokens": 256,                       # CHANGE based on VRAM
+        "max_new_tokens": 128,                       # CHANGE based on VRAM
         "temperature": 0.2,                          # CHANGE: 0.0-1.0
     },
     "mistral-7b": {
@@ -104,7 +104,7 @@ MODEL_REGISTRY = {
         "use_double_quant": True,                    # DO NOT CHANGE
         "dtype": "float16",                          # Must match compute_dtype
         "device_map": "auto",                        # DO NOT CHANGE
-        "max_new_tokens": 256,                       # CHANGE based on VRAM
+        "max_new_tokens": 128,                       # CHANGE based on VRAM
         "temperature": 0.2,                          # CHANGE: 0.0-1.0
     },
     "II-medical": {
@@ -115,8 +115,27 @@ MODEL_REGISTRY = {
         "use_double_quant": True,                    # DO NOT CHANGE
         "dtype": "float16",                          # Must match compute_dtype
         "device_map": "auto",                        # DO NOT CHANGE
-        "max_new_tokens": 256,                       # CHANGE based on VRAM
+        "max_new_tokens": 128,                       # CHANGE based on VRAM
         "temperature": 0.2,                          # CHANGE: 0.0-1.0
+    },
+    "meditron": {
+        "model_name": "EPFLiGHT/Meditron3-8B",  # CHANGE for different Mistral
+        "load_in_4bit": True,                        # CHANGE only if >24GB VRAM
+        "quant_type": "nf4",                         # DO NOT CHANGE
+        "compute_dtype": "bfloat16",                  # CHANGE to "bfloat16" on Ampere+
+        "use_double_quant": True,                    # DO NOT CHANGE
+        "dtype": "bfloat16",                          # Must match compute_dtype
+        "device_map": "auto",                        # DO NOT CHANGE
+        "max_new_tokens": 128,                       # CHANGE based on VRAM
+        "temperature": 0.2,                          # CHANGE: 0.0-1.0
+    },
+
+   "oss": {
+        "model_name": "openai/gpt-oss-20b",
+        "device_map": "auto",
+        "dtype": "bfloat16",
+        "max_new_tokens": 128,
+        "temperature": 0.2,
     },
 }
 
@@ -127,7 +146,7 @@ MODEL_REGISTRY = {
 #   Options: "qwen3-8b", "phi-4", "llama3-8b", "mistral-7b"
 # WHAT NOT TO CHANGE: Must match a key in MODEL_REGISTRY exactly
 # ============================================================================
-DEFAULT_MODEL = "phi-4"
+DEFAULT_MODEL = "oss"
 
 # ============================================================================
 # GENERATION PARAMETERS (used as defaults, can be overridden per-experiment)

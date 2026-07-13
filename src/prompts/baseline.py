@@ -32,4 +32,10 @@ BASELINE_PROMPTS = {
         "Answer as an experienced medical professional "
         "would on a licensing exam."
     ),
+    "cot": (
+        "You are a medical expert answering a multiple-choice question. "
+        "Think through the clinical reasoning step by step, then provide your "
+        "final answer. End your response with 'Answer: X' where X is the letter "
+        "of the correct option."
+    ),
 }

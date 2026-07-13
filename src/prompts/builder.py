@@ -28,7 +28,7 @@ def _format_choices(choices: list[str]) -> str:
     return "\n".join(lines)
 
 
-def build_prompt(sample: dict) -> str:
+def build_prompt(sample: dict, cot: bool = False) -> str:
     """
     Build the user prompt from a standardized dataset sample.
 
@@ -40,6 +40,10 @@ def build_prompt(sample: dict) -> str:
             "context": ...,
             "choices": ...
         }
+    cot : bool, default False
+        If True, append a CoT-friendly instruction asking the model to
+        reason step by step and end with "Answer: X". If False (default),
+        use the original instruction requesting only the answer letter/word.
 
     Returns
     -------
@@ -59,14 +63,26 @@ def build_prompt(sample: dict) -> str:
     prompt += _format_choices(sample["choices"])
 
     if len(sample["choices"]) == 3:
-        prompt += (
-            "\n\nAnswer (respond with ONLY one word: "
-            "yes, no, or maybe):"
-        )
+        if cot:
+            prompt += (
+                "\n\nThink step by step, then end your response with "
+                "'Answer: yes', 'Answer: no', or 'Answer: maybe'."
+            )
+        else:
+            prompt += (
+                "\n\nAnswer (respond with ONLY one word: "
+                "yes, no, or maybe):"
+            )
     else:
-        prompt += (
-            "\n\nAnswer (respond with ONLY one uppercase letter: "
-            "A, B, C, or D):"
-        )
+        if cot:
+            prompt += (
+                "\n\nThink step by step, then end your response with "
+                "'Answer: X' where X is the correct letter."
+            )
+        else:
+            prompt += (
+                "\n\nAnswer (respond with ONLY one uppercase letter: "
+                "A, B, C, or D):"
+            )
 
     return prompt

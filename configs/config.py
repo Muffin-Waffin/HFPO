@@ -63,7 +63,7 @@
 # ============================================================================
 MODEL_REGISTRY = {
 
-    "qwen3-8b": {
+    "qwen": {
         "model_name": "Qwen/Qwen3-8B",              # HF model ID - CHANGE to use different model
         "load_in_4bit": True,                        # 4-bit quantization (CHANGE only if >24GB VRAM)
         "quant_type": "nf4",                         # DO NOT CHANGE - nf4 is optimal for 4-bit
@@ -146,7 +146,7 @@ MODEL_REGISTRY = {
 #   Options: "qwen3-8b", "phi-4", "llama3-8b", "mistral-7b"
 # WHAT NOT TO CHANGE: Must match a key in MODEL_REGISTRY exactly
 # ============================================================================
-DEFAULT_MODEL = "oss"
+DEFAULT_MODEL = "qwen"
 
 # ============================================================================
 # GENERATION PARAMETERS (used as defaults, can be overridden per-experiment)
@@ -156,11 +156,16 @@ DEFAULT_MODEL = "oss"
 #                     Typical: 128-512 for prompts, 1024+ for long-form
 #   - TEMPERATURE: 0.0 = deterministic, 0.7 = balanced, 1.0 = creative
 #                   Lower for factual tasks, higher for creative generation
+#   - MAX_NEW_TOKENS_COT: Token budget for CoT reasoning + answer.
+#                         Higher than MAX_NEW_TOKENS to accommodate reasoning.
+#   - DATASET_SPLIT: Dataset split to use for evaluation (train/validation/test).
 #
 # WHAT NOT TO CHANGE: These are runtime defaults; override per-experiment instead
 # ============================================================================
 MAX_NEW_TOKENS = 256      # CHANGE: 128-2048 depending on task & VRAM
+MAX_NEW_TOKENS_COT = 1536  # CHANGE: Token budget for CoT reasoning + answer
 TEMPERATURE = 0.2         # CHANGE: 0.0 (deterministic) to 1.0 (creative)
+DATASET_SPLIT = "train"   # CHANGE: Dataset split for evaluation
 
 # ============================================================================
 # GENETIC ALGORITHM (GA) PARAMETERS

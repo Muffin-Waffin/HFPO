@@ -1,0 +1,19 @@
+{
+  "num_candidates": 100,
+  "subset_size": 100,
+  "ga_population_size": 20,
+  "ga_generations": 10,
+  "elite_count": 2,
+  "offspring_per_generation": 18,
+  "random_seed": 51,
+  "hospital_datasets": [
+    "medqa",
+    "pubmedqa",
+    "medmcqa"
+  ],
+  "dataset_split": "train",
+  "task_description": "Answer multiple-choice medical licensing exam questions correctly, choosing exactly one option.",
+  "model": "qwen",
+  "max_new_tokens": 256,
+  "temperature": 0.2
+}

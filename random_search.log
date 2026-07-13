@@ -440,3 +440,282 @@ Loading weights: 100%|██████████| 103/103 [00:00<00:00, 1083
 [2026-07-12 10:02:23] [pubmedqa] Prompt c4caf84e: 100/100 samples
 [2026-07-12 10:02:24] [pubmedqa] Finished prompt c4caf84e
 [2026-07-12 10:02:24] [pubmedqa] Finished prompt c4caf84e in 129.3s (74/100)
+[2026-07-12 09:51:37] Evaluating batch of 5 candidates...
+[2026-07-12 09:51:37] Evaluating 5 prompts...
+[2026-07-12 09:51:37] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 09:51:37] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 10:01:47] Broadcast completed in 610.00s | workers=3 | hospitals=3
+[2026-07-12 10:01:47] Broadcast complete.
+[2026-07-12 10:01:47] Federated evaluation complete.
+[2026-07-12 10:01:47] Batch evaluated in 610.0s (122.0s/candidate)
+[2026-07-12 10:01:47]   Candidate 23/182 | fitness=0.6582 | best_so_far=0.6733 | medqa=0.6613 pubmedqa=0.6554 medmcqa=0.6700 | batch=610.0s | ETA=190800.0s
+[2026-07-12 10:01:47]   Candidate 24/182 | fitness=0.6583 | best_so_far=0.6733 | medqa=0.6437 pubmedqa=0.6990 medmcqa=0.6512 | batch=610.0s | ETA=189600.0s
+[2026-07-12 10:01:47]   Candidate 25/182 | fitness=0.6648 | best_so_far=0.6733 | medqa=0.6766 pubmedqa=0.6814 medmcqa=0.6453 | batch=610.0s | ETA=188400.0s
+[2026-07-12 10:01:47]   Candidate 26/182 | fitness=0.6613 | best_so_far=0.6733 | medqa=0.6545 pubmedqa=0.6607 medmcqa=0.6631 | batch=610.0s | ETA=187200.0s
+[2026-07-12 10:01:47]   Candidate 27/182 | fitness=0.6729 | best_so_far=0.6733 | medqa=0.6497 pubmedqa=0.6906 medmcqa=0.6349 | batch=610.0s | ETA=186000.0s
+[2026-07-12 10:01:54] Candidate 28/182: generated
+[2026-07-12 10:02:02] Candidate 29/182: generated
+[2026-07-12 10:02:10] Candidate 30/182: generated
+[2026-07-12 10:02:18] Candidate 31/182: generated
+[2026-07-12 10:02:27] Candidate 32/182: generated
+[2026-07-12 10:02:27] Evaluating batch of 5 candidates...
+[2026-07-12 10:02:27] Evaluating 5 prompts...
+[2026-07-12 10:02:27] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 10:02:27] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 10:13:12] Broadcast completed in 645.00s | workers=3 | hospitals=3
+[2026-07-12 10:13:12] Broadcast complete.
+[2026-07-12 10:13:12] Federated evaluation complete.
+[2026-07-12 10:13:12] Batch evaluated in 645.0s (129.0s/candidate)
+[2026-07-12 10:13:12]   Candidate 28/182 | fitness=0.6590 | best_so_far=0.6733 | medqa=0.6804 pubmedqa=0.6844 medmcqa=0.6649 | batch=645.0s | ETA=184800.0s
+[2026-07-12 10:13:12]   Candidate 29/182 | fitness=0.6725 | best_so_far=0.6733 | medqa=0.6999 pubmedqa=0.6643 medmcqa=0.6333 | batch=645.0s | ETA=183600.0s
+[2026-07-12 10:13:12]   Candidate 30/182 | fitness=0.6719 | best_so_far=0.6733 | medqa=0.6483 pubmedqa=0.7071 medmcqa=0.6700 | batch=645.0s | ETA=182400.0s
+[2026-07-12 10:13:12]   Candidate 31/182 | fitness=0.6590 | best_so_far=0.6733 | medqa=0.6355 pubmedqa=0.6774 medmcqa=0.6700 | batch=645.0s | ETA=181200.0s
+[2026-07-12 10:13:12]   Candidate 32/182 | fitness=0.6741 | best_so_far=0.6741 | medqa=0.7000 pubmedqa=0.7019 medmcqa=0.6700 | batch=645.0s | ETA=180000.0s
+[2026-07-12 10:13:19] Candidate 33/182: generated
+[2026-07-12 10:13:27] Candidate 34/182: generated
+[2026-07-12 10:13:33] Candidate 35/182: generated
+[2026-07-12 10:13:42] Candidate 36/182: generated
+[2026-07-12 10:13:49] Candidate 37/182: generated
+[2026-07-12 10:13:49] Evaluating batch of 5 candidates...
+[2026-07-12 10:13:49] Evaluating 5 prompts...
+[2026-07-12 10:13:49] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 10:13:49] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 10:24:21] Broadcast completed in 632.00s | workers=3 | hospitals=3
+[2026-07-12 10:24:21] Broadcast complete.
+[2026-07-12 10:24:21] Federated evaluation complete.
+[2026-07-12 10:24:21] Batch evaluated in 632.0s (126.4s/candidate)
+[2026-07-12 10:24:21]   Candidate 33/182 | fitness=0.6675 | best_so_far=0.6741 | medqa=0.6645 pubmedqa=0.6557 medmcqa=0.6700 | batch=632.0s | ETA=178800.0s
+[2026-07-12 10:24:21]   Candidate 34/182 | fitness=0.6623 | best_so_far=0.6741 | medqa=0.6912 pubmedqa=0.7004 medmcqa=0.6695 | batch=632.0s | ETA=177600.0s
+[2026-07-12 10:24:21]   Candidate 35/182 | fitness=0.6562 | best_so_far=0.6741 | medqa=0.6821 pubmedqa=0.6813 medmcqa=0.6486 | batch=632.0s | ETA=176400.0s
+[2026-07-12 10:24:21]   Candidate 36/182 | fitness=0.6645 | best_so_far=0.6741 | medqa=0.6833 pubmedqa=0.7093 medmcqa=0.6700 | batch=632.0s | ETA=175200.0s
+[2026-07-12 10:24:21]   Candidate 37/182 | fitness=0.6589 | best_so_far=0.6741 | medqa=0.6305 pubmedqa=0.6683 medmcqa=0.6241 | batch=632.0s | ETA=174000.0s
+[2026-07-12 10:24:30] Candidate 38/182: generated
+[2026-07-12 10:24:38] Candidate 39/182: generated
+[2026-07-12 10:24:45] Candidate 40/182: generated
+[2026-07-12 10:24:54] Candidate 41/182: generated
+[2026-07-12 10:25:03] Candidate 42/182: generated
+[2026-07-12 10:25:03] Evaluating batch of 5 candidates...
+[2026-07-12 10:25:03] Evaluating 5 prompts...
+[2026-07-12 10:25:03] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 10:25:03] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 10:35:11] Broadcast completed in 608.00s | workers=3 | hospitals=3
+[2026-07-12 10:35:11] Broadcast complete.
+[2026-07-12 10:35:11] Federated evaluation complete.
+[2026-07-12 10:35:11] Batch evaluated in 608.0s (121.6s/candidate)
+[2026-07-12 10:35:11]   Candidate 38/182 | fitness=0.6594 | best_so_far=0.6741 | medqa=0.6618 pubmedqa=0.6620 medmcqa=0.6379 | batch=608.0s | ETA=172800.0s
+[2026-07-12 10:35:11]   Candidate 39/182 | fitness=0.6620 | best_so_far=0.6741 | medqa=0.6586 pubmedqa=0.6562 medmcqa=0.6431 | batch=608.0s | ETA=171600.0s
+[2026-07-12 10:35:11]   Candidate 40/182 | fitness=0.6612 | best_so_far=0.6741 | medqa=0.6464 pubmedqa=0.6958 medmcqa=0.6542 | batch=608.0s | ETA=170400.0s
+[2026-07-12 10:35:11]   Candidate 41/182 | fitness=0.6755 | best_so_far=0.6755 | medqa=0.6986 pubmedqa=0.7175 medmcqa=0.6462 | batch=608.0s | ETA=169200.0s
+[2026-07-12 10:35:11]   Candidate 42/182 | fitness=0.6699 | best_so_far=0.6755 | medqa=0.6926 pubmedqa=0.7015 medmcqa=0.6700 | batch=608.0s | ETA=168000.0s
+[2026-07-12 10:35:18] Candidate 43/182: generated
+[2026-07-12 10:35:27] Candidate 44/182: generated
+[2026-07-12 10:35:33] Candidate 45/182: generated
+[2026-07-12 10:35:41] Candidate 46/182: generated
+[2026-07-12 10:35:50] Candidate 47/182: generated
+[2026-07-12 10:35:50] Evaluating batch of 5 candidates...
+[2026-07-12 10:35:50] Evaluating 5 prompts...
+[2026-07-12 10:35:50] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 10:35:50] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 10:46:31] Broadcast completed in 641.00s | workers=3 | hospitals=3
+[2026-07-12 10:46:31] Broadcast complete.
+[2026-07-12 10:46:31] Federated evaluation complete.
+[2026-07-12 10:46:31] Batch evaluated in 641.0s (128.2s/candidate)
+[2026-07-12 10:46:31]   Candidate 43/182 | fitness=0.6673 | best_so_far=0.6755 | medqa=0.6602 pubmedqa=0.6921 medmcqa=0.6686 | batch=641.0s | ETA=166800.0s
+[2026-07-12 10:46:31]   Candidate 44/182 | fitness=0.6727 | best_so_far=0.6755 | medqa=0.6839 pubmedqa=0.7209 medmcqa=0.6567 | batch=641.0s | ETA=165600.0s
+[2026-07-12 10:46:31]   Candidate 45/182 | fitness=0.6592 | best_so_far=0.6755 | medqa=0.6676 pubmedqa=0.6614 medmcqa=0.6433 | batch=641.0s | ETA=164400.0s
+[2026-07-12 10:46:31]   Candidate 46/182 | fitness=0.6578 | best_so_far=0.6755 | medqa=0.6863 pubmedqa=0.6609 medmcqa=0.6453 | batch=641.0s | ETA=163200.0s
+[2026-07-12 10:46:31]   Candidate 47/182 | fitness=0.6662 | best_so_far=0.6755 | medqa=0.6717 pubmedqa=0.6797 medmcqa=0.6337 | batch=641.0s | ETA=162000.0s
+[2026-07-12 10:46:38] Candidate 48/182: generated
+[2026-07-12 10:46:47] Candidate 49/182: generated
+[2026-07-12 10:46:54] Candidate 50/182: generated
+[2026-07-12 10:47:03] Candidate 51/182: generated
+[2026-07-12 10:47:11] Candidate 52/182: generated
+[2026-07-12 10:47:11] Evaluating batch of 5 candidates...
+[2026-07-12 10:47:11] Evaluating 5 prompts...
+[2026-07-12 10:47:11] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 10:47:11] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 10:57:09] Broadcast completed in 598.00s | workers=3 | hospitals=3
+[2026-07-12 10:57:09] Broadcast complete.
+[2026-07-12 10:57:09] Federated evaluation complete.
+[2026-07-12 10:57:09] Batch evaluated in 598.0s (119.6s/candidate)
+[2026-07-12 10:57:09]   Candidate 48/182 | fitness=0.6683 | best_so_far=0.6755 | medqa=0.6720 pubmedqa=0.7060 medmcqa=0.6601 | batch=598.0s | ETA=160800.0s
+[2026-07-12 10:57:09]   Candidate 49/182 | fitness=0.6746 | best_so_far=0.6755 | medqa=0.6641 pubmedqa=0.7195 medmcqa=0.6520 | batch=598.0s | ETA=159600.0s
+[2026-07-12 10:57:09]   Candidate 50/182 | fitness=0.6672 | best_so_far=0.6755 | medqa=0.6732 pubmedqa=0.6982 medmcqa=0.6700 | batch=598.0s | ETA=158400.0s
+[2026-07-12 10:57:09]   Candidate 51/182 | fitness=0.6654 | best_so_far=0.6755 | medqa=0.6563 pubmedqa=0.7091 medmcqa=0.6302 | batch=598.0s | ETA=157200.0s
+[2026-07-12 10:57:09]   Candidate 52/182 | fitness=0.6768 | best_so_far=0.6768 | medqa=0.6759 pubmedqa=0.6921 medmcqa=0.6700 | batch=598.0s | ETA=156000.0s
+[2026-07-12 10:57:16] Candidate 53/182: generated
+[2026-07-12 10:57:25] Candidate 54/182: generated
+[2026-07-12 10:57:32] Candidate 55/182: generated
+[2026-07-12 10:57:38] Candidate 56/182: generated
+[2026-07-12 10:57:44] Candidate 57/182: generated
+[2026-07-12 10:57:44] Evaluating batch of 5 candidates...
+[2026-07-12 10:57:44] Evaluating 5 prompts...
+[2026-07-12 10:57:44] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 10:57:44] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 11:08:18] Broadcast completed in 634.00s | workers=3 | hospitals=3
+[2026-07-12 11:08:18] Broadcast complete.
+[2026-07-12 11:08:18] Federated evaluation complete.
+[2026-07-12 11:08:18] Batch evaluated in 634.0s (126.8s/candidate)
+[2026-07-12 11:08:18]   Candidate 53/182 | fitness=0.6671 | best_so_far=0.6768 | medqa=0.6807 pubmedqa=0.7052 medmcqa=0.6700 | batch=634.0s | ETA=154800.0s
+[2026-07-12 11:08:18]   Candidate 54/182 | fitness=0.6629 | best_so_far=0.6768 | medqa=0.6615 pubmedqa=0.6523 medmcqa=0.6700 | batch=634.0s | ETA=153600.0s
+[2026-07-12 11:08:18]   Candidate 55/182 | fitness=0.6670 | best_so_far=0.6768 | medqa=0.6621 pubmedqa=0.6812 medmcqa=0.6302 | batch=634.0s | ETA=152400.0s
+[2026-07-12 11:08:18]   Candidate 56/182 | fitness=0.6684 | best_so_far=0.6768 | medqa=0.6627 pubmedqa=0.6870 medmcqa=0.6312 | batch=634.0s | ETA=151200.0s
+[2026-07-12 11:08:18]   Candidate 57/182 | fitness=0.6713 | best_so_far=0.6768 | medqa=0.6460 pubmedqa=0.6649 medmcqa=0.6400 | batch=634.0s | ETA=150000.0s
+[2026-07-12 11:08:24] Candidate 58/182: generated
+[2026-07-12 11:08:31] Candidate 59/182: generated
+[2026-07-12 11:08:40] Candidate 60/182: generated
+[2026-07-12 11:08:48] Candidate 61/182: generated
+[2026-07-12 11:08:55] Candidate 62/182: generated
+[2026-07-12 11:08:55] Evaluating batch of 5 candidates...
+[2026-07-12 11:08:55] Evaluating 5 prompts...
+[2026-07-12 11:08:55] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 11:08:55] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 11:19:40] Broadcast completed in 645.00s | workers=3 | hospitals=3
+[2026-07-12 11:19:40] Broadcast complete.
+[2026-07-12 11:19:40] Federated evaluation complete.
+[2026-07-12 11:19:40] Batch evaluated in 645.0s (129.0s/candidate)
+[2026-07-12 11:19:40]   Candidate 58/182 | fitness=0.6622 | best_so_far=0.6768 | medqa=0.6826 pubmedqa=0.6583 medmcqa=0.6624 | batch=645.0s | ETA=148800.0s
+[2026-07-12 11:19:40]   Candidate 59/182 | fitness=0.6680 | best_so_far=0.6768 | medqa=0.6707 pubmedqa=0.6598 medmcqa=0.6510 | batch=645.0s | ETA=147600.0s
+[2026-07-12 11:19:40]   Candidate 60/182 | fitness=0.6668 | best_so_far=0.6768 | medqa=0.6435 pubmedqa=0.7095 medmcqa=0.6603 | batch=645.0s | ETA=146400.0s
+[2026-07-12 11:19:40]   Candidate 61/182 | fitness=0.6614 | best_so_far=0.6768 | medqa=0.6754 pubmedqa=0.6744 medmcqa=0.6224 | batch=645.0s | ETA=145200.0s
+[2026-07-12 11:19:40]   Candidate 62/182 | fitness=0.6731 | best_so_far=0.6768 | medqa=0.6629 pubmedqa=0.7183 medmcqa=0.6510 | batch=645.0s | ETA=144000.0s
+[2026-07-12 11:19:47] Candidate 63/182: generated
+[2026-07-12 11:19:55] Candidate 64/182: generated
+[2026-07-12 11:20:01] Candidate 65/182: generated
+[2026-07-12 11:20:08] Candidate 66/182: generated
+[2026-07-12 11:20:14] Candidate 67/182: generated
+[2026-07-12 11:20:14] Evaluating batch of 5 candidates...
+[2026-07-12 11:20:14] Evaluating 5 prompts...
+[2026-07-12 11:20:14] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 11:20:14] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 11:30:20] Broadcast completed in 606.00s | workers=3 | hospitals=3
+[2026-07-12 11:30:20] Broadcast complete.
+[2026-07-12 11:30:20] Federated evaluation complete.
+[2026-07-12 11:30:20] Batch evaluated in 606.0s (121.2s/candidate)
+[2026-07-12 11:30:20]   Candidate 63/182 | fitness=0.6780 | best_so_far=0.6780 | medqa=0.6515 pubmedqa=0.7090 medmcqa=0.6575 | batch=606.0s | ETA=142800.0s
+[2026-07-12 11:30:20]   Candidate 64/182 | fitness=0.6760 | best_so_far=0.6780 | medqa=0.6974 pubmedqa=0.7120 medmcqa=0.6700 | batch=606.0s | ETA=141600.0s
+[2026-07-12 11:30:20]   Candidate 65/182 | fitness=0.6726 | best_so_far=0.6780 | medqa=0.6807 pubmedqa=0.7105 medmcqa=0.6523 | batch=606.0s | ETA=140400.0s
+[2026-07-12 11:30:20]   Candidate 66/182 | fitness=0.6673 | best_so_far=0.6780 | medqa=0.6639 pubmedqa=0.6504 medmcqa=0.6455 | batch=606.0s | ETA=139200.0s
+[2026-07-12 11:30:20]   Candidate 67/182 | fitness=0.6719 | best_so_far=0.6780 | medqa=0.6844 pubmedqa=0.6546 medmcqa=0.6700 | batch=606.0s | ETA=138000.0s
+[2026-07-12 11:30:27] Candidate 68/182: generated
+[2026-07-12 11:30:35] Candidate 69/182: generated
+[2026-07-12 11:30:44] Candidate 70/182: generated
+[2026-07-12 11:30:50] Candidate 71/182: generated
+[2026-07-12 11:30:59] Candidate 72/182: generated
+[2026-07-12 11:30:59] Evaluating batch of 5 candidates...
+[2026-07-12 11:30:59] Evaluating 5 prompts...
+[2026-07-12 11:30:59] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 11:30:59] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 11:41:25] Broadcast completed in 626.00s | workers=3 | hospitals=3
+[2026-07-12 11:41:25] Broadcast complete.
+[2026-07-12 11:41:25] Federated evaluation complete.
+[2026-07-12 11:41:25] Batch evaluated in 626.0s (125.2s/candidate)
+[2026-07-12 11:41:25]   Candidate 68/182 | fitness=0.6769 | best_so_far=0.6780 | medqa=0.6644 pubmedqa=0.6605 medmcqa=0.6490 | batch=626.0s | ETA=136800.0s
+[2026-07-12 11:41:25]   Candidate 69/182 | fitness=0.6697 | best_so_far=0.6780 | medqa=0.6781 pubmedqa=0.7157 medmcqa=0.6403 | batch=626.0s | ETA=135600.0s
+[2026-07-12 11:41:25]   Candidate 70/182 | fitness=0.6692 | best_so_far=0.6780 | medqa=0.6876 pubmedqa=0.6552 medmcqa=0.6674 | batch=626.0s | ETA=134400.0s
+[2026-07-12 11:41:25]   Candidate 71/182 | fitness=0.6701 | best_so_far=0.6780 | medqa=0.6885 pubmedqa=0.7124 medmcqa=0.6700 | batch=626.0s | ETA=133200.0s
+[2026-07-12 11:41:25]   Candidate 72/182 | fitness=0.6604 | best_so_far=0.6780 | medqa=0.6320 pubmedqa=0.6684 medmcqa=0.6388 | batch=626.0s | ETA=132000.0s
+[2026-07-12 11:41:34] Candidate 73/182: generated
+[2026-07-12 11:41:41] Candidate 74/182: generated
+[2026-07-12 11:41:49] Candidate 75/182: generated
+[2026-07-12 11:41:57] Candidate 76/182: generated
+[2026-07-12 11:42:06] Candidate 77/182: generated
+[2026-07-12 11:42:06] Evaluating batch of 5 candidates...
+[2026-07-12 11:42:06] Evaluating 5 prompts...
+[2026-07-12 11:42:06] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 11:42:06] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 11:52:42] Broadcast completed in 636.00s | workers=3 | hospitals=3
+[2026-07-12 11:52:42] Broadcast complete.
+[2026-07-12 11:52:42] Federated evaluation complete.
+[2026-07-12 11:52:42] Batch evaluated in 636.0s (127.2s/candidate)
+[2026-07-12 11:52:42]   Candidate 73/182 | fitness=0.6767 | best_so_far=0.6780 | medqa=0.6605 pubmedqa=0.7103 medmcqa=0.6700 | batch=636.0s | ETA=130800.0s
+[2026-07-12 11:52:42]   Candidate 74/182 | fitness=0.6791 | best_so_far=0.6791 | medqa=0.6590 pubmedqa=0.6617 medmcqa=0.6601 | batch=636.0s | ETA=129600.0s
+[2026-07-12 11:52:42]   Candidate 75/182 | fitness=0.6622 | best_so_far=0.6791 | medqa=0.6452 pubmedqa=0.7076 medmcqa=0.6692 | batch=636.0s | ETA=128400.0s
+[2026-07-12 11:52:42]   Candidate 76/182 | fitness=0.6639 | best_so_far=0.6791 | medqa=0.6934 pubmedqa=0.6912 medmcqa=0.6358 | batch=636.0s | ETA=127200.0s
+[2026-07-12 11:52:42]   Candidate 77/182 | fitness=0.6711 | best_so_far=0.6791 | medqa=0.6649 pubmedqa=0.6976 medmcqa=0.6523 | batch=636.0s | ETA=126000.0s
+[2026-07-12 11:52:50] Candidate 78/182: generated
+[2026-07-12 11:52:56] Candidate 79/182: generated
+[2026-07-12 11:53:04] Candidate 80/182: generated
+[2026-07-12 11:53:11] Candidate 81/182: generated
+[2026-07-12 11:53:17] Candidate 82/182: generated
+[2026-07-12 11:53:17] Evaluating batch of 5 candidates...
+[2026-07-12 11:53:17] Evaluating 5 prompts...
+[2026-07-12 11:53:17] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 11:53:17] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 12:03:26] Broadcast completed in 609.00s | workers=3 | hospitals=3
+[2026-07-12 12:03:26] Broadcast complete.
+[2026-07-12 12:03:26] Federated evaluation complete.
+[2026-07-12 12:03:26] Batch evaluated in 609.0s (121.8s/candidate)
+[2026-07-12 12:03:26]   Candidate 78/182 | fitness=0.6741 | best_so_far=0.6791 | medqa=0.6637 pubmedqa=0.6614 medmcqa=0.6660 | batch=609.0s | ETA=124800.0s
+[2026-07-12 12:03:26]   Candidate 79/182 | fitness=0.6678 | best_so_far=0.6791 | medqa=0.6549 pubmedqa=0.6802 medmcqa=0.6644 | batch=609.0s | ETA=123600.0s
+[2026-07-12 12:03:26]   Candidate 80/182 | fitness=0.6615 | best_so_far=0.6791 | medqa=0.6375 pubmedqa=0.6590 medmcqa=0.6700 | batch=609.0s | ETA=122400.0s
+[2026-07-12 12:03:26]   Candidate 81/182 | fitness=0.6714 | best_so_far=0.6791 | medqa=0.6928 pubmedqa=0.7013 medmcqa=0.6509 | batch=609.0s | ETA=121200.0s
+[2026-07-12 12:03:26]   Candidate 82/182 | fitness=0.6787 | best_so_far=0.6791 | medqa=0.6915 pubmedqa=0.7286 medmcqa=0.6700 | batch=609.0s | ETA=120000.0s
+[2026-07-12 12:03:32] Candidate 83/182: generated
+[2026-07-12 12:03:38] Candidate 84/182: generated
+[2026-07-12 12:03:46] Candidate 85/182: generated
+[2026-07-12 12:03:54] Candidate 86/182: generated
+[2026-07-12 12:04:02] Candidate 87/182: generated
+[2026-07-12 12:04:02] Evaluating batch of 5 candidates...
+[2026-07-12 12:04:02] Evaluating 5 prompts...
+[2026-07-12 12:04:02] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 12:04:02] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 12:14:16] Broadcast completed in 614.00s | workers=3 | hospitals=3
+[2026-07-12 12:14:16] Broadcast complete.
+[2026-07-12 12:14:16] Federated evaluation complete.
+[2026-07-12 12:14:16] Batch evaluated in 614.0s (122.8s/candidate)
+[2026-07-12 12:14:16]   Candidate 83/182 | fitness=0.6786 | best_so_far=0.6791 | medqa=0.6996 pubmedqa=0.6719 medmcqa=0.6555 | batch=614.0s | ETA=118800.0s
+[2026-07-12 12:14:16]   Candidate 84/182 | fitness=0.6661 | best_so_far=0.6791 | medqa=0.6871 pubmedqa=0.6733 medmcqa=0.6691 | batch=614.0s | ETA=117600.0s
+[2026-07-12 12:14:16]   Candidate 85/182 | fitness=0.6803 | best_so_far=0.6803 | medqa=0.6741 pubmedqa=0.6616 medmcqa=0.6700 | batch=614.0s | ETA=116400.0s
+[2026-07-12 12:14:16]   Candidate 86/182 | fitness=0.6769 | best_so_far=0.6803 | medqa=0.6595 pubmedqa=0.6855 medmcqa=0.6700 | batch=614.0s | ETA=115200.0s
+[2026-07-12 12:14:16]   Candidate 87/182 | fitness=0.6761 | best_so_far=0.6803 | medqa=0.6592 pubmedqa=0.6960 medmcqa=0.6525 | batch=614.0s | ETA=114000.0s
+[2026-07-12 12:14:23] Candidate 88/182: generated
+[2026-07-12 12:14:32] Candidate 89/182: generated
+[2026-07-12 12:14:40] Candidate 90/182: generated
+[2026-07-12 12:14:49] Candidate 91/182: generated
+[2026-07-12 12:14:55] Candidate 92/182: generated
+[2026-07-12 12:14:55] Evaluating batch of 5 candidates...
+[2026-07-12 12:14:55] Evaluating 5 prompts...
+[2026-07-12 12:14:55] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 12:14:55] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 12:24:50] Broadcast completed in 595.00s | workers=3 | hospitals=3
+[2026-07-12 12:24:50] Broadcast complete.
+[2026-07-12 12:24:50] Federated evaluation complete.
+[2026-07-12 12:24:50] Batch evaluated in 595.0s (119.0s/candidate)
+[2026-07-12 12:24:50]   Candidate 88/182 | fitness=0.6788 | best_so_far=0.6803 | medqa=0.6554 pubmedqa=0.6932 medmcqa=0.6569 | batch=595.0s | ETA=112800.0s
+[2026-07-12 12:24:50]   Candidate 89/182 | fitness=0.6670 | best_so_far=0.6803 | medqa=0.6961 pubmedqa=0.6787 medmcqa=0.6434 | batch=595.0s | ETA=111600.0s
+[2026-07-12 12:24:50]   Candidate 90/182 | fitness=0.6761 | best_so_far=0.6803 | medqa=0.7008 pubmedqa=0.7131 medmcqa=0.6700 | batch=595.0s | ETA=110400.0s
+[2026-07-12 12:24:50]   Candidate 91/182 | fitness=0.6623 | best_so_far=0.6803 | medqa=0.6595 pubmedqa=0.6946 medmcqa=0.6425 | batch=595.0s | ETA=109200.0s
+[2026-07-12 12:24:50]   Candidate 92/182 | fitness=0.6775 | best_so_far=0.6803 | medqa=0.6891 pubmedqa=0.6835 medmcqa=0.6699 | batch=595.0s | ETA=108000.0s
+[2026-07-12 12:24:57] Candidate 93/182: generated
+[2026-07-12 12:25:04] Candidate 94/182: generated
+[2026-07-12 12:25:10] Candidate 95/182: generated
+[2026-07-12 12:25:16] Candidate 96/182: generated
+[2026-07-12 12:25:24] Candidate 97/182: generated
+[2026-07-12 12:25:24] Evaluating batch of 5 candidates...
+[2026-07-12 12:25:24] Evaluating 5 prompts...
+[2026-07-12 12:25:24] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 12:25:24] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 12:35:38] Broadcast completed in 614.00s | workers=3 | hospitals=3
+[2026-07-12 12:35:38] Broadcast complete.
+[2026-07-12 12:35:38] Federated evaluation complete.
+[2026-07-12 12:35:38] Batch evaluated in 614.0s (122.8s/candidate)
+[2026-07-12 12:35:38]   Candidate 93/182 | fitness=0.6741 | best_so_far=0.6803 | medqa=0.6817 pubmedqa=0.6800 medmcqa=0.6700 | batch=614.0s | ETA=106800.0s
+[2026-07-12 12:35:38]   Candidate 94/182 | fitness=0.6708 | best_so_far=0.6803 | medqa=0.6725 pubmedqa=0.7106 medmcqa=0.6378 | batch=614.0s | ETA=105600.0s
+[2026-07-12 12:35:38]   Candidate 95/182 | fitness=0.6763 | best_so_far=0.6803 | medqa=0.6777 pubmedqa=0.7160 medmcqa=0.6700 | batch=614.0s | ETA=104400.0s
+[2026-07-12 12:35:38]   Candidate 96/182 | fitness=0.6812 | best_so_far=0.6812 | medqa=0.7038 pubmedqa=0.6750 medmcqa=0.6602 | batch=614.0s | ETA=103200.0s
+[2026-07-12 12:35:38]   Candidate 97/182 | fitness=0.6765 | best_so_far=0.6812 | medqa=0.6601 pubmedqa=0.6690 medmcqa=0.6456 | batch=614.0s | ETA=102000.0s
+[2026-07-12 12:35:46] Candidate 98/182: generated
+[2026-07-12 12:35:52] Candidate 99/182: generated
+[2026-07-12 12:35:58] Candidate 100/182: generated
+[2026-07-12 12:35:58] Evaluating batch of 5 candidates...
+[2026-07-12 12:35:58] Evaluating 5 prompts...
+[2026-07-12 12:35:58] Federated evaluation: 5 prompts across 3 hospitals.
+[2026-07-12 12:35:58] Cache hits: 0 | Need evaluation: 5
+[2026-07-12 12:46:41] Broadcast completed in 643.00s | workers=3 | hospitals=3
+[2026-07-12 12:46:41] Broadcast complete.
+[2026-07-12 12:46:41] Federated evaluation complete.
+[2026-07-12 12:46:41] Batch evaluated in 643.0s (128.6s/candidate)
+[2026-07-12 12:46:41]   Candidate 98/182 | fitness=0.6746 | best_so_far=0.6812 | medqa=0.6786 pubmedqa=0.7220 medmcqa=0.6700 | batch=643.0s | ETA=100800.0s
+[2026-07-12 12:46:41]   Candidate 99/182 | fitness=0.6720 | best_so_far=0.6812 | medqa=0.6979 pubmedqa=0.7108 medmcqa=0.6700 | batch=643.0s | ETA=99600.0s
+[2026-07-12 12:46:41]   Candidate 100/182 | fitness=0.6651 | best_so_far=0.6812 | medqa=0.6827 pubmedqa=0.6825 medmcqa=0.6591 | batch=643.0s | ETA=98400.0s

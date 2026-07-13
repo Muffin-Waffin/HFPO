@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 import random
 import time
 import uuid
@@ -53,7 +54,7 @@ validator = PromptValidator()
 GA_POPULATION_SIZE = config.GA_POPULATION_SIZE        # 20
 GA_GENERATIONS = 10                                   # 10 generations (not 20)
 ELITE_COUNT = 2
-EVALUATION_SUBSET_SIZE = config.EVALUATION_SUBSET_SIZE  # 100
+DEFAULT_EVALUATION_SUBSET_SIZE = config.EVALUATION_SUBSET_SIZE  # 100
 RANDOM_SEED = config.RANDOM_SEED                        # 51
 HOSPITAL_DATASET_NAMES = ("medqa", "pubmedqa", "medmcqa")
 DATASET_SPLIT = config.DATASET_SPLIT                    # "train"
@@ -61,7 +62,6 @@ TASK_DESCRIPTION = (
     "Answer multiple-choice medical licensing exam questions correctly, "
     "choosing exactly one option."
 )
-OUTPUT_CSV = "results/random_search_results.csv"
 SEED_MUTATION_STRATEGIES = [
     "Chain of Thought",
     "Trigger Chain of Thought",
@@ -74,19 +74,19 @@ SEED_MUTATION_STRATEGIES = [
 ]
 
 OFFSPRING_PER_GENERATION = GA_POPULATION_SIZE - ELITE_COUNT  # 18
-TOTAL_CANDIDATES = GA_POPULATION_SIZE + OFFSPRING_PER_GENERATION * (GA_GENERATIONS - 1)  # 182
+DEFAULT_TOTAL_CANDIDATES = GA_POPULATION_SIZE + OFFSPRING_PER_GENERATION * (GA_GENERATIONS - 1)  # 182
 
 
-def _build_hospitals(model, tokenizer):
-    """Build hospital clients with the SAME fixed 100-sample subsets (RANDOM_SEED=51)."""
+def _build_hospitals(model, tokenizer, subset_size: int):
+    """Build hospital clients with the SAME fixed subsets (RANDOM_SEED=51)."""
     hospitals = []
     rng = random.Random(RANDOM_SEED)
 
     for dataset_name in HOSPITAL_DATASET_NAMES:
         dataset = load_dataset(dataset_name, split=DATASET_SPLIT)
 
-        if len(dataset) > EVALUATION_SUBSET_SIZE:
-            indices = rng.sample(range(len(dataset)), EVALUATION_SUBSET_SIZE)
+        if len(dataset) > subset_size:
+            indices = rng.sample(range(len(dataset)), subset_size)
             if hasattr(dataset, "select"):
                 dataset = dataset.select(indices)
             else:
@@ -172,7 +172,19 @@ def main():
         "--limit",
         type=int,
         default=None,
-        help="Limit number of candidates to generate/evaluate (for smoke testing)",
+        help="Limit number of candidates to generate/evaluate (for smoke testing, overrides --num_candidates)",
+    )
+    parser.add_argument(
+        "--num-candidates",
+        type=int,
+        default=DEFAULT_TOTAL_CANDIDATES,
+        help=f"Total candidates to generate/evaluate (default: {DEFAULT_TOTAL_CANDIDATES}, compute-matched to 10 HFPO gens)",
+    )
+    parser.add_argument(
+        "--subset-size",
+        type=int,
+        default=DEFAULT_EVALUATION_SUBSET_SIZE,
+        help=f"Evaluation samples per hospital (default: {DEFAULT_EVALUATION_SUBSET_SIZE}, overrides config for this run only)",
     )
     parser.add_argument(
         "--resume",
@@ -187,19 +199,45 @@ def main():
     )
     args = parser.parse_args()
 
-    limit = args.limit if args.limit is not None else TOTAL_CANDIDATES
-    print(f"Random search baseline: {limit} candidates (full run = {TOTAL_CANDIDATES})")
+    # Determine effective limits
+    num_candidates = args.limit if args.limit is not None else args.num_candidates
+    subset_size = args.subset_size
+
+    print(f"Random search baseline: {num_candidates} candidates, {subset_size} samples/hospital")
     print(f"Config: pop_size={GA_POPULATION_SIZE}, generations={GA_GENERATIONS}, "
           f"elite={ELITE_COUNT}, offspring/gen={OFFSPRING_PER_GENERATION}, "
-          f"subset_size={EVALUATION_SUBSET_SIZE}, seed={RANDOM_SEED}")
+          f"subset_size={subset_size}, seed={RANDOM_SEED}")
 
     random.seed(RANDOM_SEED)
 
     results_dir = Path("results")
     results_dir.mkdir(parents=True, exist_ok=True)
 
-    checkpoint_path = results_dir / "random_search_checkpoint.json"
-    results_path = results_dir / "random_search_results.csv"
+    # Config-specific output paths to avoid mixing different configs
+    config_suffix = f"subset{subset_size}_cand{num_candidates}"
+    checkpoint_path = results_dir / f"random_search_checkpoint_{config_suffix}.json"
+    results_path = results_dir / f"random_search_results_{config_suffix}.csv"
+    config_path = results_dir / f"random_search_config_{config_suffix}.json"
+
+    # Write config metadata
+    config_meta = {
+        "num_candidates": num_candidates,
+        "subset_size": subset_size,
+        "ga_population_size": GA_POPULATION_SIZE,
+        "ga_generations": GA_GENERATIONS,
+        "elite_count": ELITE_COUNT,
+        "offspring_per_generation": OFFSPRING_PER_GENERATION,
+        "random_seed": RANDOM_SEED,
+        "hospital_datasets": list(HOSPITAL_DATASET_NAMES),
+        "dataset_split": DATASET_SPLIT,
+        "task_description": TASK_DESCRIPTION,
+        "model": config.DEFAULT_MODEL,
+        "max_new_tokens": config.MAX_NEW_TOKENS,
+        "temperature": config.TEMPERATURE,
+    }
+    with open(config_path, "w") as f:
+        json.dump(config_meta, f, indent=2)
+    print(f"Config written to {config_path}")
 
     # Load existing state if resuming
     start_idx = 0
@@ -209,18 +247,25 @@ def main():
     candidates = []
 
     if args.resume and checkpoint_path.exists():
-        import json
         print(f"Resuming from checkpoint: {checkpoint_path}")
         with open(checkpoint_path, "r") as f:
             state = json.load(f)
-        start_idx = state.get("next_candidate_index", 0)
-        existing_prompt_texts = set(state.get("existing_prompt_texts", []))
-        results_data = state.get("results_data", [])
-        best_so_far = state.get("best_so_far", 0.0)
-        candidates = state.get("candidates", [])
-        print(f"  Resuming from candidate {start_idx + 1}/{limit}")
-        print(f"  Already evaluated: {len(results_data)} candidates")
-        print(f"  Best so far: {best_so_far:.4f}")
+        # Verify config matches
+        saved_subset = state.get("subset_size")
+        saved_num_cand = state.get("num_candidates")
+        if saved_subset is not None and saved_subset != subset_size:
+            print(f"WARNING: Checkpoint subset_size={saved_subset} != current={subset_size}. Starting fresh.")
+        elif saved_num_cand is not None and saved_num_cand != num_candidates:
+            print(f"WARNING: Checkpoint num_candidates={saved_num_cand} != current={num_candidates}. Starting fresh.")
+        else:
+            start_idx = state.get("next_candidate_index", 0)
+            existing_prompt_texts = set(state.get("existing_prompt_texts", []))
+            results_data = state.get("results_data", [])
+            best_so_far = state.get("best_so_far", 0.0)
+            candidates = state.get("candidates", [])
+            print(f"  Resuming from candidate {start_idx + 1}/{num_candidates}")
+            print(f"  Already evaluated: {len(results_data)} candidates")
+            print(f"  Best so far: {best_so_far:.4f}")
     elif results_path.exists():
         # Load results CSV to get existing state (even without explicit resume)
         print(f"Found existing results at {results_path}, loading...")
@@ -255,7 +300,7 @@ def main():
         max_new_tokens=config.MAX_NEW_TOKENS,
     )
 
-    hospitals = _build_hospitals(model, tokenizer)
+    hospitals = _build_hospitals(model, tokenizer, subset_size)
     aggregator = Aggregator()
     evaluation_cache = EvaluationCache()
     lineage_tracker = LineageTracker()
@@ -268,7 +313,7 @@ def main():
         model_name=config.DEFAULT_MODEL,
         dataset_name="+".join(HOSPITAL_DATASET_NAMES),
         evaluation_version="v1",
-        diagnostics_path=Path("results/random_search_diagnostics.jsonl"),
+        diagnostics_path=Path(f"results/random_search_diagnostics_{config_suffix}.jsonl"),
     )
 
     # Batch size for evaluation - evaluate multiple candidates at once for GPU parallelism
@@ -279,13 +324,14 @@ def main():
     start_time = time.perf_counter()
 
     print(f"\n{'=' * 80}")
-    print(f"Generating and evaluating {limit} random candidates (batch size: {BATCH_SIZE})...")
+    print(f"Generating and evaluating {num_candidates} random candidates (batch size: {BATCH_SIZE})...")
     print(f"{'=' * 80}")
 
     def save_checkpoint(next_idx):
-        import json
         state = {
             "next_candidate_index": next_idx,
+            "subset_size": subset_size,
+            "num_candidates": num_candidates,
             "existing_prompt_texts": list(existing_prompt_texts),
             "results_data": results_data,
             "best_so_far": best_so_far,
@@ -299,7 +345,7 @@ def main():
 
     # Generate and evaluate in batches
     batch = []
-    for i in range(start_idx, limit):
+    for i in range(start_idx, num_candidates):
         candidate_idx = i + 1
         gen_start = time.perf_counter()
 
@@ -314,10 +360,10 @@ def main():
         candidates.append(candidate)
         batch.append(candidate)
 
-        print(f"Candidate {candidate_idx}/{limit}: generated")
+        print(f"Candidate {candidate_idx}/{num_candidates}: generated")
 
         # Evaluate batch when full or at end
-        if len(batch) >= BATCH_SIZE or candidate_idx == limit:
+        if len(batch) >= BATCH_SIZE or candidate_idx == num_candidates:
             print(f"Evaluating batch of {len(batch)} candidates...")
             eval_start = time.perf_counter()
             evaluated = federated_server.evaluate_population(batch)
@@ -337,10 +383,10 @@ def main():
 
                 total_elapsed = time.perf_counter() - start_time
                 avg_time = total_elapsed / (idx - start_idx + 1) if idx > start_idx else 0
-                remaining = limit - idx
+                remaining = num_candidates - idx
                 eta = avg_time * remaining if idx > start_idx else 0
 
-                print(f"  Candidate {idx}/{limit} | "
+                print(f"  Candidate {idx}/{num_candidates} | "
                       f"fitness={fitness_value:.4f} | "
                       f"best_so_far={best_so_far:.4f} | "
                       f"medqa={medqa_score:.4f} pubmedqa={pubmedqa_score:.4f} medmcqa={medmcqa_score:.4f} | "
@@ -375,14 +421,14 @@ def main():
                         f"{row['best_fitness_so_far']:.4f}",
                     ])
 
-            if candidate_idx % 10 == 0 or candidate_idx == limit:
-                print(f"  Progress: {candidate_idx}/{limit} ({100*candidate_idx/limit:.1f}%) "
+            if candidate_idx % 10 == 0 or candidate_idx == num_candidates:
+                print(f"  Progress: {candidate_idx}/{num_candidates} ({100*candidate_idx/num_candidates:.1f}%) "
                       f"| Best so far: {best_so_far:.4f} | ETA: {eta:.1f}s", flush=True)
 
             batch = []
 
-    print(f"Results written to {OUTPUT_CSV}")
-    print(f"\nRandom search complete ({limit} candidates)")
+    print(f"Results written to {results_path}")
+    print(f"\nRandom search complete ({num_candidates} candidates, {subset_size} samples/hospital)")
     print(f"Best fitness found: {best_so_far:.4f}")
     best_idx = max(range(len(results_data)), key=lambda i: results_data[i]["fitness"]) + 1
     print(f"Found at candidate index: {best_idx}")
@@ -411,8 +457,8 @@ class _QwenReasoningLLM:
         print(f"Generations: {GA_GENERATIONS}")
         print(f"Elite Count: {ELITE_COUNT}")
         print(f"Offspring/Gen: {OFFSPRING_PER_GENERATION}")
-        print(f"Total Candidates: {TOTAL_CANDIDATES}")
-        print(f"Eval Subset Size: {EVALUATION_SUBSET_SIZE}")
+        print(f"Total Candidates: {DEFAULT_TOTAL_CANDIDATES}")
+        print(f"Eval Subset Size: {DEFAULT_EVALUATION_SUBSET_SIZE}")
         print(f"Random Seed: {RANDOM_SEED}")
         print("=" * 80)
 

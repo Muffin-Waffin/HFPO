@@ -58,7 +58,7 @@ Report accuracy as percentages with 1 decimal place. Where noted, include ± 95%
 **Notes:**
 
 ## Per-Generation HFPO Progress (Seed 51)
-
+k
 **Config:** Generations, pop=20, elite=2, 100 samples/hospital, Qwen3-8B, temp=0.2, RANDOM_SEED=51
 
 | Generation | Best Fitness | Avg Fitness | Worst Fitness | Time (s) | Best Prompt (truncated) |
@@ -102,3 +102,155 @@ Report accuracy as percentages with 1 decimal place. Where noted, include ± 95%
 | **Aggregate** | **73.0%** |
 
 ---
+
+## Experiment 4 — Centralized vs. Federated Evaluation Ablation
+
+| Condition | MedQA | PubMedQA | MedMCQA | Aggregate | Notes |
+|---|---|---|---|---|---|
+| Centralized (pooled) eval | — | — | — | — | |
+| Federated (per-client) eval | — | — | — | — | |
+| **Δ (Federated − Centralized)** | — | — | — | — | |
+
+---
+
+## Experiment 5 — Privacy-Budget Accuracy Tradeoff
+
+| Privacy Setting | MedQA | PubMedQA | MedMCQA | Aggregate |
+|---|---|---|---|---|
+| No privacy | — | — | — | — |
+| DP (ε = ___) | — | — | — | — |
+| DP (ε = ___) | — | — | — | — |
+| DP (ε = ___) | — | — | — | — |
+| Secure aggregation | — | — | — | — |
+
+*(Plot this as a line/curve: aggregate accuracy vs. privacy setting, for the paper figure.)*
+
+---
+
+## Experiment 6 — Vanilla EvoPrompt Reimplementation (centralized, no federation)
+
+| Dataset | Vanilla EvoPrompt Accuracy | HFPO (centralized, Exp 4 row) | Δ |
+|---|---|---|---|
+| MedQA | — | — | — |
+| PubMedQA | — | — | — |
+| MedMCQA | — | — | — |
+| **Aggregate** | — | — | — |
+
+---
+
+## Experiment 7 — Crossover-Bugfix Ablation
+
+| Config | MedQA | PubMedQA | MedMCQA | Aggregate | Generation Plateau Observed |
+|---|---|---|---|---|---|
+| Pre-fix | — | — | — | — | — |
+| Post-fix | — | — | — | — | — |
+
+---
+
+## Experiment 8 — Cross-Dataset Generalization
+
+Best-evolved prompt from primary run, evaluated (inference-only) on datasets it wasn't evolved on.
+
+| Prompt Evolved On | Evaluated On | Accuracy | Native (in-domain) Accuracy | Δ (Transfer Gap) |
+|---|---|---|---|---|
+| MedQA | PubMedQA | — | — | — |
+| MedQA | MedMCQA | — | — | — |
+| (repeat if evolving separately per dataset) | | | | |
+
+---
+
+## Experiment 9 — Multi-Model Comparison
+
+| Model | Zero-shot (Expert) | Zero-shot (CoT) | Best Evolved (HFPO) | Absolute Gain (vs CoT) | Generation of Best Prompt |
+|---|---|---|---|---|---|
+| Qwen3-8B | — | — | — | — | — |
+| Meditron3-8B | — | — | — | — | — |
+| Llama-3.1-8B | — | — | — | — | — |
+
+*(Figure: best fitness vs. generation, one curve per model.)*
+*(Optional Figure: population diversity vs. generation, one curve per model — requires diversity metric logging.)*
+
+---
+
+## Experiment 10 — Client-Count Scaling (Tier 3)
+
+| # Clients | MedQA | PubMedQA | MedMCQA | Aggregate |
+|---|---|---|---|---|
+| 2 | — | — | — | — |
+| 3 | — | — | — | — |
+| 5 | — | — | — | — |
+| ... | — | — | — | — |
+
+---
+
+## Experiment 11 — Diversity-Collapse Intervention (Tier 3)
+
+| Config | Generation Plateau Observed | Final Aggregate Accuracy | Diversity Metric @ Gen 8 |
+|---|---|---|---|
+| Baseline (no intervention) | — | — | — |
+| With intervention (___) | — | — | — |
+
+---
+
+## Experiment 12 — Per-Generation HFPO Progress (Seed 51)
+
+**Config:** 20 generations, pop=20, elite=2, 100 samples/hospital, Qwen3-8B, temp=0.2, RANDOM_SEED=51
+
+| Generation | Best Fitness | Avg Fitness | Worst Fitness | Time (s) | Best Prompt (truncated) |
+|---|---:|---:|---:|---:|---|
+| 0 | 0.6867 | 0.6550 | 0.6133 | 3877.2 | Focus on the clinical findings... |
+| 1 | 0.7167 | 0.6863 | 0.6400 | 3641.5 | Consider the question from the perspective... |
+| 2 | 0.7167 | 0.6783 | 0.5933 | 12073.2 | Consider the question from the perspective... |
+| 3 | 0.7267 | 0.6848 | 0.6167 | 1804.9 | Focus on the most critical diagnostic clues... |
+| 4 | 0.7267 | 0.6785 | 0.6267 | 2451.9 | Focus on the most critical diagnostic clues... |
+| 5 | **0.7300** | 0.6815 | 0.6467 | 1946.6 | **Identify the option that best represents the clinical judgment...** |
+| 6 | 0.7300 | 0.6763 | 0.6033 | 1794.7 | Identify the option that best represents the clinical judgment... |
+| 7 | 0.7300 | 0.6705 | 0.6000 | 1832.4 | Identify the option that best represents the clinical judgment... |
+| 8 | 0.7300 | 0.6728 | 0.5767 | 1785.7 | Identify the option that best represents the clinical judgment... |
+| 9 | 0.7300 | 0.6752 | 0.6200 | 2924.3 | Identify the option that best represents the clinical judgment... |
+| 10 | 0.7300 | 0.6813 | 0.6267 | 5891.3 | Identify the option that best represents the clinical judgment... |
+| 11 | 0.7300 | 0.6783 | 0.5833 | 4587.6 | Identify the option that best represents the clinical judgment... |
+| 12 | 0.7300 | 0.6837 | 0.6533 | 3157.0 | Identify the option that best represents the clinical judgment... |
+| 13 | 0.7300 | 0.6890 | 0.6600 | 1852.8 | Identify the option that best represents the clinical judgment... |
+| 14 | 0.7300 | 0.6835 | 0.6400 | 1776.6 | Identify the option that best represents the clinical judgment... |
+| 15 | 0.7300 | 0.6843 | 0.6400 | 1778.4 | Identify the option that best represents the clinical judgment... |
+| 16 | 0.7300 | 0.6795 | 0.6100 | 1781.4 | Identify the option that best represents the clinical judgment... |
+| 17 | 0.7300 | 0.6852 | 0.6367 | 3716.3 | Identify the option that best represents the clinical judgment... |
+| 18 | 0.7300 | 0.6943 | 0.6633 | 2329.0 | Identify the option that best represents the clinical judgment... |
+| 19 | 0.7300 | 0.6952 | 0.6567 | 2275.2 | Identify the option that best represents the clinical judgment... |
+
+**Key observations:**
+- **Plateau at generation 5** (0-indexed): best fitness reaches 0.7300 and stays flat through gen 19
+- **Mean population fitness** gradually improves from 0.655 → 0.695 despite best staying flat
+- **Worst fitness** remains volatile (0.57–0.66), indicating ongoing diversity
+- **Total wall-clock**: ~2.2 hours per generation average (varies 30 min – 3.3 hrs)
+
+**Best prompt (found at Gen 5, carried forward as elite):**
+> `Identify the option that best represents the clinical judgment of an experienced practitioner, emphasizing evidence-based decision-making and the avoidance of misleading or irrelevant choices.`
+
+**Per-hospital breakdown at Gen 19 (final):**
+| Hospital | Score |
+|---|---|
+| MedQA | 68.0% |
+| PubMedQA | 87.0% |
+| MedMCQA | 64.0% |
+| **Aggregate** | **73.0%** |
+
+---
+
+## Master Summary Table (for paper Table 1 — Qwen3-8B)
+
+| Method | MedQA | PubMedQA | MedMCQA | Avg (± CI) |
+|---|---|---|---|---|
+| Zero-shot (Expert) | — | — | — | — |
+| Zero-shot (CoT) | — | — | — | — |
+| Random search (compute-matched) | — | — | — | — |
+| Vanilla EvoPrompt (centralized) | — | — | — | — |
+| HFPO — centralized eval | — | — | — | — |
+| HFPO — federated, no privacy | — | — | — | — |
+| HFPO — federated, DP (ε = ___) | — | — | — | — |
+| HFPO — federated, secure agg | — | — | — | — |
+
+---
+
+*Last updated: 2026-07-13 (added Exp 12 per-generation HFPO progress from completed 20-gen run)*

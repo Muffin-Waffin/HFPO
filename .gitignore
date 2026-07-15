@@ -26,7 +26,6 @@ logs/
 *.json
 *.jsonl
 *.csv
-*.jpeg
 *.log
 *.pdf
 *.tex

@@ -23,6 +23,14 @@ data/cache/
 # Logs & outputs
 logs/
 # outputs/
+*.json
+*.jsonl
+*.csv
+*.jpeg
+*.log
+*.pdf
+*.tex
+__init__.py
 
 # Notebook
 .ipynb_checkpoints/
@@ -30,6 +38,7 @@ logs/
 # IDE
 .vscode/
 .idea/
+__pycache__
 
 # OS
 .DS_Store

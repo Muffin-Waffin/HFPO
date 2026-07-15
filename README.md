@@ -1,4 +1,4 @@
-# FedGAPrompt: Federated Genetic Algorithm for Prompt Optimization
+# HFPO: Federated Genetic Algorithm for Prompt Optimization
 
 **Heterogeneous Federated Prompt Optimization (HFPO)** — A privacy-preserving framework that evolves system prompts across isolated medical institutions using genetic algorithms, without sharing patient data.
 

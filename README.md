@@ -134,36 +134,9 @@ TEMPERATURE = 0.2
 
 ---
 
-## Architecture
+## Workflow 
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                      EvolutionEngine                            │
-│  (orchestrates generations: evaluate → select → generate → loop)│
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-           ┌───────────────┼───────────────┐
-           ▼               ▼               ▼
-    ┌─────────────┐ ┌─────────────┐ ┌─────────────┐
-    │ Hospital 1  │ │ Hospital 2  │ │ Hospital 3  │
-    │   (MedQA)   │ │ (PubMedQA)  │ │ (MedMCQA)   │
-    │  Evaluator  │ │  Evaluator  │ │  Evaluator  │
-    └──────┬──────┘ └──────┬──────┘ └──────┬──────┘
-           │               │               │
-           └───────────────┼───────────────┘
-                           ▼
-                  ┌─────────────────┐
-                  │   Aggregator    │
-                  │ (min/avg/max    │
-                  │  across hosp.)  │
-                  └────────┬────────┘
-                           ▼
-                  ┌─────────────────┐
-                  │  FitnessVector  │
-                  │ attached to     │
-                  │ PromptCandidate │
-                  └─────────────────┘
-```
+![workfloww ](workflow.jpeg)
 
 ### Core Components (`src/`)
 

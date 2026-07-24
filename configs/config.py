@@ -130,8 +130,12 @@ MODEL_REGISTRY = {
         "temperature": 0.2,                          # CHANGE: 0.0-1.0
     },
 
-   "oss": {
+    "oss": {
         "model_name": "openai/gpt-oss-20b",
+        "load_in_4bit": True,
+        "quant_type": "nf4",
+        "compute_dtype": "bfloat16",
+        "use_double_quant": True,
         "device_map": "auto",
         "dtype": "bfloat16",
         "max_new_tokens": 128,

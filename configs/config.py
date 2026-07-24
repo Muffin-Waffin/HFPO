@@ -224,3 +224,26 @@ MUTATION_TOURNAMENT_SIZE = 3
 MUTATION_ELITE_COUNT = 2
 MIN_CHILDREN_FOR_RANKING = 10
 TOP_CHILDREN_TO_KEEP = 5
+
+# ============================================================================
+# PRIVACY CONFIGURATION (Federated Evaluation)
+# ============================================================================
+# WHAT TO CHANGE:
+#   - PRIVACY_MODE: "none" (default), "dp", "secure_agg", or combinations:
+#       "dp+secure_agg"  → DP noise locally, then SecureAgg mask for transmission
+#       "secure_agg+dp"  → SecureAgg mask first, then DP noise (less common)
+#       "dp,sa"          → Same as "dp+secure_agg" (comma separator)
+#   - DP_EPSILON: Privacy budget for DP mode (lower = more private, noisier)
+#   - DP_SENSITIVITY: Override sensitivity Δ (default: 1/EVALUATION_SUBSET_SIZE)
+#   - SECURE_AGG_RANDOM_SEED: Seed for reproducible masks (testing only)
+#
+# NOTES:
+#   - "none": No privacy protection, raw scores transmitted
+#   - "dp": Local Differential Privacy with Laplace noise at each hospital
+#   - "secure_agg": Additive secret sharing, server un-masks after collection
+#   - Combined: Apply both (order matters - first in string = first applied)
+# ============================================================================
+PRIVACY_MODE = "dp"
+DP_EPSILON = 1.0
+DP_SENSITIVITY = None  # None = auto-compute as 1/EVALUATION_SUBSET_SIZE
+SECURE_AGG_RANDOM_SEED = None

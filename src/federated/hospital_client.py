@@ -29,9 +29,10 @@ introduced, since only the `Evaluator` implementation changes, never
 from __future__ import annotations
 
 from collections.abc import Iterable
-from typing import Any,Protocol
+from typing import Any, Protocol, Sequence
 
 from src.evaluation.evaluator import Evaluator
+from src.federated.privacy import NoPrivacyMechanism, PrivacyMechanism
 
 from src.core.evaluation_record import EvaluationRecord
 from src.core.prompt_candidate import PromptCandidate
@@ -97,6 +98,7 @@ class HospitalClient:
         hospital_id: str,
         dataset: Any,
         evaluator: Evaluator,
+        privacy_mechanism: PrivacyMechanism | None = None,
     ) -> None:
         """Initialize a HospitalClient with its private evaluation resources.
 
@@ -105,6 +107,10 @@ class HospitalClient:
             dataset: The hospital's private local dataset.
             evaluator: The `Evaluator` used to score prompts against
                 samples from `dataset`.
+            privacy_mechanism: Optional privacy mechanism to apply to
+                evaluation records before they leave this hospital.
+                If None, no privacy transformation is applied
+                (equivalent to NoPrivacyMechanism).
 
         Raises:
             ValueError: If `hospital_id` is empty or whitespace, or if
@@ -122,6 +128,9 @@ class HospitalClient:
         self.hospital_id = hospital_id
         self.dataset = dataset
         self.evaluator = evaluator
+        self._privacy_mechanism: PrivacyMechanism = (
+            privacy_mechanism if privacy_mechanism is not None else NoPrivacyMechanism()
+        )
 
     def evaluate_prompt(self, prompt: PromptCandidate) -> EvaluationRecord:
         """Evaluate one prompt against this hospital's local dataset.
@@ -191,7 +200,7 @@ class HospitalClient:
             f"in {elapsed:.1f}s "
             f"({num_correct}/{num_total})"
         )
-        return EvaluationRecord(
+        record = EvaluationRecord(
             prompt_id=prompt.id,
             hospital_id=self.hospital_id,
             generation=prompt.generation,
@@ -200,6 +209,10 @@ class HospitalClient:
             num_total=num_total,
             metadata={"predictions": predictions},
         )
+
+        # Apply local privacy mechanism (DP noise, etc.) before record leaves hospital
+        private_records = self._privacy_mechanism.apply((record,))
+        return private_records[0]
 
     def evaluate_population(
         self, population: list[PromptCandidate]

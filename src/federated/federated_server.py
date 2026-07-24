@@ -35,6 +35,7 @@ from src.core.lineage_tracker import LineageTracker
 from src.core.prompt_candidate import PromptCandidate
 from src.federated.aggregator import Aggregator
 from src.federated.hospital_client import HospitalClient
+from src.federated.privacy import NoPrivacyMechanism, PrivacyMechanism
 
 
 class FederatedServer:
@@ -87,6 +88,7 @@ class FederatedServer:
         model_name: str,
         dataset_name: str,
         evaluation_version: str,
+        privacy_mechanism: PrivacyMechanism | None = None,
         max_parallel_workers: int | None = None,
         diagnostics_path: str | Path | None = None,
     ) -> None:
@@ -105,6 +107,8 @@ class FederatedServer:
             dataset_name: Name of the dataset used for evaluation.
             evaluation_version: Version identifier of the evaluation
                 pipeline.
+            privacy_mechanism: Optional server-side privacy mechanism for
+                post-collection processing (e.g., SecureAgg unmasking).
             max_parallel_workers: Optional limit on concurrent hospital
                 evaluations. If None (default), uses one worker per hospital.
 
@@ -147,6 +151,7 @@ class FederatedServer:
         self._model_name: str = model_name
         self._dataset_name: str = dataset_name
         self._evaluation_version: str = evaluation_version
+        self._privacy_mechanism: PrivacyMechanism = privacy_mechanism if privacy_mechanism is not None else NoPrivacyMechanism()
         self._max_parallel_workers: int | None = max_parallel_workers
         self._diagnostics_path = Path(diagnostics_path) if diagnostics_path is not None else Path("results/hfpo_run/parent_child_diagnostics.jsonl")
         self._diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
@@ -239,6 +244,11 @@ class FederatedServer:
                 for hospital_records in per_hospital_records
                 for record in hospital_records
             ]
+
+            # Server-side unmasking for Secure Aggregation
+            # (DP is applied locally at hospitals, no server step needed)
+            if hasattr(self._privacy_mechanism, "unmask"):
+                flattened_records = list(self._privacy_mechanism.unmask(flattened_records))
 
             expected_record_count = len(self._hospitals) * len(uncached_prompts)
             if len(flattened_records) != expected_record_count:

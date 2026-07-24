@@ -54,6 +54,7 @@ from src.evolution.tournament_selector import TournamentSelector
 from src.federated.aggregator import Aggregator
 from src.federated.federated_server import FederatedServer
 from src.federated.hospital_client import HospitalClient
+from src.federated.privacy import create_privacy_mechanism
 from src.llms.loader import load_model
 from src.evolution.prompt_generator.candidate_parser import CandidateParser
 from src.evolution.prompt_generator.similarity_selector import (
@@ -319,6 +320,33 @@ def main() -> None:
         max_new_tokens=config.MAX_NEW_TOKENS,
     )
 
+    # Create privacy mechanisms from config
+    privacy_mode = getattr(config, "PRIVACY_MODE", "none")
+    dp_epsilon = getattr(config, "DP_EPSILON", 1.0)
+    dp_sensitivity = getattr(config, "DP_SENSITIVITY", None)
+    secure_agg_seed = getattr(config, "SECURE_AGG_RANDOM_SEED", None)
+
+    # Hospital-side mechanism (applied locally at each hospital)
+    hospital_privacy = create_privacy_mechanism(
+        privacy_mode,
+        epsilon=dp_epsilon,
+        sensitivity=dp_sensitivity,
+        random_seed=config.RANDOM_SEED,
+    )
+    # Server-side mechanism (for SecureAgg unmasking)
+    server_privacy = create_privacy_mechanism(
+        privacy_mode,
+        epsilon=dp_epsilon,
+        sensitivity=dp_sensitivity,
+        random_seed=secure_agg_seed,
+    )
+
+    print(f"Privacy mode: {privacy_mode}")
+    if privacy_mode == "dp":
+        print(f"  DP epsilon: {dp_epsilon}, sensitivity: {dp_sensitivity or 'auto (1/subset_size)'}")
+    elif privacy_mode == "secure_agg":
+        print(f"  SecureAgg: enabled")
+
     import random
     hospitals = []
 
@@ -348,6 +376,7 @@ def main() -> None:
                     model=model,
                     tokenizer=tokenizer,
                 ),
+                privacy_mechanism=hospital_privacy,
             )
         )
 
@@ -363,6 +392,7 @@ def main() -> None:
         model_name=config.DEFAULT_MODEL,
         dataset_name=FEDERATION_DATASET_LABEL,
         evaluation_version=EVALUATION_VERSION,
+        privacy_mechanism=server_privacy,
         diagnostics_path=Path(OUTPUT_DIRECTORY) / "parent_child_diagnostics.jsonl",
     )
 

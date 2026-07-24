@@ -3,12 +3,12 @@
         {
             "ancestry_ids": [],
             "fitness": {
-                "medmcqa": 0.7,
-                "medqa": 0.67,
-                "pubmedqa": 0.69
+                "medmcqa": 0.6912222223075493,
+                "medqa": 0.6853482410593792,
+                "pubmedqa": 0.7343239159871411
             },
             "generation": 0,
-            "id": "c5d52c5c-4cff-4aaa-99fb-064eccd5ff87",
+            "id": "eafcf215-39ed-43cf-99dd-024b6a6c7555",
             "metadata": {
                 "evaluation_predictions": {
                     "medmcqa": [
@@ -17,7 +17,7 @@
                         0,
                         1,
                         1,
-                        2,
+                        1,
                         0,
                         2,
                         2,
@@ -32,7 +32,7 @@
                         0,
                         0,
                         0,
-                        1,
+                        0,
                         2,
                         2,
                         0,
@@ -174,7 +174,7 @@
                         2,
                         1,
                         0,
-                        3,
+                        1,
                         3,
                         1,
                         3,
@@ -274,33 +274,33 @@
                         "no",
                         "yes",
                         "yes",
-                        "maybe",
-                        "no",
-                        "yes",
-                        "yes",
-                        "maybe",
-                        "maybe",
-                        "yes",
-                        "no",
-                        "no",
-                        "no",
-                        "maybe",
-                        "yes",
-                        "no",
                         "no",
                         "no",
                         "yes",
-                        "maybe",
                         "yes",
                         "maybe",
                         "maybe",
+                        "yes",
+                        "no",
+                        "no",
+                        "no",
                         "no",
                         "yes",
                         "no",
-                        "yes",
-                        "yes",
                         "no",
+                        "no",
+                        "yes",
                         "maybe",
+                        "yes",
+                        "maybe",
+                        "maybe",
+                        "no",
+                        "yes",
+                        "no",
+                        "yes",
+                        "yes",
+                        "no",
+                        "no",
                         "maybe",
                         "yes",
                         "maybe",
@@ -326,102 +326,102 @@
         {
             "ancestry_ids": [],
             "fitness": {
-                "medmcqa": 0.7,
-                "medqa": 0.66,
-                "pubmedqa": 0.69
+                "medmcqa": 0.7102613889937948,
+                "medqa": 0.6667210992703786,
+                "pubmedqa": 0.7018889762801196
             },
             "generation": 0,
-            "id": "3a0d3776-30d7-4800-aff1-2a0844450bf6",
+            "id": "bfb45ace-22ff-42a7-a27c-4c73923da4ae",
             "metadata": {
                 "evaluation_predictions": {
                     "medmcqa": [
                         2,
                         0,
                         0,
-                        1,
-                        1,
-                        2,
                         0,
-                        2,
-                        2,
-                        3,
-                        2,
-                        2,
+                        1,
                         1,
                         0,
                         0,
                         2,
                         3,
+                        2,
+                        2,
+                        1,
                         0,
-                        0,
+                        2,
+                        2,
+                        3,
                         0,
                         0,
                         0,
                         2,
                         0,
                         2,
+                        0,
+                        2,
                         2,
                         1,
                         3,
                         3,
-                        2,
+                        0,
                         0,
                         1,
-                        1,
-                        0,
-                        1,
-                        2,
-                        0,
-                        0,
-                        3,
-                        1,
-                        3,
-                        1,
-                        0,
-                        0,
-                        0,
-                        0,
-                        3,
-                        0,
-                        1,
-                        0,
                         1,
                         0,
                         1,
                         2,
                         0,
+                        0,
+                        3,
+                        1,
+                        3,
+                        1,
+                        0,
+                        0,
+                        0,
+                        1,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        2,
+                        0,
+                        0,
+                        3,
+                        1,
+                        2,
+                        1,
+                        0,
+                        0,
+                        3,
+                        0,
+                        1,
+                        0,
+                        2,
+                        0,
+                        0,
+                        1,
+                        3,
+                        0,
+                        0,
+                        3,
+                        1,
+                        3,
+                        0,
+                        3,
+                        1,
+                        0,
                         2,
                         3,
-                        3,
-                        2,
-                        1,
-                        0,
                         0,
                         0,
                         0,
                         1,
                         0,
-                        2,
-                        0,
-                        0,
-                        1,
-                        3,
-                        0,
-                        0,
-                        3,
-                        0,
-                        3,
-                        0,
-                        3,
-                        1,
-                        0,
-                        2,
-                        3,
-                        3,
-                        0,
-                        0,
-                        1,
-                        1,
                         3,
                         1,
                         1,
@@ -429,7 +429,7 @@
                         0,
                         0,
                         1,
-                        0,
+                        1,
                         0,
                         3,
                         0,
@@ -452,24 +452,24 @@
                         0,
                         2,
                         0,
-                        1,
+                        0,
                         2,
                         1,
                         2,
-                        1,
-                        0,
-                        1,
-                        2,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
                         2,
                         0,
                         1,
                         2,
                         0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        2,
+                        0,
+                        1,
+                        2,
+                        1,
                         2,
                         0,
                         1,
@@ -477,7 +477,7 @@
                         0,
                         3,
                         2,
-                        0,
+                        1,
                         0,
                         2,
                         0,
@@ -487,40 +487,40 @@
                         0,
                         1,
                         1,
-                        2,
-                        3,
                         1,
                         3,
                         1,
-                        0,
-                        0,
-                        2,
-                        1,
-                        0,
-                        3,
                         3,
                         1,
-                        3,
-                        2,
-                        0,
-                        3,
                         0,
                         0,
-                        0,
-                        1,
-                        1,
-                        3,
-                        0,
-                        0,
-                        0,
-                        0,
-                        1,
                         2,
                         1,
+                        0,
+                        1,
+                        3,
+                        1,
+                        3,
+                        2,
+                        0,
+                        0,
+                        2,
+                        0,
+                        0,
+                        1,
                         1,
                         3,
                         0,
                         0,
+                        0,
+                        0,
+                        1,
+                        2,
+                        1,
+                        1,
+                        3,
+                        0,
+                        2,
                         1,
                         3,
                         3,
@@ -549,14 +549,14 @@
                         "no",
                         "yes",
                         "maybe",
-                        "yes",
+                        "maybe",
                         "no",
                         "yes",
                         "no",
                         "maybe",
                         "yes",
                         "yes",
-                        "no",
+                        "maybe",
                         "no",
                         "no",
                         "no",
@@ -565,36 +565,32 @@
                         "yes",
                         "no",
                         "maybe",
+                        "yes",
+                        "maybe",
+                        "yes",
+                        "yes",
+                        "no",
+                        "yes",
+                        "yes",
+                        "no",
+                        "no",
+                        "maybe",
+                        "no",
+                        "no",
+                        "yes",
+                        "yes",
                         "maybe",
                         "maybe",
                         "yes",
                         "yes",
                         "no",
                         "yes",
-                        "yes",
-                        "no",
-                        "no",
-                        "maybe",
-                        "no",
-                        "no",
-                        "yes",
-                        "yes",
-                        "maybe",
-                        "maybe",
-                        "yes",
-                        "yes",
-                        "no",
-                        "yes",
                         "no",
                         "no",
                         "maybe",
                         "yes",
                         "yes",
                         "yes",
-                        "yes",
-                        "yes",
-                        "maybe",
-                        "no",
                         "yes",
                         "yes",
                         "maybe",
@@ -602,28 +598,32 @@
                         "yes",
                         "yes",
                         "maybe",
-                        "maybe",
-                        "maybe",
-                        "no",
-                        "no",
-                        "no",
                         "no",
                         "yes",
-                        "no",
-                        "no",
-                        "no",
+                        "yes",
                         "yes",
                         "maybe",
                         "yes",
+                        "no",
+                        "no",
+                        "no",
+                        "no",
+                        "yes",
+                        "no",
+                        "no",
+                        "no",
+                        "yes",
+                        "maybe",
+                        "yes",
+                        "yes",
+                        "maybe",
+                        "no",
+                        "yes",
+                        "no",
+                        "yes",
+                        "yes",
                         "maybe",
                         "maybe",
-                        "no",
-                        "yes",
-                        "no",
-                        "yes",
-                        "yes",
-                        "no",
-                        "no",
                         "yes",
                         "yes",
                         "maybe",
@@ -644,63 +644,40 @@
             },
             "origin": "seed",
             "parent_ids": [],
-            "text": "Treat this as a medical licensing exam."
+            "text": "Choose one option."
         },
         {
             "ancestry_ids": [
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6",
-                "d9ceb109-b8ef-4f0c-a163-fcd54f35f981"
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "ba1e9334-8dde-46fc-98f6-1fe353b1c282",
+            "id": "14b012be-670f-4909-b3de-8448c23d0b44",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 11074.953596995329,
+                "generation_time_ms": 12443.433264000305,
                 "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6",
-                "d9ceb109-b8ef-4f0c-a163-fcd54f35f981"
-            ],
-            "text": "Consider the implications of each option as if you were making a real-world clinical decision. Select the response that best represents the standard of care in a medical context."
-        },
-        {
-            "ancestry_ids": [
-                "a38f6f1f-67ad-4582-9dd5-0b658bc62bb5"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "97c94093-1c87-42e5-abcc-5b5ace5d54ff",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 12898.589131000335,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "4545c59a-f298-4eee-805a-62b3bfaa5155",
+                "mutation_operator": "f201d3c3-338e-48a1-8e98-daea2139a721",
                 "temperature": 0.2,
                 "template_used": "mutation"
             },
             "origin": "mutation",
             "parent_ids": [
-                "a38f6f1f-67ad-4582-9dd5-0b658bc62bb5"
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
             ],
-            "text": "Imagine you are explaining the question to a peer who is struggling with the concept. What would you emphasize to help them understand the correct answer? Use this teaching-style reasoning to inform your selection."
+            "text": "Frame your reasoning around the most efficient path to the correct answer. Avoid excessive analysis and focus on the key differentiating features among the options."
         },
         {
             "ancestry_ids": [
-                "2168b41b-614e-4e38-9e8d-7943a36f0d91",
-                "c5d52c5c-4cff-4aaa-99fb-064eccd5ff87"
+                "bfb45ace-22ff-42a7-a27c-4c73923da4ae",
+                "04dde3dd-9e73-43f9-b6ef-67f8fb5665e9"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "b86314fb-af28-41d9-9636-c7ed647f2a98",
+            "id": "675ac743-39d4-4445-8df3-76e0dda64f63",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 5096.914595997077,
+                "generation_time_ms": 3761.2244749998354,
                 "generator": "_QwenReasoningLLM",
                 "mutation_operator": "crossover",
                 "temperature": 0.2,
@@ -708,112 +685,43 @@
             },
             "origin": "crossover",
             "parent_ids": [
-                "2168b41b-614e-4e38-9e8d-7943a36f0d91",
-                "c5d52c5c-4cff-4aaa-99fb-064eccd5ff87"
+                "bfb45ace-22ff-42a7-a27c-4c73923da4ae",
+                "04dde3dd-9e73-43f9-b6ef-67f8fb5665e9"
             ],
-            "text": "Select the option that best aligns with the key diagnostic clues presented."
+            "text": "Apply your understanding of medical principles to identify the correct answer."
         },
         {
             "ancestry_ids": [
-                "c8567231-bd90-4b71-8fb1-4be77079035f",
-                "c5d52c5c-4cff-4aaa-99fb-064eccd5ff87"
+                "da9adf1d-7f1b-4764-9607-564b55fc8c67"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "2cd3658e-0f0a-4b55-8e7e-b5784f2c5ab2",
+            "id": "9ff4e848-6848-4b17-997d-733cda9fc666",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 14254.366064997157,
+                "generation_time_ms": 5594.3022100000235,
                 "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "c8567231-bd90-4b71-8fb1-4be77079035f",
-                "c5d52c5c-4cff-4aaa-99fb-064eccd5ff87"
-            ],
-            "text": "Start by identifying the core clinical findings in the question, then use this foundation to assess each option and select the one that most accurately reflects the clinical scenario."
-        },
-        {
-            "ancestry_ids": [
-                "2168b41b-614e-4e38-9e8d-7943a36f0d91",
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "d36b6854-2ea9-4f01-aeab-2ba374ec0f7a",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 11591.25308599323,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "2168b41b-614e-4e38-9e8d-7943a36f0d91",
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
-            ],
-            "text": "You are to act as a medical professional preparing for a licensing exam. Provide clear, direct answers to each question by selecting the most accurate option."
-        },
-        {
-            "ancestry_ids": [
-                "2168b41b-614e-4e38-9e8d-7943a36f0d91",
-                "c5d52c5c-4cff-4aaa-99fb-064eccd5ff87"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "dd72fa3d-4f4e-4bf8-a269-95610856561d",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 6184.679032012355,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "2168b41b-614e-4e38-9e8d-7943a36f0d91",
-                "c5d52c5c-4cff-4aaa-99fb-064eccd5ff87"
-            ],
-            "text": "Prioritize the key diagnostic elements and respond with a clear, focused selection."
-        },
-        {
-            "ancestry_ids": [
-                "42dfc633-3d04-4e6f-9e20-9144f0c48665"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "f55ed8d6-919f-4579-8562-bbb0910c0375",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 5681.381449001492,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "d9d13a4e-83ee-441b-a580-6e8255915222",
+                "mutation_operator": "6ba79343-2f6f-4634-a9d6-7b598448c9d7",
                 "temperature": 0.2,
                 "template_used": "mutation"
             },
             "origin": "mutation",
             "parent_ids": [
-                "42dfc633-3d04-4e6f-9e20-9144f0c48665"
+                "da9adf1d-7f1b-4764-9607-564b55fc8c67"
             ],
-            "text": "Refine your approach by removing superfluous information while preserving essential diagnostic elements."
+            "text": "Select the best answer by identifying the key clinical feature or rule that determines the correct choice, without overcomplicating the reasoning."
         },
         {
             "ancestry_ids": [
-                "a38f6f1f-67ad-4582-9dd5-0b658bc62bb5",
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
+                "eafcf215-39ed-43cf-99dd-024b6a6c7555",
+                "554a582c-d4e6-4064-b47e-4e3eeebe155f"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "b8f67635-4de7-4ff5-b94b-97f344e4cb9c",
+            "id": "e2b5a590-fe32-4a6f-b9f2-80df91ed126a",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 8746.247272007167,
+                "generation_time_ms": 6049.62556099963,
                 "generator": "_QwenReasoningLLM",
                 "mutation_operator": "crossover",
                 "temperature": 0.2,
@@ -821,89 +729,43 @@
             },
             "origin": "crossover",
             "parent_ids": [
-                "a38f6f1f-67ad-4582-9dd5-0b658bc62bb5",
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
+                "eafcf215-39ed-43cf-99dd-024b6a6c7555",
+                "554a582c-d4e6-4064-b47e-4e3eeebe155f"
             ],
-            "text": "You are to simulate the thinking of a practicing physician. Choose the single best answer based on your understanding of clinical medicine and standard practice."
+            "text": "Prioritize identifying the key diagnostic features, then use this understanding to eliminate distractors that lack these essential elements."
         },
         {
             "ancestry_ids": [
-                "a38f6f1f-67ad-4582-9dd5-0b658bc62bb5",
-                "b9892d33-c18e-414f-92af-f701697cb962"
+                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "9e18c52e-f798-47c4-91e4-aa879718bfbb",
+            "id": "226fd792-448a-4a68-98db-36aa4a105dd7",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 7114.770749001764,
+                "generation_time_ms": 5652.1470560001035,
                 "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "a38f6f1f-67ad-4582-9dd5-0b658bc62bb5",
-                "b9892d33-c18e-414f-92af-f701697cb962"
-            ],
-            "text": "Analyze the question thoroughly and apply your training to determine the correct answer from the given choices."
-        },
-        {
-            "ancestry_ids": [
-                "c5d52c5c-4cff-4aaa-99fb-064eccd5ff87",
-                "c8567231-bd90-4b71-8fb1-4be77079035f"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "df3f541b-3467-4b00-8e23-40dfaf6e99ea",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 7731.242565001594,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "c5d52c5c-4cff-4aaa-99fb-064eccd5ff87",
-                "c8567231-bd90-4b71-8fb1-4be77079035f"
-            ],
-            "text": "Use the most defining characteristics of the condition to guide your selection, then cross-check each option to ensure consistency with these features."
-        },
-        {
-            "ancestry_ids": [
-                "c8567231-bd90-4b71-8fb1-4be77079035f"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "260f6b96-0784-41aa-b6a6-e2da81b55f28",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 8189.072834997205,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "4545c59a-f298-4eee-805a-62b3bfaa5155",
+                "mutation_operator": "f201d3c3-338e-48a1-8e98-daea2139a721",
                 "temperature": 0.2,
                 "template_used": "mutation"
             },
             "origin": "mutation",
             "parent_ids": [
-                "c8567231-bd90-4b71-8fb1-4be77079035f"
+                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
             ],
-            "text": "Approach the question from a different angle by considering alternative diagnostic pathways before evaluating the options."
+            "text": "Use the process of elimination by focusing on the answer that introduces the most contradiction with the given clinical findings."
         },
         {
             "ancestry_ids": [
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6",
-                "66ad6237-9b19-43eb-a5db-731cbd944af0"
+                "da9adf1d-7f1b-4764-9607-564b55fc8c67",
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "f075df16-e461-4fa9-ac5c-c118074a8ef1",
+            "id": "158929e8-7ff9-489f-94da-0a06a2b70c90",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 11786.339234997286,
+                "generation_time_ms": 5052.69489300008,
                 "generator": "_QwenReasoningLLM",
                 "mutation_operator": "crossover",
                 "temperature": 0.2,
@@ -911,22 +773,22 @@
             },
             "origin": "crossover",
             "parent_ids": [
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6",
-                "66ad6237-9b19-43eb-a5db-731cbd944af0"
+                "da9adf1d-7f1b-4764-9607-564b55fc8c67",
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
             ],
-            "text": "Approach each question as a clinical scenario you would encounter in practice. Use only the details provided to determine the correct answer, ensuring your response is grounded in the given context."
+            "text": "Answer with the clarity and precision required in a medical licensing setting. Choose one option only."
         },
         {
             "ancestry_ids": [
-                "c5d52c5c-4cff-4aaa-99fb-064eccd5ff87",
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
+                "36cd914d-586b-4380-b954-8b05eb634b66",
+                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "c36fd6a3-bac1-45e5-b6ff-737976b47cde",
+            "id": "751e4fab-b523-4dfb-8f6c-ad84effd3700",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 10147.278078991803,
+                "generation_time_ms": 5209.542943999622,
                 "generator": "_QwenReasoningLLM",
                 "mutation_operator": "crossover",
                 "temperature": 0.2,
@@ -934,22 +796,22 @@
             },
             "origin": "crossover",
             "parent_ids": [
-                "c5d52c5c-4cff-4aaa-99fb-064eccd5ff87",
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
+                "36cd914d-586b-4380-b954-8b05eb634b66",
+                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
             ],
-            "text": "Treat the question as a simulated clinical encounter. Use your understanding of the clinical findings to guide your choice, ensuring your answer reflects the level of expertise expected in a medical licensing exam."
+            "text": "Evaluate each option based on its direct relevance to the patient's condition and its potential to guide effective treatment."
         },
         {
             "ancestry_ids": [
-                "c8567231-bd90-4b71-8fb1-4be77079035f",
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
+                "36cd914d-586b-4380-b954-8b05eb634b66",
+                "0a5ea9c0-4367-40a5-a0f4-2fa3c25cacc8"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "df9782cc-61bb-49a8-8f7e-906db5fad4f1",
+            "id": "60515b7f-a76a-4bf7-95e5-2e68466515e4",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 12736.740705004195,
+                "generation_time_ms": 3754.605220000485,
                 "generator": "_QwenReasoningLLM",
                 "mutation_operator": "crossover",
                 "temperature": 0.2,
@@ -957,22 +819,22 @@
             },
             "origin": "crossover",
             "parent_ids": [
-                "c8567231-bd90-4b71-8fb1-4be77079035f",
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
+                "36cd914d-586b-4380-b954-8b05eb634b66",
+                "0a5ea9c0-4367-40a5-a0f4-2fa3c25cacc8"
             ],
-            "text": "Consider the question from the perspective of a medical student preparing for a licensing exam. Focus on the most reliable and evidence-based answer, while ensuring that your reasoning mirrors the critical thinking required in clinical practice."
+            "text": "Select the best answer by balancing attention to detail with a clear understanding of the question."
         },
         {
             "ancestry_ids": [
-                "42dfc633-3d04-4e6f-9e20-9144f0c48665",
-                "d9ceb109-b8ef-4f0c-a163-fcd54f35f981"
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf",
+                "0a5ea9c0-4367-40a5-a0f4-2fa3c25cacc8"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "1dc62c63-5bfd-48ba-a09e-566d70fe6d6d",
+            "id": "50d5b835-53fb-4021-84d5-c4c328fdb4a4",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 7952.422305999789,
+                "generation_time_ms": 4609.0042149999135,
                 "generator": "_QwenReasoningLLM",
                 "mutation_operator": "crossover",
                 "temperature": 0.2,
@@ -980,77 +842,215 @@
             },
             "origin": "crossover",
             "parent_ids": [
-                "42dfc633-3d04-4e6f-9e20-9144f0c48665",
-                "d9ceb109-b8ef-4f0c-a163-fcd54f35f981"
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf",
+                "0a5ea9c0-4367-40a5-a0f4-2fa3c25cacc8"
             ],
-            "text": "Identify the choice that not only reflects the most up-to-date medical knowledge but also safeguards the patient’s health and recovery."
+            "text": "Treat each multiple-choice item as a diagnostic challenge, prioritizing clarity and precision in your reasoning."
         },
         {
             "ancestry_ids": [
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
+                "04dde3dd-9e73-43f9-b6ef-67f8fb5665e9",
+                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "3aff69d6-a92b-4ebf-b002-4dcf973c0b76",
+            "id": "f9c63aed-2488-4701-a72d-978b07a52cb7",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 9720.303355992655,
+                "generation_time_ms": 4357.0297850001225,
                 "generator": "_QwenReasoningLLM",
-                "mutation_operator": "4545c59a-f298-4eee-805a-62b3bfaa5155",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "04dde3dd-9e73-43f9-b6ef-67f8fb5665e9",
+                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
+            ],
+            "text": "Analyze the key diagnostic clues and choose the best-supported option."
+        },
+        {
+            "ancestry_ids": [
+                "04dde3dd-9e73-43f9-b6ef-67f8fb5665e9",
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "596baa6b-12eb-498a-87e5-69fd9a77d9fc",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 3947.55903999976,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "04dde3dd-9e73-43f9-b6ef-67f8fb5665e9",
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
+            ],
+            "text": "Approach each question as if you are preparing for a high-stakes certification exam."
+        },
+        {
+            "ancestry_ids": [
+                "cbfa56ac-6570-443e-84fe-54e35e40cd4e",
+                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "7895eb83-39cb-4717-8e2f-454a36208915",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 4283.949068999391,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "cbfa56ac-6570-443e-84fe-54e35e40cd4e",
+                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
+            ],
+            "text": "Analyze the essential clinical clues and make your selection based strictly on what is presented."
+        },
+        {
+            "ancestry_ids": [
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf",
+                "554a582c-d4e6-4064-b47e-4e3eeebe155f"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "0716bc1f-e3d2-422e-b00e-f31a688e7133",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 5680.739721999998,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf",
+                "554a582c-d4e6-4064-b47e-4e3eeebe155f"
+            ],
+            "text": "Analyze the question by first identifying the key diagnostic or therapeutic clue, then using that to eliminate distractors and select the best response."
+        },
+        {
+            "ancestry_ids": [
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf",
+                "36cd914d-586b-4380-b954-8b05eb634b66"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "aa4ef55c-365e-4a2e-84c9-89ea94cb3304",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 5858.269112999551,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf",
+                "36cd914d-586b-4380-b954-8b05eb634b66"
+            ],
+            "text": "Focus on the core clinical implications of each option, always considering how your choice directly impacts patient care and reflects the standards expected in a professional medical setting."
+        },
+        {
+            "ancestry_ids": [
+                "6687d110-96c0-4a31-a6c1-d1cc4c663ddd",
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "937ac387-0a90-4e8f-a312-5051f9d4d58f",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 4288.734407000447,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "6687d110-96c0-4a31-a6c1-d1cc4c663ddd",
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
+            ],
+            "text": "Approach each question as a critical thinking exercise, focusing on the best possible clinical judgment."
+        },
+        {
+            "ancestry_ids": [
+                "eafcf215-39ed-43cf-99dd-024b6a6c7555",
+                "bfb45ace-22ff-42a7-a27c-4c73923da4ae"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "5c1a9d7b-af63-4ecd-8c4e-6607fb075095",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 4661.397968000529,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "eafcf215-39ed-43cf-99dd-024b6a6c7555",
+                "bfb45ace-22ff-42a7-a27c-4c73923da4ae"
+            ],
+            "text": "Identify the correct answer by prioritizing the most direct and evidence-based interpretation of the given data."
+        },
+        {
+            "ancestry_ids": [
+                "bfb45ace-22ff-42a7-a27c-4c73923da4ae",
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "09b25bbf-b148-4008-94f4-7c337fa58d1f",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 5203.2477499997185,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "bfb45ace-22ff-42a7-a27c-4c73923da4ae",
+                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
+            ],
+            "text": "You are to select the most accurate and clinically appropriate response from the options provided. Focus on the best answer based on established medical knowledge."
+        },
+        {
+            "ancestry_ids": [
+                "cbfa56ac-6570-443e-84fe-54e35e40cd4e"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "9cbafd64-c415-429c-aeb6-12a76bafe538",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 5888.452750000397,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "f201d3c3-338e-48a1-8e98-daea2139a721",
                 "temperature": 0.2,
                 "template_used": "mutation"
             },
             "origin": "mutation",
             "parent_ids": [
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
+                "cbfa56ac-6570-443e-84fe-54e35e40cd4e"
             ],
-            "text": "For every question, begin by listing all possible differential diagnoses and then use the answer choices to narrow down to the most specific and accurate diagnosis."
-        },
-        {
-            "ancestry_ids": [
-                "c5d52c5c-4cff-4aaa-99fb-064eccd5ff87",
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "e72c74e3-aad5-4922-b9b7-e362008a62ac",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 8269.333503005328,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "c5d52c5c-4cff-4aaa-99fb-064eccd5ff87",
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
-            ],
-            "text": "Evaluate the options with the mindset of a practicing physician, prioritizing the most clinically relevant and evidence-supported response."
-        },
-        {
-            "ancestry_ids": [
-                "b5ac66db-c0dc-4b47-a158-49c945265e2f",
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "3fc7a70c-fb33-423d-b5fd-ac3a453b6f10",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 8979.786294003134,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "b5ac66db-c0dc-4b47-a158-49c945265e2f",
-                "3a0d3776-30d7-4800-aff1-2a0844450bf6"
-            ],
-            "text": "Provide the most clinically valid answer, considering the latest evidence and standard of care, as if you were responding to a question on a formal medical licensing examination."
+            "text": "Use the information provided to select the most accurate answer. Focus on identifying the key diagnostic clue that directly supports the correct choice."
         }
     ],
     "generation": 1,

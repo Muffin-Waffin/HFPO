@@ -1,0 +1,391 @@
+================================================================================
+HFPO Evolution
+================================================================================
+Model: qwen
+Population Size: 20
+Generations: 20
+Tournament Size: 3
+Mutation Rate: 0.35
+Crossover Rate: 0.65
+Adaptive Mutation: ENABLED (evolve every 5 gens)
+================================================================================
+Privacy mode: dp
+  DP epsilon: 1.0, sensitivity: auto (1/subset_size)
+medqa: using 100 evaluation samples
+pubmedqa: using 100 evaluation samples
+medmcqa: using 100 evaluation samples
+Initialized mutation population with 8 strategies
+Loading weights: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 103/103 [00:00<00:00, 902.85it/s]
+
+Starting Evolution...
+
+
+================================================================================
+Generation 1/20
+================================================================================
+Evaluating population...
+Evaluating 20 prompts...
+Federated evaluation: 20 prompts across 3 hospitals.
+Cache hits: 0 | Need evaluation: 20
+[medqa] Evaluating prompt 5012c6de
+[pubmedqa] Evaluating prompt 5012c6de
+[medmcqa] Evaluating prompt 5012c6de
+[medqa] Started evaluating prompt 5012c6de
+[pubmedqa] Started evaluating prompt 5012c6de
+[medmcqa] Started evaluating prompt 5012c6de
+/home/xon/FedPrompt/FedGAPrompt/.venv/lib/python3.12/site-packages/bitsandbytes/backends/cuda/ops.py:468: FutureWarning: _check_is_size will be removed in a future PyTorch release along with guard_size_oblivious.     Use _check(i >= 0) instead.
+  torch._check_is_size(blocksize)
+[medmcqa] Prompt 5012c6de: 100/100 samples
+[pubmedqa] Prompt 5012c6de: 100/100 samples
+[medqa] Prompt 5012c6de: 100/100 samples
+[medmcqa] Finished prompt 5012c6de
+[medmcqa] Finished prompt 5012c6de in 122.9s (70/100)
+[medmcqa] Evaluating prompt ee005bf2
+[medmcqa] Started evaluating prompt ee005bf2
+[pubmedqa] Finished prompt 5012c6de
+[pubmedqa] Finished prompt 5012c6de in 123.1s (61/100)
+[pubmedqa] Evaluating prompt ee005bf2
+[pubmedqa] Started evaluating prompt ee005bf2
+[medqa] Finished prompt 5012c6de
+[medqa] Finished prompt 5012c6de in 123.5s (68/100)
+[medqa] Evaluating prompt ee005bf2
+[medqa] Started evaluating prompt ee005bf2
+[medmcqa] Prompt ee005bf2: 100/100 samples
+[medqa] Prompt ee005bf2: 100/100 samples
+[medmcqa] Finished prompt ee005bf2
+[medmcqa] Finished prompt ee005bf2 in 124.4s (66/100)
+[medmcqa] Evaluating prompt 04dde3dd
+[medmcqa] Started evaluating prompt 04dde3dd
+[pubmedqa] Prompt ee005bf2: 100/100 samples
+[medqa] Finished prompt ee005bf2
+[medqa] Finished prompt ee005bf2 in 125.1s (64/100)
+[medqa] Evaluating prompt 04dde3dd
+[medqa] Started evaluating prompt 04dde3dd
+[pubmedqa] Finished prompt ee005bf2
+[pubmedqa] Finished prompt ee005bf2 in 126.0s (56/100)
+[pubmedqa] Evaluating prompt 04dde3dd
+[pubmedqa] Started evaluating prompt 04dde3dd
+[medmcqa] Prompt 04dde3dd: 100/100 samples
+[medqa] Prompt 04dde3dd: 100/100 samples
+[pubmedqa] Prompt 04dde3dd: 100/100 samples
+[medmcqa] Finished prompt 04dde3dd
+[medmcqa] Finished prompt 04dde3dd in 135.6s (72/100)
+[medmcqa] Evaluating prompt 0a5ea9c0
+[medmcqa] Started evaluating prompt 0a5ea9c0
+[medqa] Finished prompt 04dde3dd
+[medqa] Finished prompt 04dde3dd in 134.4s (65/100)
+[medqa] Evaluating prompt 0a5ea9c0
+[medqa] Started evaluating prompt 0a5ea9c0
+[pubmedqa] Finished prompt 04dde3dd
+[pubmedqa] Finished prompt 04dde3dd in 135.2s (61/100)
+[pubmedqa] Evaluating prompt 0a5ea9c0
+[pubmedqa] Started evaluating prompt 0a5ea9c0
+[medmcqa] Prompt 0a5ea9c0: 100/100 samples
+[pubmedqa] Prompt 0a5ea9c0: 100/100 samples
+[medqa] Prompt 0a5ea9c0: 100/100 samples
+[medmcqa] Finished prompt 0a5ea9c0
+[medmcqa] Finished prompt 0a5ea9c0 in 136.4s (66/100)
+[medmcqa] Evaluating prompt bfb45ace
+[medmcqa] Started evaluating prompt bfb45ace
+[pubmedqa] Finished prompt 0a5ea9c0
+[pubmedqa] Finished prompt 0a5ea9c0 in 135.5s (64/100)
+[pubmedqa] Evaluating prompt bfb45ace
+[pubmedqa] Started evaluating prompt bfb45ace
+[medqa] Finished prompt 0a5ea9c0
+[medqa] Finished prompt 0a5ea9c0 in 137.0s (69/100)
+[medqa] Evaluating prompt bfb45ace
+[medqa] Started evaluating prompt bfb45ace
+[pubmedqa] Prompt bfb45ace: 100/100 samples
+[pubmedqa] Finished prompt bfb45ace
+[pubmedqa] Finished prompt bfb45ace in 135.1s (70/100)
+[pubmedqa] Evaluating prompt c04a7263
+[pubmedqa] Started evaluating prompt c04a7263
+[medqa] Prompt bfb45ace: 100/100 samples
+[medmcqa] Prompt bfb45ace: 100/100 samples
+[medqa] Finished prompt bfb45ace
+[medqa] Finished prompt bfb45ace in 136.6s (67/100)
+[medqa] Evaluating prompt c04a7263
+[medqa] Started evaluating prompt c04a7263
+[medmcqa] Finished prompt bfb45ace
+[medmcqa] Finished prompt bfb45ace in 137.5s (66/100)
+[medmcqa] Evaluating prompt c04a7263
+[medmcqa] Started evaluating prompt c04a7263
+[pubmedqa] Prompt c04a7263: 100/100 samples
+[pubmedqa] Finished prompt c04a7263
+[pubmedqa] Finished prompt c04a7263 in 135.4s (63/100)
+[pubmedqa] Evaluating prompt eafcf215
+[pubmedqa] Started evaluating prompt eafcf215
+[pubmedqa] Prompt eafcf215: 100/100 samples
+[pubmedqa] Finished prompt eafcf215
+[pubmedqa] Finished prompt eafcf215 in 134.9s (70/100)
+[pubmedqa] Evaluating prompt 554a582c
+[pubmedqa] Started evaluating prompt 554a582c
+[pubmedqa] Prompt 554a582c: 100/100 samples
+[pubmedqa] Finished prompt 554a582c
+[pubmedqa] Finished prompt 554a582c in 133.2s (76/100)
+[pubmedqa] Evaluating prompt 0d06c4d2
+[pubmedqa] Started evaluating prompt 0d06c4d2
+[pubmedqa] Prompt 0d06c4d2: 100/100 samples
+[pubmedqa] Finished prompt 0d06c4d2
+[pubmedqa] Finished prompt 0d06c4d2 in 134.5s (69/100)
+[pubmedqa] Evaluating prompt 4bdf2324
+[pubmedqa] Started evaluating prompt 4bdf2324
+[pubmedqa] Prompt 4bdf2324: 100/100 samples
+[pubmedqa] Finished prompt 4bdf2324
+[pubmedqa] Finished prompt 4bdf2324 in 134.7s (59/100)
+[pubmedqa] Evaluating prompt 36cd914d
+[pubmedqa] Started evaluating prompt 36cd914d
+[pubmedqa] Prompt 36cd914d: 100/100 samples
+[pubmedqa] Finished prompt 36cd914d
+[pubmedqa] Finished prompt 36cd914d in 135.8s (67/100)
+[pubmedqa] Evaluating prompt cbfa56ac
+[pubmedqa] Started evaluating prompt cbfa56ac
+[pubmedqa] Prompt cbfa56ac: 100/100 samples
+[pubmedqa] Finished prompt cbfa56ac
+[pubmedqa] Finished prompt cbfa56ac in 135.0s (60/100)
+[pubmedqa] Evaluating prompt 59e5d90e
+[pubmedqa] Started evaluating prompt 59e5d90e
+[pubmedqa] Prompt 59e5d90e: 100/100 samples
+[pubmedqa] Finished prompt 59e5d90e
+[pubmedqa] Finished prompt 59e5d90e in 136.2s (55/100)
+[pubmedqa] Evaluating prompt da9adf1d
+[pubmedqa] Started evaluating prompt da9adf1d
+[pubmedqa] Prompt da9adf1d: 100/100 samples
+[pubmedqa] Finished prompt da9adf1d
+[pubmedqa] Finished prompt da9adf1d in 134.0s (66/100)
+[pubmedqa] Evaluating prompt ef759b6c
+[pubmedqa] Started evaluating prompt ef759b6c
+[pubmedqa] Prompt ef759b6c: 100/100 samples
+[pubmedqa] Finished prompt ef759b6c
+[pubmedqa] Finished prompt ef759b6c in 134.2s (59/100)
+[pubmedqa] Evaluating prompt ae4fb859
+[pubmedqa] Started evaluating prompt ae4fb859
+[pubmedqa] Prompt ae4fb859: 100/100 samples
+[pubmedqa] Finished prompt ae4fb859
+[pubmedqa] Finished prompt ae4fb859 in 133.2s (72/100)
+[pubmedqa] Evaluating prompt 1edae25f
+[pubmedqa] Started evaluating prompt 1edae25f
+[pubmedqa] Prompt 1edae25f: 100/100 samples
+[pubmedqa] Finished prompt 1edae25f
+[pubmedqa] Finished prompt 1edae25f in 134.1s (61/100)
+[pubmedqa] Evaluating prompt 1c1189fe
+[pubmedqa] Started evaluating prompt 1c1189fe
+[pubmedqa] Prompt 1c1189fe: 100/100 samples
+[pubmedqa] Finished prompt 1c1189fe
+[pubmedqa] Finished prompt 1c1189fe in 134.2s (61/100)
+[pubmedqa] Evaluating prompt 71952f04
+[pubmedqa] Started evaluating prompt 71952f04
+[pubmedqa] Prompt 71952f04: 100/100 samples
+[pubmedqa] Finished prompt 71952f04
+[pubmedqa] Finished prompt 71952f04 in 130.5s (55/100)
+[pubmedqa] Evaluating prompt 6687d110
+[pubmedqa] Started evaluating prompt 6687d110
+[pubmedqa] Prompt 6687d110: 100/100 samples
+[pubmedqa] Finished prompt 6687d110
+[pubmedqa] Finished prompt 6687d110 in 133.9s (69/100)
+[medmcqa] Prompt c04a7263: 100/100 samples
+[medmcqa] Finished prompt c04a7263
+[medmcqa] Finished prompt c04a7263 in 2641.1s (67/100)
+[medmcqa] Evaluating prompt eafcf215
+[medmcqa] Started evaluating prompt eafcf215
+[medmcqa] Prompt eafcf215: 100/100 samples
+[medmcqa] Finished prompt eafcf215
+[medmcqa] Finished prompt eafcf215 in 58.3s (68/100)
+[medmcqa] Evaluating prompt 554a582c
+[medmcqa] Started evaluating prompt 554a582c
+[medmcqa] Prompt 554a582c: 100/100 samples
+[medmcqa] Finished prompt 554a582c
+[medmcqa] Finished prompt 554a582c in 60.2s (62/100)
+[medmcqa] Evaluating prompt 0d06c4d2
+[medmcqa] Started evaluating prompt 0d06c4d2
+[medmcqa] Prompt 0d06c4d2: 100/100 samples
+[medmcqa] Finished prompt 0d06c4d2
+[medmcqa] Finished prompt 0d06c4d2 in 59.5s (70/100)
+[medmcqa] Evaluating prompt 4bdf2324
+[medmcqa] Started evaluating prompt 4bdf2324
+[medmcqa] Prompt 4bdf2324: 100/100 samples
+[medmcqa] Finished prompt 4bdf2324
+[medmcqa] Finished prompt 4bdf2324 in 60.0s (70/100)
+[medmcqa] Evaluating prompt 36cd914d
+[medmcqa] Started evaluating prompt 36cd914d
+[medmcqa] Prompt 36cd914d: 100/100 samples
+[medmcqa] Finished prompt 36cd914d
+[medmcqa] Finished prompt 36cd914d in 59.0s (70/100)
+[medmcqa] Evaluating prompt cbfa56ac
+[medmcqa] Started evaluating prompt cbfa56ac
+[medmcqa] Prompt cbfa56ac: 100/100 samples
+[medmcqa] Finished prompt cbfa56ac
+[medmcqa] Finished prompt cbfa56ac in 60.4s (68/100)
+[medmcqa] Evaluating prompt 59e5d90e
+[medmcqa] Started evaluating prompt 59e5d90e
+[medmcqa] Prompt 59e5d90e: 100/100 samples
+[medmcqa] Finished prompt 59e5d90e
+[medmcqa] Finished prompt 59e5d90e in 56.2s (67/100)
+[medmcqa] Evaluating prompt da9adf1d
+[medmcqa] Started evaluating prompt da9adf1d
+[medmcqa] Prompt da9adf1d: 100/100 samples
+[medmcqa] Finished prompt da9adf1d
+[medmcqa] Finished prompt da9adf1d in 57.0s (67/100)
+[medmcqa] Evaluating prompt ef759b6c
+[medmcqa] Started evaluating prompt ef759b6c
+[medmcqa] Prompt ef759b6c: 100/100 samples
+[medmcqa] Finished prompt ef759b6c
+[medmcqa] Finished prompt ef759b6c in 185.2s (66/100)
+[medmcqa] Evaluating prompt ae4fb859
+[medmcqa] Started evaluating prompt ae4fb859
+[medmcqa] Prompt ae4fb859: 100/100 samples
+[medmcqa] Finished prompt ae4fb859
+[medmcqa] Finished prompt ae4fb859 in 55.5s (64/100)
+[medmcqa] Evaluating prompt 1edae25f
+[medmcqa] Started evaluating prompt 1edae25f
+[medmcqa] Prompt 1edae25f: 100/100 samples
+[medmcqa] Finished prompt 1edae25f
+[medmcqa] Finished prompt 1edae25f in 57.0s (65/100)
+[medmcqa] Evaluating prompt 1c1189fe
+[medmcqa] Started evaluating prompt 1c1189fe
+[medmcqa] Prompt 1c1189fe: 100/100 samples
+[medmcqa] Finished prompt 1c1189fe
+[medmcqa] Finished prompt 1c1189fe in 55.5s (64/100)
+[medmcqa] Evaluating prompt 71952f04
+[medmcqa] Started evaluating prompt 71952f04
+[medmcqa] Prompt 71952f04: 100/100 samples
+[medmcqa] Finished prompt 71952f04
+[medmcqa] Finished prompt 71952f04 in 398.1s (66/100)
+[medmcqa] Evaluating prompt 6687d110
+[medmcqa] Started evaluating prompt 6687d110
+[medmcqa] Prompt 6687d110: 100/100 samples
+[medmcqa] Finished prompt 6687d110
+[medmcqa] Finished prompt 6687d110 in 56.4s (66/100)
+[medqa] Prompt c04a7263: 100/100 samples
+[medqa] Finished prompt c04a7263
+[medqa] Finished prompt c04a7263 in 3946.5s (65/100)
+[medqa] Evaluating prompt eafcf215
+[medqa] Started evaluating prompt eafcf215
+[medqa] Prompt eafcf215: 100/100 samples
+[medqa] Finished prompt eafcf215
+[medqa] Finished prompt eafcf215 in 19.4s (66/100)
+[medqa] Evaluating prompt 554a582c
+[medqa] Started evaluating prompt 554a582c
+[medqa] Prompt 554a582c: 100/100 samples
+[medqa] Finished prompt 554a582c
+[medqa] Finished prompt 554a582c in 25.8s (63/100)
+[medqa] Evaluating prompt 0d06c4d2
+[medqa] Started evaluating prompt 0d06c4d2
+[medqa] Prompt 0d06c4d2: 100/100 samples
+[medqa] Finished prompt 0d06c4d2
+[medqa] Finished prompt 0d06c4d2 in 19.4s (66/100)
+[medqa] Evaluating prompt 4bdf2324
+[medqa] Started evaluating prompt 4bdf2324
+[medqa] Prompt 4bdf2324: 100/100 samples
+[medqa] Finished prompt 4bdf2324
+[medqa] Finished prompt 4bdf2324 in 19.5s (66/100)
+[medqa] Evaluating prompt 36cd914d
+[medqa] Started evaluating prompt 36cd914d
+[medqa] Prompt 36cd914d: 100/100 samples
+[medqa] Finished prompt 36cd914d
+[medqa] Finished prompt 36cd914d in 19.3s (68/100)
+[medqa] Evaluating prompt cbfa56ac
+[medqa] Started evaluating prompt cbfa56ac
+[medqa] Prompt cbfa56ac: 100/100 samples
+[medqa] Finished prompt cbfa56ac
+[medqa] Finished prompt cbfa56ac in 19.4s (68/100)
+[medqa] Evaluating prompt 59e5d90e
+[medqa] Started evaluating prompt 59e5d90e
+[medqa] Prompt 59e5d90e: 100/100 samples
+[medqa] Finished prompt 59e5d90e
+[medqa] Finished prompt 59e5d90e in 19.1s (65/100)
+[medqa] Evaluating prompt da9adf1d
+[medqa] Started evaluating prompt da9adf1d
+[medqa] Prompt da9adf1d: 100/100 samples
+[medqa] Finished prompt da9adf1d
+[medqa] Finished prompt da9adf1d in 19.2s (70/100)
+[medqa] Evaluating prompt ef759b6c
+[medqa] Started evaluating prompt ef759b6c
+[medqa] Prompt ef759b6c: 100/100 samples
+[medqa] Finished prompt ef759b6c
+[medqa] Finished prompt ef759b6c in 44.5s (66/100)
+[medqa] Evaluating prompt ae4fb859
+[medqa] Started evaluating prompt ae4fb859
+[medqa] Prompt ae4fb859: 100/100 samples
+[medqa] Finished prompt ae4fb859
+[medqa] Finished prompt ae4fb859 in 19.6s (65/100)
+[medqa] Evaluating prompt 1edae25f
+[medqa] Started evaluating prompt 1edae25f
+[medqa] Prompt 1edae25f: 100/100 samples
+[medqa] Finished prompt 1edae25f
+[medqa] Finished prompt 1edae25f in 19.7s (63/100)
+[medqa] Evaluating prompt 1c1189fe
+[medqa] Started evaluating prompt 1c1189fe
+[medqa] Prompt 1c1189fe: 100/100 samples
+[medqa] Finished prompt 1c1189fe
+[medqa] Finished prompt 1c1189fe in 19.7s (66/100)
+[medqa] Evaluating prompt 71952f04
+[medqa] Started evaluating prompt 71952f04
+[medqa] Prompt 71952f04: 100/100 samples
+[medqa] Finished prompt 71952f04
+[medqa] Finished prompt 71952f04 in 119.4s (66/100)
+[medqa] Evaluating prompt 6687d110
+[medqa] Started evaluating prompt 6687d110
+[medqa] Prompt 6687d110: 100/100 samples
+[medqa] Finished prompt 6687d110
+[medqa] Finished prompt 6687d110 in 19.7s (66/100)
+Broadcast completed in 5007.01s | workers=3 | hospitals=3
+Broadcast complete.
+Federated evaluation complete.
+Evaluation complete | Best fitness: 0.7036
+Selected 2 elites.
+Generating offspring...
+Generating 18 offspring...
+Generated offspring 1/18
+Generated offspring 2/18
+Generated offspring 3/18
+Generated offspring 4/18
+Generated offspring 5/18
+Generated offspring 6/18
+Generated offspring 7/18
+Generated offspring 8/18
+Generated offspring 9/18
+Generated offspring 10/18
+Generated offspring 11/18
+Generated offspring 12/18
+Generated offspring 13/18
+Generated offspring 14/18
+Generated offspring 15/18
+Generated offspring 16/18
+Generated offspring 17/18
+Generated offspring 18/18
+Offspring generation complete.
+Generated 18 offspring.
+Saving generation snapshot...
+Building next population...
+Saving population checkpoint...
+Generation 1 completed in 5103.43 seconds.
+
+================================================================================
+Generation 2/20
+================================================================================
+Evaluating population...
+Evaluating 20 prompts...
+Federated evaluation: 20 prompts across 3 hospitals.
+Cache hits: 2 | Need evaluation: 18
+[medqa] Evaluating prompt 14b012be
+[pubmedqa] Evaluating prompt 14b012be
+[medqa] Started evaluating prompt 14b012be
+[pubmedqa] Started evaluating prompt 14b012be
+[medmcqa] Evaluating prompt 14b012be
+[medmcqa] Started evaluating prompt 14b012be
+[medqa] Prompt 14b012be: 100/100 samples
+[medmcqa] Prompt 14b012be: 100/100 samples
+[medqa] Finished prompt 14b012be
+[medqa] Finished prompt 14b012be in 121.1s (65/100)
+[medqa] Evaluating prompt 675ac743
+[medqa] Started evaluating prompt 675ac743
+[pubmedqa] Prompt 14b012be: 100/100 samples
+[medmcqa] Finished prompt 14b012be
+[medmcqa] Finished prompt 14b012be in 121.5s (62/100)
+[medmcqa] Evaluating prompt 675ac743
+[medmcqa] Started evaluating prompt 675ac743
+[pubmedqa] Finished prompt 14b012be
+[pubmedqa] Finished prompt 14b012be in 122.3s (82/100)
+[pubmedqa] Evaluating prompt 675ac743
+[pubmedqa] Started evaluating prompt 675ac743

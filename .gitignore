@@ -30,8 +30,6 @@ logs/
 *.log
 *.pdf
 *.tex
-__init__.py
-
 # Notebook
 .ipynb_checkpoints/
 

@@ -247,7 +247,7 @@ TOP_CHILDREN_TO_KEEP = 5
 #   - "secure_agg": Additive secret sharing, server un-masks after collection
 #   - Combined: Apply both (order matters - first in string = first applied)
 # ============================================================================
-PRIVACY_MODE = "dp"
+PRIVACY_MODE = "secure_agg"
 DP_EPSILON = 1.0
 DP_SENSITIVITY = None  # None = auto-compute as 1/EVALUATION_SUBSET_SIZE
 SECURE_AGG_RANDOM_SEED = None

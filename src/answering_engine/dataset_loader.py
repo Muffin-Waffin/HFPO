@@ -26,11 +26,13 @@ what is appropriate for paper benchmarking:
 
 from __future__ import annotations
 
+import random
 from typing import Any
 
 from datasets import Dataset
 
 from src.data.loader import load_dataset as _load_dataset
+from configs.config import RANDOM_SEED, EVALUATION_SUBSET_SIZE
 
 
 # Canonical set of datasets known to the existing data package.
@@ -64,7 +66,48 @@ class DatasetLoader:
     """
 
     @staticmethod
-    def load(name: str, split: str | None = None) -> Dataset:
+    def _compute_ga_training_indices(dataset_length: int) -> set[int]:
+        """Reproduces the exact index set the GA loop excluded for training.
+
+        Must replicate experiments/run_evolution.py's subsetting logic
+        EXACTLY, including its guard condition, so the excluded set is
+        guaranteed identical to what the GA actually trained on:
+
+            if dataset_length > EVALUATION_SUBSET_SIZE:
+                random.seed(RANDOM_SEED)
+                return set(random.sample(range(dataset_length), EVALUATION_SUBSET_SIZE))
+            else:
+                return set()   # GA used the full dataset, nothing to exclude
+
+        Import RANDOM_SEED and EVALUATION_SUBSET_SIZE from configs.config
+        — do NOT hardcode 51 or 100 as literals here. If either constant
+        is renamed or missing from configs.config, let the resulting
+        AttributeError/ImportError propagate; do not catch it or fall back
+        to a hardcoded default, since a silent fallback could quietly
+        recreate this exact contamination bug if config.py ever changes.
+
+        Args:
+            dataset_length: The full length of the dataset the GA loop
+                would have loaded (before any subsetting).
+
+        Returns:
+            The set of integer indices the GA loop excluded from training
+            and reserved implicitly for its own 100-sample evaluation
+            subset. Empty set if the GA loop would not have subsetted at
+            all (dataset_length <= EVALUATION_SUBSET_SIZE).
+        """
+        if dataset_length > EVALUATION_SUBSET_SIZE:
+            random.seed(RANDOM_SEED)
+            return set(random.sample(range(dataset_length), EVALUATION_SUBSET_SIZE))
+        else:
+            return set()
+
+    @staticmethod
+    def load(
+        name: str,
+        split: str | None = None,
+        exclude_ga_training_subset: bool = True,
+    ) -> Dataset:
         """Load a single dataset by name.
 
         Delegates to ``src.data.loader.load_dataset()`` after
@@ -76,6 +119,17 @@ class DatasetLoader:
             split: Dataset split to load. If ``None``, the default
                 evaluation split for the dataset is used (see
                 ``get_default_split``).
+            exclude_ga_training_subset: If True (default) AND the resolved
+                split is "train" AND name is "pubmedqa", excludes the exact
+                100 rows the GA loop used for prompt selection, so the
+                returned dataset is genuinely held-out rather than partially
+                overlapping with GA training data. Has no effect for medqa or
+                medmcqa (their default splits never overlap with the GA loop's
+                "train" split in the first place), and no effect if the
+                resolved split for pubmedqa is anything other than "train".
+                Set to False only if you deliberately want the raw,
+                potentially-contaminated pubmedqa split (e.g. for debugging
+                or reproducing the original in-sample number).
 
         Returns:
             A Hugging Face ``Dataset`` object with samples in the
@@ -94,13 +148,26 @@ class DatasetLoader:
         if split is None:
             split = DatasetLoader.get_default_split(name)
 
-        return _load_dataset(name, split=split)
+        dataset = _load_dataset(name, split=split)
+
+        if exclude_ga_training_subset and name == "pubmedqa" and split == "train":
+            excluded_indices = DatasetLoader._compute_ga_training_indices(len(dataset))
+            if excluded_indices:
+                held_out_indices = [i for i in range(len(dataset)) if i not in excluded_indices]
+                dataset = dataset.select(held_out_indices)
+                print(
+                    f"pubmedqa: excluded {len(excluded_indices)} GA-training rows, "
+                    f"{len(held_out_indices)} held-out rows remain."
+                )
+
+        return dataset
 
     @staticmethod
     def load_multiple(
         names: list[str],
         split: str | None = None,
         split_overrides: dict[str, str] | None = None,
+        exclude_ga_training_subset: bool = True,
     ) -> dict[str, Dataset]:
         """Load multiple datasets by name.
 
@@ -116,6 +183,9 @@ class DatasetLoader:
             split_overrides: Optional per-dataset split overrides.
                 Keys are dataset names, values are split names.
                 Takes precedence over ``split``.
+            exclude_ga_training_subset: If True (default), excludes the
+                GA training subset for pubmedqa when the resolved split
+                is "train" (same behavior as ``load()``).
 
         Returns:
             A dictionary mapping each normalized dataset name to its
@@ -131,7 +201,7 @@ class DatasetLoader:
             normalized = name.lower().strip()
             effective_split = split_overrides.get(normalized, split)
             datasets[normalized] = DatasetLoader.load(
-                normalized, split=effective_split
+                normalized, split=effective_split, exclude_ga_training_subset=exclude_ga_training_subset
             )
         return datasets
 

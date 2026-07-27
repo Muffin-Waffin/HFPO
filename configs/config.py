@@ -214,7 +214,7 @@ DATASET_SPLIT = "train"   # CHANGE: Dataset split for evaluation
 #   - Tournament selection implementation details
 # ============================================================================
 GA_POPULATION_SIZE = 20
-GA_GENERATIONS = 20
+GA_GENERATIONS = 10
 GA_MUTATION_RATE = 0.35
 GA_CROSSOVER_RATE = 0.65
 GA_TOURNAMENT_SIZE = 3

@@ -99,11 +99,11 @@ k
 | MedQA | 68.0% |
 | PubMedQA | 87.0% |
 | MedMCQA | 64.0% |
-| **Aggregate** | **73.0%** |
+| **Aggregate** | **73.0%** 
 
 ---
 
-## Experiment 4 — Centralized vs. Federated Evaluation Ablation
+##  Centralized vs. Federated Evaluation Ablation
 
 | Condition | MedQA | PubMedQA | MedMCQA | Aggregate | Notes |
 |---|---|---|---|---|---|
@@ -159,13 +159,13 @@ Best-evolved prompt from primary run, evaluated (inference-only) on datasets it 
 
 ---
 
-## Experiment 9 — Multi-Model Comparison
+## Multi-Model Comparison
 
 | Model | Zero-shot (Expert) | Zero-shot (CoT) | Best Evolved (HFPO) | Absolute Gain (vs CoT) | Generation of Best Prompt |
 |---|---|---|---|---|---|
 | Qwen3-8B | — | — | — | — | — |
-| Meditron3-8B | — | — | — | — | — |
-| Llama-3.1-8B | — | — | — | — | — |
+| PHI-4-14b | — | — | — | — | — |
+| GPT-OSS-20b | — | — | — | — | — |
 
 *(Figure: best fitness vs. generation, one curve per model.)*
 *(Optional Figure: population diversity vs. generation, one curve per model — requires diversity metric logging.)*
@@ -246,10 +246,10 @@ Best-evolved prompt from primary run, evaluated (inference-only) on datasets it 
 | Zero-shot (CoT) | — | — | — | — |
 | Random search (compute-matched) | — | — | — | — |
 | Vanilla EvoPrompt (centralized) | — | — | — | — |
-| HFPO — centralized eval | — | — | — | — |
-| HFPO — federated, no privacy | — | — | — | — |
-| HFPO — federated, DP (ε = ___) | — | — | — | — |
 | HFPO — federated, secure agg | — | — | — | — |
+<!-- | HFPO — centralized eval | — | — | — | — | -->
+<!-- | HFPO — federated, no privacy | — | — | — | — | -->
+<!-- | HFPO — federated, DP (ε = ___) | — | — | — | — | -->
 
 ---
 

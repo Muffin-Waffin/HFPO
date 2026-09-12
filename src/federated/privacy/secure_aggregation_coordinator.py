@@ -49,7 +49,9 @@ class SecureAggregationCoordinator:
 
     __slots__ = ("_hospital_ids", "_hospital_set", "_pair_masks", "_lock", "_rng")
 
-    def __init__(self, hospital_ids: Sequence[str]) -> None:
+    def __init__(
+        self, hospital_ids: Sequence[str], random_seed: int | None = None
+    ) -> None:
         """Initialize the coordinator with a fixed set of hospital IDs.
 
         Args:
@@ -57,6 +59,8 @@ class SecureAggregationCoordinator:
                 participate in every round.  Stored as a
                 deterministically sorted tuple — sort order defines
                 which side of each pair receives ``+mask`` vs ``-mask``.
+            random_seed: Optional seed for reproducible mask generation.
+                None (default) uses non-deterministic randomness.
 
         Raises:
             ValueError: If ``hospital_ids`` has fewer than 2 entries or
@@ -80,7 +84,7 @@ class SecureAggregationCoordinator:
         self._pair_masks: dict[str, dict[tuple[str, str], float]] = {}
 
         self._lock = threading.Lock()
-        self._rng = random.Random()  # unseeded → non-deterministic by default
+        self._rng = random.Random(random_seed)
 
     # ------------------------------------------------------------------
     # Public API

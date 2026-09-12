@@ -54,7 +54,7 @@ from src.evolution.tournament_selector import TournamentSelector
 from src.federated.aggregator import Aggregator
 from src.federated.federated_server import FederatedServer
 from src.federated.hospital_client import HospitalClient
-from src.federated.privacy import create_privacy_mechanism
+from src.federated.privacy import create_privacy_mechanism, create_secure_agg_coordinator
 from src.llms.loader import load_model
 from src.evolution.prompt_generator.candidate_parser import CandidateParser
 from src.evolution.prompt_generator.similarity_selector import (
@@ -326,26 +326,30 @@ def main() -> None:
     dp_sensitivity = getattr(config, "DP_SENSITIVITY", None)
     secure_agg_seed = getattr(config, "SECURE_AGG_RANDOM_SEED", None)
 
-    # Hospital-side mechanism (applied locally at each hospital)
-    hospital_privacy = create_privacy_mechanism(
-        privacy_mode,
-        epsilon=dp_epsilon,
-        sensitivity=dp_sensitivity,
-        random_seed=config.RANDOM_SEED,
-    )
-    # Server-side mechanism (for SecureAgg unmasking)
-    server_privacy = create_privacy_mechanism(
-        privacy_mode,
-        epsilon=dp_epsilon,
-        sensitivity=dp_sensitivity,
-        random_seed=secure_agg_seed,
-    )
+    # Detect if mode includes secure_agg (reuse combined-mode logic)
+    def _mode_includes_secure_agg(mode: str) -> bool:
+        mode = mode.lower().strip().replace(" ", "")
+        parts = []
+        if "+" in mode or "," in mode:
+            sep = "+" if "+" in mode else ","
+            parts = [p.strip() for p in mode.split(sep) if p.strip()]
+        else:
+            parts = [mode]
+        return any(p in ("secure_agg", "secure_aggregation", "secureagg", "sa") for p in parts)
+
+    # Shared coordinator for secure_agg modes (created once per run)
+    coordinator = None
+    if _mode_includes_secure_agg(privacy_mode):
+        coordinator = create_secure_agg_coordinator(
+            HOSPITAL_DATASET_NAMES,
+            random_seed=secure_agg_seed,
+        )
 
     print(f"Privacy mode: {privacy_mode}")
     if privacy_mode == "dp":
         print(f"  DP epsilon: {dp_epsilon}, sensitivity: {dp_sensitivity or 'auto (1/subset_size)'}")
-    elif privacy_mode == "secure_agg":
-        print(f"  SecureAgg: enabled")
+    elif _mode_includes_secure_agg(privacy_mode):
+        print(f"  SecureAgg: enabled (coordinator shared across {len(HOSPITAL_DATASET_NAMES)} hospitals)")
 
     import random
     hospitals = []
@@ -368,6 +372,16 @@ def main() -> None:
 
         print(f"{dataset_name}: using {len(dataset)} evaluation samples")
 
+        # Per-hospital privacy mechanism (shares coordinator for secure_agg modes)
+        hospital_privacy = create_privacy_mechanism(
+            privacy_mode,
+            epsilon=dp_epsilon,
+            sensitivity=dp_sensitivity,
+            random_seed=config.RANDOM_SEED,
+            coordinator=coordinator,
+            hospital_id=dataset_name,
+        )
+
         hospitals.append(
             HospitalClient(
                 hospital_id=dataset_name,
@@ -383,6 +397,16 @@ def main() -> None:
     aggregator = Aggregator()
     evaluation_cache = EvaluationCache()
     lineage_tracker = LineageTracker()
+
+    # Server-side privacy mechanism (shares coordinator for secure_agg modes)
+    server_privacy = create_privacy_mechanism(
+        privacy_mode,
+        epsilon=dp_epsilon,
+        sensitivity=dp_sensitivity,
+        random_seed=secure_agg_seed,
+        coordinator=coordinator,
+        hospital_id=None,
+    )
 
     federated_server = FederatedServer(
         hospitals=hospitals,

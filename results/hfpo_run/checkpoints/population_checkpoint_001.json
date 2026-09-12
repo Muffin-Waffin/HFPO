@@ -1,14 +1,14 @@
-{
+
     "candidates": [
         {
             "ancestry_ids": [],
             "fitness": {
-                "medmcqa": 0.6912222223075493,
-                "medqa": 0.6853482410593792,
-                "pubmedqa": 0.7343239159871411
+                "medmcqa": 0.7024444446150986,
+                "medqa": 0.7106964821187585,
+                "pubmedqa": 0.7686478319742823
             },
             "generation": 0,
-            "id": "eafcf215-39ed-43cf-99dd-024b6a6c7555",
+            "id": "e5e9d6a1-6c2e-4954-b2fd-375faac2871c",
             "metadata": {
                 "evaluation_predictions": {
                     "medmcqa": [
@@ -326,12 +326,12 @@
         {
             "ancestry_ids": [],
             "fitness": {
-                "medmcqa": 0.7102613889937948,
-                "medqa": 0.6667210992703786,
-                "pubmedqa": 0.7018889762801196
+                "medmcqa": 0.6637779525602393,
+                "medqa": 0.7705227779875895,
+                "pubmedqa": 0.6934421985407571
             },
             "generation": 0,
-            "id": "bfb45ace-22ff-42a7-a27c-4c73923da4ae",
+            "id": "81aefb39-8e1a-4ecb-a841-c033d4e684d2",
             "metadata": {
                 "evaluation_predictions": {
                     "medmcqa": [
@@ -648,80 +648,103 @@
         },
         {
             "ancestry_ids": [
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
+                "4f3ce067-52a4-432c-bbcb-c843d3d6221b",
+                "81aefb39-8e1a-4ecb-a841-c033d4e684d2"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "14b012be-670f-4909-b3de-8448c23d0b44",
+            "id": "4674710d-adb0-44ab-9928-4743f354ccf4",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 12443.433264000305,
+                "generation_time_ms": 8698.511091,
                 "generator": "_QwenReasoningLLM",
-                "mutation_operator": "f201d3c3-338e-48a1-8e98-daea2139a721",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "4f3ce067-52a4-432c-bbcb-c843d3d6221b",
+                "81aefb39-8e1a-4ecb-a841-c033d4e684d2"
+            ],
+            "text": "Choose the option that best reflects the standard of care in clinical practice. Your response should demonstrate a clear understanding of the key diagnostic or therapeutic principles."
+        },
+        {
+            "ancestry_ids": [
+                "d4b84d95-b291-48e5-b3ba-4145450b35d8",
+                "f216fb2e-e474-4595-a8b8-9db4e39530f3"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "b2a413ac-535a-452f-a26f-29bb04c201c6",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 3850.2986699995745,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "d4b84d95-b291-48e5-b3ba-4145450b35d8",
+                "f216fb2e-e474-4595-a8b8-9db4e39530f3"
+            ],
+            "text": "Use succinct logic to identify the best choice without unnecessary elaboration."
+        },
+        {
+            "ancestry_ids": [
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "4abe1ea3-aca9-4085-9a5c-4c5e904a7824",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 5837.4177959994995,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "d8b79327-32ae-43d2-8b4c-1cf40e2968a3",
                 "temperature": 0.2,
                 "template_used": "mutation"
             },
             "origin": "mutation",
             "parent_ids": [
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c"
             ],
-            "text": "Frame your reasoning around the most efficient path to the correct answer. Avoid excessive analysis and focus on the key differentiating features among the options."
+            "text": "Consider the differential diagnosis by prioritizing the most clinically relevant findings. Avoid overemphasizing minor or atypical features."
         },
         {
             "ancestry_ids": [
-                "bfb45ace-22ff-42a7-a27c-4c73923da4ae",
-                "04dde3dd-9e73-43f9-b6ef-67f8fb5665e9"
+                "35177431-b893-4701-97f7-cb33c5d75ea1"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "675ac743-39d4-4445-8df3-76e0dda64f63",
+            "id": "de4874ff-567a-47b8-beeb-9897ebc2055e",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 3761.2244749998354,
+                "generation_time_ms": 3945.2623520001,
                 "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "bfb45ace-22ff-42a7-a27c-4c73923da4ae",
-                "04dde3dd-9e73-43f9-b6ef-67f8fb5665e9"
-            ],
-            "text": "Apply your understanding of medical principles to identify the correct answer."
-        },
-        {
-            "ancestry_ids": [
-                "da9adf1d-7f1b-4764-9607-564b55fc8c67"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "9ff4e848-6848-4b17-997d-733cda9fc666",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 5594.3022100000235,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "6ba79343-2f6f-4634-a9d6-7b598448c9d7",
+                "mutation_operator": "c7485dd0-4fed-45df-b8ab-251c65207f14",
                 "temperature": 0.2,
                 "template_used": "mutation"
             },
             "origin": "mutation",
             "parent_ids": [
-                "da9adf1d-7f1b-4764-9607-564b55fc8c67"
+                "35177431-b893-4701-97f7-cb33c5d75ea1"
             ],
-            "text": "Select the best answer by identifying the key clinical feature or rule that determines the correct choice, without overcomplicating the reasoning."
+            "text": "Determine the correct response by focusing on the most direct and supported option."
         },
         {
             "ancestry_ids": [
-                "eafcf215-39ed-43cf-99dd-024b6a6c7555",
-                "554a582c-d4e6-4064-b47e-4e3eeebe155f"
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c",
+                "f216fb2e-e474-4595-a8b8-9db4e39530f3"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "e2b5a590-fe32-4a6f-b9f2-80df91ed126a",
+            "id": "8556ebc3-3430-4336-b8d3-d510eeee4f0c",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 6049.62556099963,
+                "generation_time_ms": 3662.169769000684,
                 "generator": "_QwenReasoningLLM",
                 "mutation_operator": "crossover",
                 "temperature": 0.2,
@@ -729,43 +752,135 @@
             },
             "origin": "crossover",
             "parent_ids": [
-                "eafcf215-39ed-43cf-99dd-024b6a6c7555",
-                "554a582c-d4e6-4064-b47e-4e3eeebe155f"
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c",
+                "f216fb2e-e474-4595-a8b8-9db4e39530f3"
             ],
-            "text": "Prioritize identifying the key diagnostic features, then use this understanding to eliminate distractors that lack these essential elements."
+            "text": "Analyze the question efficiently and choose the most direct response."
         },
         {
             "ancestry_ids": [
-                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
+                "4f3ce067-52a4-432c-bbcb-c843d3d6221b",
+                "30becd09-ee28-4a88-b912-ba62fae70288"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "226fd792-448a-4a68-98db-36aa4a105dd7",
+            "id": "512da9b3-356f-4e93-b63a-d4a9631626fd",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 5652.1470560001035,
+                "generation_time_ms": 5165.152734999538,
                 "generator": "_QwenReasoningLLM",
-                "mutation_operator": "f201d3c3-338e-48a1-8e98-daea2139a721",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "4f3ce067-52a4-432c-bbcb-c843d3d6221b",
+                "30becd09-ee28-4a88-b912-ba62fae70288"
+            ],
+            "text": "Focus on the most reliable evidence and apply it swiftly to guide clinical judgment in a way that prioritizes patient well-being."
+        },
+        {
+            "ancestry_ids": [
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c",
+                "d4b84d95-b291-48e5-b3ba-4145450b35d8"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "fd589ba0-a42c-4f1e-897a-839cc29d9b92",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 4323.631435999232,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c",
+                "d4b84d95-b291-48e5-b3ba-4145450b35d8"
+            ],
+            "text": "Choose the correct response by integrating your medical knowledge with a careful review of the question's context."
+        },
+        {
+            "ancestry_ids": [
+                "7f48cad7-1f60-4bfe-a376-5c7d4457ae15",
+                "4f3ce067-52a4-432c-bbcb-c843d3d6221b"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "b3d6bdc6-df74-4dff-bbbd-e05c31be714e",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 5457.725577000019,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "7f48cad7-1f60-4bfe-a376-5c7d4457ae15",
+                "4f3ce067-52a4-432c-bbcb-c843d3d6221b"
+            ],
+            "text": "Consider the question as a real-world clinical scenario. Select the best answer based on your understanding of medical principles and standard practice."
+        },
+        {
+            "ancestry_ids": [
+                "7f48cad7-1f60-4bfe-a376-5c7d4457ae15",
+                "d4b84d95-b291-48e5-b3ba-4145450b35d8"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "2807e12a-2dda-416f-89b7-5b5cd1dc610c",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 3611.427501000435,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "7f48cad7-1f60-4bfe-a376-5c7d4457ae15",
+                "d4b84d95-b291-48e5-b3ba-4145450b35d8"
+            ],
+            "text": "Think critically and choose the best response based on your understanding of medical principles."
+        },
+        {
+            "ancestry_ids": [
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "4939a5ee-fd88-4f79-8f51-062cd906e6e8",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 6636.2684290006655,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "d8b79327-32ae-43d2-8b4c-1cf40e2968a3",
                 "temperature": 0.2,
                 "template_used": "mutation"
             },
             "origin": "mutation",
             "parent_ids": [
-                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c"
             ],
-            "text": "Use the process of elimination by focusing on the answer that introduces the most contradiction with the given clinical findings."
+            "text": "Consider the answer choices as potential diagnoses and work backward. Which option contains the most precise and non-overlapping clinical feature that uniquely identifies the correct answer?"
         },
         {
             "ancestry_ids": [
-                "da9adf1d-7f1b-4764-9607-564b55fc8c67",
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
+                "d4b84d95-b291-48e5-b3ba-4145450b35d8",
+                "4f3ce067-52a4-432c-bbcb-c843d3d6221b"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "158929e8-7ff9-489f-94da-0a06a2b70c90",
+            "id": "79fce17f-2038-4389-b350-7bd163550d49",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 5052.69489300008,
+                "generation_time_ms": 4040.5703369997354,
                 "generator": "_QwenReasoningLLM",
                 "mutation_operator": "crossover",
                 "temperature": 0.2,
@@ -773,284 +888,165 @@
             },
             "origin": "crossover",
             "parent_ids": [
-                "da9adf1d-7f1b-4764-9607-564b55fc8c67",
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
+                "d4b84d95-b291-48e5-b3ba-4145450b35d8",
+                "4f3ce067-52a4-432c-bbcb-c843d3d6221b"
             ],
-            "text": "Answer with the clarity and precision required in a medical licensing setting. Choose one option only."
+            "text": "Apply your clinical judgment to select the most accurate response from the options provided."
         },
         {
             "ancestry_ids": [
-                "36cd914d-586b-4380-b954-8b05eb634b66",
-                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
+                "12e5fea7-0ae0-455e-abea-1c843dea934a"
             ],
             "fitness": null,
             "generation": 1,
-            "id": "751e4fab-b523-4dfb-8f6c-ad84effd3700",
+            "id": "77c4080f-7b93-414c-9829-2b85f328ced4",
             "metadata": {
                 "attempts": 1,
-                "generation_time_ms": 5209.542943999622,
+                "generation_time_ms": 6234.391932000108,
                 "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "36cd914d-586b-4380-b954-8b05eb634b66",
-                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
-            ],
-            "text": "Evaluate each option based on its direct relevance to the patient's condition and its potential to guide effective treatment."
-        },
-        {
-            "ancestry_ids": [
-                "36cd914d-586b-4380-b954-8b05eb634b66",
-                "0a5ea9c0-4367-40a5-a0f4-2fa3c25cacc8"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "60515b7f-a76a-4bf7-95e5-2e68466515e4",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 3754.605220000485,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "36cd914d-586b-4380-b954-8b05eb634b66",
-                "0a5ea9c0-4367-40a5-a0f4-2fa3c25cacc8"
-            ],
-            "text": "Select the best answer by balancing attention to detail with a clear understanding of the question."
-        },
-        {
-            "ancestry_ids": [
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf",
-                "0a5ea9c0-4367-40a5-a0f4-2fa3c25cacc8"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "50d5b835-53fb-4021-84d5-c4c328fdb4a4",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 4609.0042149999135,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf",
-                "0a5ea9c0-4367-40a5-a0f4-2fa3c25cacc8"
-            ],
-            "text": "Treat each multiple-choice item as a diagnostic challenge, prioritizing clarity and precision in your reasoning."
-        },
-        {
-            "ancestry_ids": [
-                "04dde3dd-9e73-43f9-b6ef-67f8fb5665e9",
-                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "f9c63aed-2488-4701-a72d-978b07a52cb7",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 4357.0297850001225,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "04dde3dd-9e73-43f9-b6ef-67f8fb5665e9",
-                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
-            ],
-            "text": "Analyze the key diagnostic clues and choose the best-supported option."
-        },
-        {
-            "ancestry_ids": [
-                "04dde3dd-9e73-43f9-b6ef-67f8fb5665e9",
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "596baa6b-12eb-498a-87e5-69fd9a77d9fc",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 3947.55903999976,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "04dde3dd-9e73-43f9-b6ef-67f8fb5665e9",
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
-            ],
-            "text": "Approach each question as if you are preparing for a high-stakes certification exam."
-        },
-        {
-            "ancestry_ids": [
-                "cbfa56ac-6570-443e-84fe-54e35e40cd4e",
-                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "7895eb83-39cb-4717-8e2f-454a36208915",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 4283.949068999391,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "cbfa56ac-6570-443e-84fe-54e35e40cd4e",
-                "eafcf215-39ed-43cf-99dd-024b6a6c7555"
-            ],
-            "text": "Analyze the essential clinical clues and make your selection based strictly on what is presented."
-        },
-        {
-            "ancestry_ids": [
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf",
-                "554a582c-d4e6-4064-b47e-4e3eeebe155f"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "0716bc1f-e3d2-422e-b00e-f31a688e7133",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 5680.739721999998,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf",
-                "554a582c-d4e6-4064-b47e-4e3eeebe155f"
-            ],
-            "text": "Analyze the question by first identifying the key diagnostic or therapeutic clue, then using that to eliminate distractors and select the best response."
-        },
-        {
-            "ancestry_ids": [
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf",
-                "36cd914d-586b-4380-b954-8b05eb634b66"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "aa4ef55c-365e-4a2e-84c9-89ea94cb3304",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 5858.269112999551,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf",
-                "36cd914d-586b-4380-b954-8b05eb634b66"
-            ],
-            "text": "Focus on the core clinical implications of each option, always considering how your choice directly impacts patient care and reflects the standards expected in a professional medical setting."
-        },
-        {
-            "ancestry_ids": [
-                "6687d110-96c0-4a31-a6c1-d1cc4c663ddd",
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "937ac387-0a90-4e8f-a312-5051f9d4d58f",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 4288.734407000447,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "6687d110-96c0-4a31-a6c1-d1cc4c663ddd",
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
-            ],
-            "text": "Approach each question as a critical thinking exercise, focusing on the best possible clinical judgment."
-        },
-        {
-            "ancestry_ids": [
-                "eafcf215-39ed-43cf-99dd-024b6a6c7555",
-                "bfb45ace-22ff-42a7-a27c-4c73923da4ae"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "5c1a9d7b-af63-4ecd-8c4e-6607fb075095",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 4661.397968000529,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "eafcf215-39ed-43cf-99dd-024b6a6c7555",
-                "bfb45ace-22ff-42a7-a27c-4c73923da4ae"
-            ],
-            "text": "Identify the correct answer by prioritizing the most direct and evidence-based interpretation of the given data."
-        },
-        {
-            "ancestry_ids": [
-                "bfb45ace-22ff-42a7-a27c-4c73923da4ae",
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "09b25bbf-b148-4008-94f4-7c337fa58d1f",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 5203.2477499997185,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "crossover",
-                "temperature": 0.2,
-                "template_used": "crossover"
-            },
-            "origin": "crossover",
-            "parent_ids": [
-                "bfb45ace-22ff-42a7-a27c-4c73923da4ae",
-                "0d06c4d2-1f31-41dc-ac63-3058b92ffaaf"
-            ],
-            "text": "You are to select the most accurate and clinically appropriate response from the options provided. Focus on the best answer based on established medical knowledge."
-        },
-        {
-            "ancestry_ids": [
-                "cbfa56ac-6570-443e-84fe-54e35e40cd4e"
-            ],
-            "fitness": null,
-            "generation": 1,
-            "id": "9cbafd64-c415-429c-aeb6-12a76bafe538",
-            "metadata": {
-                "attempts": 1,
-                "generation_time_ms": 5888.452750000397,
-                "generator": "_QwenReasoningLLM",
-                "mutation_operator": "f201d3c3-338e-48a1-8e98-daea2139a721",
+                "mutation_operator": "d8b79327-32ae-43d2-8b4c-1cf40e2968a3",
                 "temperature": 0.2,
                 "template_used": "mutation"
             },
             "origin": "mutation",
             "parent_ids": [
-                "cbfa56ac-6570-443e-84fe-54e35e40cd4e"
+                "12e5fea7-0ae0-455e-abea-1c843dea934a"
             ],
-            "text": "Use the information provided to select the most accurate answer. Focus on identifying the key diagnostic clue that directly supports the correct choice."
+            "text": "Analyze the question and answer choices using a single, focused line of reasoning. Select the most direct and logically consistent option based on the information given."
+        },
+        {
+            "ancestry_ids": [
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "ddff546f-76b7-4dbc-801e-1b28a5599c4c",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 5321.902777000105,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "81691e49-1496-4a54-ad4b-58d5833ea9e5",
+                "temperature": 0.2,
+                "template_used": "mutation"
+            },
+            "origin": "mutation",
+            "parent_ids": [
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c"
+            ],
+            "text": "Select the best answer by identifying the single most critical finding that differentiates the correct option from the others."
+        },
+        {
+            "ancestry_ids": [
+                "d4b84d95-b291-48e5-b3ba-4145450b35d8",
+                "35177431-b893-4701-97f7-cb33c5d75ea1"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "c5d2518d-55f8-4c7c-b911-48ad0d520ebe",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 6570.388283999819,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "d4b84d95-b291-48e5-b3ba-4145450b35d8",
+                "35177431-b893-4701-97f7-cb33c5d75ea1"
+            ],
+            "text": "Use a structured method to evaluate each option. Begin by assessing what each choice implies about the underlying pathophysiology or clinical scenario, then choose the option that best matches the evidence."
+        },
+        {
+            "ancestry_ids": [
+                "4f3ce067-52a4-432c-bbcb-c843d3d6221b",
+                "30becd09-ee28-4a88-b912-ba62fae70288"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "657944f3-728f-44ed-84fd-748b29d1f88a",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 4948.155971999768,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "4f3ce067-52a4-432c-bbcb-c843d3d6221b",
+                "30becd09-ee28-4a88-b912-ba62fae70288"
+            ],
+            "text": "Treat each option as a potential treatment plan, prioritizing the safest and most effective choice for the patient."
+        },
+        {
+            "ancestry_ids": [
+                "0a07c371-601a-4867-a849-446998721398",
+                "4f3ce067-52a4-432c-bbcb-c843d3d6221b"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "95b031a8-8e07-40fa-af58-7aec1ca9c11f",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 3954.258370000389,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "0a07c371-601a-4867-a849-446998721398",
+                "4f3ce067-52a4-432c-bbcb-c843d3d6221b"
+            ],
+            "text": "Select the most clinically appropriate response, demonstrating both knowledge and critical thinking."
+        },
+        {
+            "ancestry_ids": [
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "d5bb6384-00a3-4722-b613-fe1fdd19f774",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 6393.764043000374,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "af66498c-4610-4a0e-bb1a-ea6a999f70b5",
+                "temperature": 0.2,
+                "template_used": "mutation"
+            },
+            "origin": "mutation",
+            "parent_ids": [
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c"
+            ],
+            "text": "When answering, emphasize the most critical clinical findings and restructure your reasoning to place greater weight on the most relevant details. Select the correct option based on this focused approach."
+        },
+        {
+            "ancestry_ids": [
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c",
+                "81aefb39-8e1a-4ecb-a841-c033d4e684d2"
+            ],
+            "fitness": null,
+            "generation": 1,
+            "id": "9ebdb3a1-c5d2-4e2a-8f19-5cb31662f6ab",
+            "metadata": {
+                "attempts": 1,
+                "generation_time_ms": 4538.976934000857,
+                "generator": "_QwenReasoningLLM",
+                "mutation_operator": "crossover",
+                "temperature": 0.2,
+                "template_used": "crossover"
+            },
+            "origin": "crossover",
+            "parent_ids": [
+                "e5e9d6a1-6c2e-4954-b2fd-375faac2871c",
+                "81aefb39-8e1a-4ecb-a841-c033d4e684d2"
+            ],
+            "text": "Identify the single most appropriate response by prioritizing the most direct and relevant information from the question."
         }
     ],
     "generation": 1,

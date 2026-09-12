@@ -16,17 +16,45 @@ Usage:
     from src.federated.privacy import create_privacy_mechanism
 
     mechanism = create_privacy_mechanism("dp", epsilon=1.0)
-    mechanism = create_privacy_mechanism("secure_agg")
+    mechanism = create_privacy_mechanism("secure_agg", coordinator=coordinator, hospital_id="medqa")
     mechanism = create_privacy_mechanism("none")
+
+Factory helpers:
+    create_secure_agg_coordinator(hospital_ids, random_seed=None) -> SecureAggregationCoordinator
+        Creates the one coordinator instance every hospital- and
+        server-side SecureAggregationMechanism for a run must share.
 """
 
 from __future__ import annotations
+
+from typing import Sequence
 
 from src.federated.privacy.composed import ComposedPrivacyMechanism
 from src.federated.privacy.differential_privacy import DifferentialPrivacyMechanism
 from src.federated.privacy.no_privacy import NoPrivacyMechanism
 from src.federated.privacy.secure_aggregation import SecureAggregationMechanism
+from src.federated.privacy.secure_aggregation_coordinator import SecureAggregationCoordinator
 from src.federated.privacy.interfaces import PrivacyMechanism
+
+
+def create_secure_agg_coordinator(
+    hospital_ids: Sequence[str],
+    random_seed: int | None = None,
+) -> SecureAggregationCoordinator:
+    """Creates the one coordinator instance every hospital- and
+    server-side SecureAggregationMechanism for a run must share.
+
+    Args:
+        hospital_ids: The full, fixed set of hospital IDs
+            participating in this run.
+        random_seed: Optional seed for reproducible mask generation,
+            passed through to SecureAggregationCoordinator.
+
+    Returns:
+        A new SecureAggregationCoordinator configured for exactly
+        these hospitals.
+    """
+    return SecureAggregationCoordinator(hospital_ids, random_seed=random_seed)
 
 
 def create_privacy_mechanism(mode: str, **kwargs) -> PrivacyMechanism:
@@ -38,7 +66,7 @@ def create_privacy_mechanism(mode: str, **kwargs) -> PrivacyMechanism:
             - Combined: "dp+secure_agg", "secure_agg+dp", "dp,sa", "sa,dp"
         **kwargs: Mechanism-specific parameters:
             - dp: epsilon (required), sensitivity (optional), clip_scores (bool), random_seed (int)
-            - secure_agg: random_seed (optional)
+            - secure_agg: coordinator (required), hospital_id (optional) for server-side role
             - none: no parameters
 
     Returns:
@@ -78,8 +106,16 @@ def _create_single_mechanism(mode: str, **kwargs) -> PrivacyMechanism:
         )
 
     if mode in ("secure_agg", "secure_aggregation", "secureagg", "sa"):
+        coordinator = kwargs.get("coordinator")
+        if coordinator is None:
+            raise ValueError(
+                "SecureAggregationMechanism requires 'coordinator' parameter "
+                "(create with create_secure_agg_coordinator)"
+            )
+        hospital_id = kwargs.get("hospital_id")
         return SecureAggregationMechanism(
-            random_seed=kwargs.get("random_seed"),
+            coordinator=coordinator,
+            hospital_id=hospital_id,
         )
 
     raise ValueError(
@@ -94,5 +130,7 @@ __all__ = [
     "DifferentialPrivacyMechanism",
     "SecureAggregationMechanism",
     "ComposedPrivacyMechanism",
+    "SecureAggregationCoordinator",
     "create_privacy_mechanism",
+    "create_secure_agg_coordinator",
 ]

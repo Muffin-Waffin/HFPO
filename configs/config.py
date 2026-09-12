@@ -62,7 +62,17 @@
 #   - Increase max_new_tokens = more KV cache = more VRAM per generation
 # ============================================================================
 MODEL_REGISTRY = {
-
+    "4b": {
+            "model_name": "Qwen/Qwen3-4B",              # HF model ID - CHANGE to use different model
+            "load_in_4bit": True,                        # 4-bit quantization (CHANGE only if >24GB VRAM)
+            "quant_type": "nf4",                         # DO NOT CHANGE - nf4 is optimal for 4-bit
+            "compute_dtype": "bfloat16",                  # CHANGE to "bfloat16" only on Ampere+ GPUs
+            "use_double_quant": True,                    # DO NOT CHANGE - saves ~0.5GB VRAM
+            "dtype": "bfloat16",                          # Must match compute_dtype
+            "device_map": "auto",                        # DO NOT CHANGE unless manual GPU mapping
+            "max_new_tokens": 128,                       # CHANGE: Higher = longer output, more VRAM
+            "temperature": 0.2,                          # CHANGE: 0.0=deterministic, 1.0=creative
+    },
     "qwen": {
         "model_name": "Qwen/Qwen3-8B",              # HF model ID - CHANGE to use different model
         "load_in_4bit": True,                        # 4-bit quantization (CHANGE only if >24GB VRAM)
@@ -150,7 +160,7 @@ MODEL_REGISTRY = {
 #   Options: "qwen3-8b", "phi-4", "llama3-8b", "mistral-7b"
 # WHAT NOT TO CHANGE: Must match a key in MODEL_REGISTRY exactly
 # ============================================================================
-DEFAULT_MODEL = "qwen"
+DEFAULT_MODEL = "4b"
 
 # ============================================================================
 # GENERATION PARAMETERS (used as defaults, can be overridden per-experiment)
@@ -247,7 +257,7 @@ TOP_CHILDREN_TO_KEEP = 5
 #   - "secure_agg": Additive secret sharing, server un-masks after collection
 #   - Combined: Apply both (order matters - first in string = first applied)
 # ============================================================================
-PRIVACY_MODE = "dp+secure_agg"
+PRIVACY_MODE = "none"
 DP_EPSILON = 0.5
 DP_SENSITIVITY = None  # None = auto-compute as 1/EVALUATION_SUBSET_SIZE
 SECURE_AGG_RANDOM_SEED = None
